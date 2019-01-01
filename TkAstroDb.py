@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.0.8"
+__version__ = "1.0.9"
 
 import os
 import sys
@@ -66,7 +66,7 @@ for _i in os.listdir(os.getcwd()):
 tree = xml.etree.ElementTree.parse(f"{xml_file}")
 root = tree.getroot()
 
-for _i in range(1000000):
+for _i in range(10):
     try:
         user_data = []
         for gender, roddenrating, bdata, adb_link, categories in zip(
@@ -1167,7 +1167,12 @@ def find_expected_values():
                             )
                     else:
                         style.font = _font_(bold=True)
-                        new_sheet.write(*i[0], i[1], style=style)
+                        if "Orb" in i[1]:
+                            style.alignment = xlwt.Alignment()
+                            new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2, label=i[1], style=style)
+                            style.alignment = alignment
+                        else:
+                            new_sheet.write(*i[0], i[1], style=style)
                         style.font = _font_(bold=False)
                 elif i[1] != "" and j[1] == "":
                     new_sheet.write(*i[0], i[1], style=style)
@@ -1208,7 +1213,12 @@ def find_chi_square_values():
                             new_sheet.write(*i[0], 0, style=style)
                     else:
                         style.font = _font_(bold=True)
-                        new_sheet.write(*i[0], i[1], style=style)
+                        if "Orb" in i[1]:
+                            style.alignment = xlwt.Alignment()
+                            new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2, label=i[1], style=style)
+                            style.alignment = alignment
+                        else:
+                            new_sheet.write(*i[0], i[1], style=style)
                         style.font = _font_(bold=False)
                 elif i[1] != "" and j[1] == "":
                     new_sheet.write(*i[0], i[1], style=style)
@@ -1249,7 +1259,12 @@ def find_effect_size_values():
                             new_sheet.write(*i[0], 0, style=style)
                     else:
                         style.font = _font_(bold=True)
-                        new_sheet.write(*i[0], i[1], style=style)
+                        if "Orb" in i[1]:
+                            style.alignment = xlwt.Alignment()
+                            new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2, label=i[1], style=style)
+                            style.alignment = alignment
+                        else:
+                            new_sheet.write(*i[0], i[1], style=style)
                         style.font = _font_(bold=False)
                 elif i[1] != "" and j[1] == "":
                     new_sheet.write(*i[0], i[1], style=style)
