@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.0.9"
+__version__ = "1.1.0"
 
 import os
 import sys
@@ -712,6 +712,8 @@ opposite = 6
 
 r1, r2 = "", ""
 
+_r1, _r2 = [], []
+
 method, selection = False, False
 
 style = xlwt.XFStyle()
@@ -732,7 +734,7 @@ def get_excel_datas(sheet):
     global r1, r2, selection
     datas = []
     for row in range(sheet.nrows):
-        if selection is False:
+        if selection == "expected":
             if row == 1:
                 r1 += f"{sheet.cell_value(row, 4).split(': ')[1]} / "
             elif row == 2:
@@ -745,7 +747,26 @@ def get_excel_datas(sheet):
                 for col in range(sheet.ncols):
                     if col != 13:
                         datas.append(([row, col], sheet.cell_value(row, col)))
-        elif selection is True:  
+        elif selection == "chisquare" or selection == "effectsize":
+            if row == 1:
+                _r1.append(f"{sheet.cell_value(row, 4).split(': ')[1]}")
+                for i in _r1:
+                    if "/" in i:
+                        r1 = i
+            elif row == 2:
+                _r2.append(f"{sheet.cell_value(row, 4).split(': ')[1]}")
+                for i in _r2:
+                    if "/" in i:
+                        r2 = i
+            elif row == 0 or row == 213 or row == 228 or row == 243 \
+                    or row == 258 or row == 273 or row == 288 or row == 303 \
+                    or row == 318 or row == 333 or row == 348 or row == 363 or row == 378:
+                pass
+            else:
+                for col in range(sheet.ncols):
+                    if col != 13:
+                        datas.append(([row, col], sheet.cell_value(row, col)))
+        elif selection == "observed":  
             if row == 0 or row == 1 or row == 2 or row == 213 or row == 228 or row == 243 \
                     or row == 258 or row == 273 or row == 288 or row == 303 \
                     or row == 318 or row == 333 or row == 348 or row == 363 or row == 378:
@@ -781,12 +802,15 @@ def write_total_vert(sheet, num=4):
 def write_title_of_total(sheet):
     style.font = _font_(bold=True)
     sheet.write_merge(r1=0, r2=0, c1=4, c2=9, label=f"Adb Version: {xml_file.replace('.xml', '')}", style=style)
-    if selection is True:
+    if selection == "observed":
         sheet.write_merge(r1=1, r2=1, c1=4, c2=9, label=f"House System: {house_systems[hsys]}", style=style)
         sheet.write_merge(r1=2, r2=2, c1=4, c2=9, label=f"Rodden Rating: {'+'.join(selected_ratings)}", style=style)
-    elif selection is False:
+    elif selection == "expected":
         sheet.write_merge(r1=1, r2=1, c1=4, c2=9, label=f"House System: {r1[:-3]}", style=style)
         sheet.write_merge(r1=2, r2=2, c1=4, c2=9, label=f"Rodden Rating: {r2[:-3]}", style=style)
+    elif selection == "chisquare" or selection == "effectize":
+        sheet.write_merge(r1=1, r2=1, c1=4, c2=9, label=f"House System: {r1}", style=style)
+        sheet.write_merge(r1=2, r2=2, c1=4, c2=9, label=f"Rodden Rating: {r2}", style=style)
     sheet.write(4, 13, "Total", style=style)
     sheet.write(18, 13, "Total", style=style)
     sheet.write(32, 13, "Total", style=style)
@@ -1054,7 +1078,7 @@ def write_datas_to_excel(get_datas):
 
 def find_observed_values():
     global selection
-    selection = True
+    selection = "observed"
     __size__ = len(displayed_results)
     __received__ = 0
     __now__ = time.time()
@@ -1135,7 +1159,7 @@ def sum_of_row(table):
 
 def find_expected_values():
     global selection
-    selection = False
+    selection = "expected"
     file_name_1 = "table0.xlsx"
     file_name_2 = "table1.xlsx"
     read_file_1 = xlrd.open_workbook(file_name_1)
@@ -1189,7 +1213,7 @@ def find_expected_values():
 
 def find_chi_square_values():
     global selection
-    selection = False
+    selection = "chisquare"
     file_name_1 = "expected_values.xlsx"
     file_name_2 = "observed_values.xlsx"
     read_file_1 = xlrd.open_workbook(file_name_1)
@@ -1235,7 +1259,7 @@ def find_chi_square_values():
 
 def find_effect_size_values():
     global selection
-    selection = False
+    selection = "effectsize"
     file_name_1 = "observed_values.xlsx"
     file_name_2 = "expected_values.xlsx"
     read_file_1 = xlrd.open_workbook(file_name_1)
