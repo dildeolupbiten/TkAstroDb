@@ -66,7 +66,7 @@ for _i in os.listdir(os.getcwd()):
 tree = xml.etree.ElementTree.parse(f"{xml_file}")
 root = tree.getroot()
 
-for _i in range(10):
+for _i in range(1000000):
     try:
         user_data = []
         for gender, roddenrating, bdata, adb_link, categories in zip(
