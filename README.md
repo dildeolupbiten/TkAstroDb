@@ -95,7 +95,7 @@ In order to run **TkAstroDb**, at least Python's 3.6 version must be installed o
 
 ![img15](https://user-images.githubusercontent.com/29302909/50427129-c68e6d80-08b0-11e9-962d-16e25a55570e.png)
 
-## Tables
+## Spreadsheets
 
 **observed_values.xlsx**
 
