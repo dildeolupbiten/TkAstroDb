@@ -25,11 +25,11 @@ In order to run **TkAstroDb**, at least Python's 3.6 version must be installed o
 
 **1.** Run the program as follows. (Users should wait a bit the program to be opened. Because the program will try to find all records and categories from the xml file.)
 
-# For Unix
+### For Unix
 
     python3 TkAstroDb.py
 
-# For Windows
+### For Windows
 
     python TkAstroDb.py
 
