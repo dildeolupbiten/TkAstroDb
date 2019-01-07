@@ -4,11 +4,9 @@ TkAstroDb is a program that uses Astrodatabank (Adb) to conduct statistical stud
 
 If third party users have a license, they should follow the below instructions:
 
-**1.** After got the license and downloaded the database which is in a xml file.
+**1.** After got the license and downloaded the database which is in a xml file, in order to run the program, the xml file has to be in the same directory with **TkAstroDb.py** script file.
 
-**2.** In order to run the program, the xml file has to be in the same directory with **TkAstroDb.py** script file.
-
-**3.** Before running the program make sure that **TkAstroDb** directory tree contains at least the following:
+**2.** Before running the program make sure that **TkAstroDb** directory tree contains at least the following:
 
     TkAstroDb+
              |_Eph+
