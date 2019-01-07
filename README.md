@@ -31,7 +31,7 @@ or if the above command gives an error on Windows, please run the program as fol
 
     python TkAstroDb.py
 
-**Note.** If Windows users get a **Permission Error**  while the installation of **Pyswisseph** library, they should open the **cmd** as Administrator, then they should retype the above commands. Note that the upper directories of **TkAstroDb** directory should not contain spaces.
+**Note:** If Windows users get a **Permission Error**  while the installation of **Pyswisseph** library, they should open the **cmd** as Administrator, then they should retype the above commands. Note that the upper directories of **TkAstroDb** directory should not contain spaces.
 
 **2.** After that, a window should be opened which is similar to the below. 
 
