@@ -1526,8 +1526,8 @@ def main():
     calculations_menu.add_command(label="Find Chi-Square Values", command=func3)
     calculations_menu.add_command(label="Find Effect Size Values", command=func4)
 
-    method_menu.add_command(label="Flavia Minghetti's method", command=set_method_to_true)
-    method_menu.add_command(label="Sjoerd Visser's method", command=set_method_to_false)
+    method_menu.add_command(label="Flavia's method", command=set_method_to_true)
+    method_menu.add_command(label="Sjoerd's method", command=set_method_to_false)
 
     export_menu.add_command(label="Adb Links", command=export)
 
