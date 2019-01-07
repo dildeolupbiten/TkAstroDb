@@ -97,19 +97,19 @@ In order to run **TkAstroDb**, at least Python's 3.6 version must be installed o
 
 ## Screenshots Of Spreadsheet Files
 
-**1. observed_values.xlsx**
+**observed_values.xlsx**
 
 ![im16](https://user-images.githubusercontent.com/29302909/50789196-9ee5cf00-12cc-11e9-978f-e8bc4547a1ed.png)
 
-**2. expected_values.xlsx**
+**expected_values.xlsx**
 
 ![img17](https://user-images.githubusercontent.com/29302909/50789206-a4431980-12cc-11e9-9174-d1c6506ecf02.png)
 
-**3. chi-square.xlsx**
+**chi-square.xlsx**
 
 ![img18](https://user-images.githubusercontent.com/29302909/50789208-a7d6a080-12cc-11e9-8953-9f1adf827f97.png)
 
-**4. effect-size.xlsx**
+**effect-size.xlsx**
 
 ![img19](https://user-images.githubusercontent.com/29302909/50789212-ab6a2780-12cc-11e9-8b84-58a0bd030275.png)
 
