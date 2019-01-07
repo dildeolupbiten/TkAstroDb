@@ -25,19 +25,21 @@ In order to run **TkAstroDb**, at least Python's 3.6 version must be installed o
 
 **1.** Run the program as follows. (Users should wait a bit the program to be opened. Because the program will try to find all records and categories from the xml file.)
 
+# For Unix
+
     python3 TkAstroDb.py
 
-or if the above command gives an error on Windows, please run the program as follows:
+# For Windows
 
     python TkAstroDb.py
 
-**Note:** If Windows users get a **Permission Error**  while the installation of **Pyswisseph** library, they should open the **cmd** as Administrator, then they should retype the above commands. Note that the upper directories of **TkAstroDb** directory should not contain spaces.
+**Note:** When the program first run in Windows, users will get a **Permission Error**  during the installation of **Pyswisseph** library unless they run the **cmd** as Administrator.
 
-**2.** After that, a window should be opened which is similar to the below. 
+**2.** Users should see a window after 10-15 minutes which is similar to the below. 
 
 ![img1](https://user-images.githubusercontent.com/29302909/50402991-0f103300-07ac-11e9-98e1-fab84856cd47.png)
 
-**3.** If users want to add single records to the displayed records according to the selection, they should type the name of the record. For example suppose a user wants to add **Albert Einstein** to the displayed records, the user should write **Einstein, Albert** to the **Search A Record By Name** section. While typing the name, if the record is found, the user can add that record to the treeview by clicking the **Add** button.
+**3.** If users want to add single records to the displayed records according to the selection, they should type the name of the record. For example suppose a user wants to add **Albert Einstein** to the displayed records, the user should write **Einstein, Albert** to the **Search A Record By Name** section. While typing the name, if the record is found, the user will see an **Add** button which is used for adding records to the treeview.
 
 ![img2](https://user-images.githubusercontent.com/29302909/50403025-729a6080-07ac-11e9-85a5-a83d45b76661.png)
 
