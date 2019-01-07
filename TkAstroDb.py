@@ -1180,10 +1180,10 @@ def find_expected_values():
                 if i[1] != "" and j[1] != "":
                     if type(i[1]) == float or type(j[1]) == float:
                         if method is False:
-                            # ganglion's method
+                            # Sjoerd Visser's method
                             new_sheet.write(*i[0], i[1] * ratio, style=style)
                         elif method is True:
-                            # Roland303's method
+                            # Flavia Minghetti's method
                             new_sheet.write(
                                 *i[0],
                                 sum_of_row(data_2) * ((i[1] + j[1]) / sum_of_all * 100) / 100,
@@ -1323,12 +1323,12 @@ def main():
         t4 = threading.Thread(target=find_effect_size_values)
         t4.start()
 
-    def set_method_to_0():
+    def set_method_to_false():
         global method
         method = False
         func2()
 
-    def set_method_to_1():
+    def set_method_to_true():
         global method
         method = True
         func2()
@@ -1526,8 +1526,8 @@ def main():
     calculations_menu.add_command(label="Find Chi-Square Values", command=func3)
     calculations_menu.add_command(label="Find Effect Size Values", command=func4)
 
-    method_menu.add_command(label="ganglion's method", command=set_method_to_0)
-    method_menu.add_command(label="Roland303's method", command=set_method_to_1)
+    method_menu.add_command(label="Flavia Minghetti's method", command=set_method_to_true)
+    method_menu.add_command(label="Sjoerd Visser's method", command=set_method_to_false)
 
     export_menu.add_command(label="Adb Links", command=export)
 
