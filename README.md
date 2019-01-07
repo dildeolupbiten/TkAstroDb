@@ -45,7 +45,7 @@ or if the above command gives an error on Windows, please run the program as fol
 
 **5.** Click **Select** button which is near to **Categories** label. After that a small window should be opened as below. Select one category or more categories to study, then press **Apply** button.
 
-![img5](https://user-images.githubusercontent.com/29302909/50041712-25124b00-006a-11e9-850a-c8b986933512.png)
+![img5](https://user-images.githubusercontent.com/29302909/50767418-d1bca280-128d-11e9-9c30-a7ce39884f35.png)
 
 **6.** Click **Select** button which is near to **Rodden Rating** label. A small window should be opened as below. Select one rating or more ratings then press **Apply** button.
 
