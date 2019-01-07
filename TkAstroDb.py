@@ -1160,8 +1160,8 @@ def sum_of_row(table):
 def find_expected_values():
     global selection
     selection = "expected"
-    file_name_1 = "table0.xlsx"
-    file_name_2 = "table1.xlsx"
+    file_name_1 = "control_group.xlsx"
+    file_name_2 = "observed_values.xlsx"
     read_file_1 = xlrd.open_workbook(file_name_1)
     read_file_2 = xlrd.open_workbook(file_name_2)
     sheet_1 = read_file_1.sheet_by_name("Sheet1")
@@ -1206,7 +1206,7 @@ def find_expected_values():
                     control_list.append(i[0])
                 if j[0] not in control_list:
                     control_list.append(j[0])
-    save_file(new_file, new_sheet, "expected_values")
+    save_file(new_file, new_sheet, "expected_values", "control_group", "observed_values")
     master.update()
     msgbox.showinfo(title="Find Expected Values", message="Process finished successfully.")
 
