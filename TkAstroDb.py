@@ -808,7 +808,7 @@ def write_title_of_total(sheet):
     elif selection == "expected":
         sheet.write_merge(r1=1, r2=1, c1=4, c2=9, label=f"House System: {r1[:-3]}", style=style)
         sheet.write_merge(r1=2, r2=2, c1=4, c2=9, label=f"Rodden Rating: {r2[:-3]}", style=style)
-    elif selection == "chisquare" or selection == "effectize":
+    elif selection == "chisquare" or selection == "effectsize":
         sheet.write_merge(r1=1, r2=1, c1=4, c2=9, label=f"House System: {r1}", style=style)
         sheet.write_merge(r1=2, r2=2, c1=4, c2=9, label=f"Rodden Rating: {r2}", style=style)
     sheet.write(4, 13, "Total", style=style)
