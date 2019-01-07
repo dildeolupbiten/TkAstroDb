@@ -37,7 +37,7 @@ or if the above command gives an error on Windows, please run the program as fol
 
 ![img1](https://user-images.githubusercontent.com/29302909/50402991-0f103300-07ac-11e9-98e1-fab84856cd47.png)
 
-**3.** If users want to add single records to the displayed records according to the selection, they should type the name of the record. For example suppose a user wants to add **Albert Einstein** to the displayed records, the user should write **Einstein, Albert** to the **Search A Record By name** section. While typing the name, if the record is found, the user can add that record to the treeview by clicking the **Add** button.
+**3.** If users want to add single records to the displayed records according to the selection, they should type the name of the record. For example suppose a user wants to add **Albert Einstein** to the displayed records, the user should write **Einstein, Albert** to the **Search A Record By Name** section. While typing the name, if the record is found, the user can add that record to the treeview by clicking the **Add** button.
 
 ![img2](https://user-images.githubusercontent.com/29302909/50403025-729a6080-07ac-11e9-85a5-a83d45b76661.png)
 
