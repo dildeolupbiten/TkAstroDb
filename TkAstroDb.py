@@ -1454,7 +1454,7 @@ def main():
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
         developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
-        thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, ganglion, Roland303"
+        thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
         github, _github = "GitHub:", "https://github.com/dildeolupbiten/TkAstroDb"
         tframe1 = tk.Frame(master=toplevel5, bd="2", relief="groove")
