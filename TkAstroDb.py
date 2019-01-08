@@ -116,7 +116,7 @@ for _i in range(5000):
             if _k[0] == f"{_i}":
                 _records_.append(j_)
                 category_name = _k[1]
-                if category_name == None:
+                if category_name is None:
                     category_name = "No Category Name"
     category_groups[(_i, category_name)] = _records_
     if not _records_:
@@ -1194,7 +1194,8 @@ def find_expected_values():
                         style.font = _font_(bold=True)
                         if "Orb" in i[1]:
                             style.alignment = xlwt.Alignment()
-                            new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2, label=i[1], style=style)
+                            new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
+                                                  label=i[1], style=style)
                             style.alignment = alignment
                         else:
                             new_sheet.write(*i[0], i[1], style=style)
@@ -1240,7 +1241,8 @@ def find_chi_square_values():
                         style.font = _font_(bold=True)
                         if "Orb" in i[1]:
                             style.alignment = xlwt.Alignment()
-                            new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2, label=i[1], style=style)
+                            new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
+                                                  label=i[1], style=style)
                             style.alignment = alignment
                         else:
                             new_sheet.write(*i[0], i[1], style=style)
@@ -1286,7 +1288,8 @@ def find_effect_size_values():
                         style.font = _font_(bold=True)
                         if "Orb" in i[1]:
                             style.alignment = xlwt.Alignment()
-                            new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2, label=i[1], style=style)
+                            new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
+                                                  label=i[1], style=style)
                             style.alignment = alignment
                         else:
                             new_sheet.write(*i[0], i[1], style=style)
