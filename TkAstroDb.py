@@ -575,7 +575,7 @@ rating_button.grid(row=3, column=1, padx=5, pady=5)
 
 
 def create_checkbutton():
-    for i, j in enumerate(("event", "human")):
+    for i, j in enumerate(("event", "human", "male", "female")):
         _var_ = tk.StringVar()
         _var_.set(value="0")
         _checkbutton_ = tk.Checkbutton(
@@ -587,7 +587,8 @@ def create_checkbutton():
         yield _checkbutton_
     
 
-var_checkbutton_1, display_checkbutton_1, var_checkbutton_2, display_checkbutton_2 = create_checkbutton()
+var_checkbutton_1, display_checkbutton_1, var_checkbutton_2, display_checkbutton_2, \
+    var_checkbutton_3, display_checkbutton_3, var_checkbutton_4, display_checkbutton_4 = create_checkbutton()
 
 
 def display_results():
@@ -608,20 +609,70 @@ def display_results():
                             if item[0] == 3546 or item[0] == 68092:
                                 pass
                             else:
-                                control_items.append(item)
-                                treeview.insert("", _num_, values=[col for col in item])
-                                _num_ += 1
-                                displayed_results.append(item)
+                                if var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "0":
+                                    if item[2] == "M":
+                                        pass
+                                    else:
+                                        control_items.append(item)
+                                        treeview.insert("", _num_, values=[col for col in item])
+                                        _num_ += 1
+                                        displayed_results.append(item)
+                                elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "1":
+                                    if item[2] == "F":
+                                        pass
+                                    else:
+                                        control_items.append(item)
+                                        treeview.insert("", _num_, values=[col for col in item])
+                                        _num_ += 1
+                                        displayed_results.append(item)
+                                elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "0":
+                                    control_items.append(item)
+                                    treeview.insert("", _num_, values=[col for col in item])
+                                    _num_ += 1
+                                    displayed_results.append(item)
+                                elif var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "1":
+                                    if item[2] == "F" or item[2] == "M":
+                                        pass
+                                    else:
+                                        control_items.append(item)
+                                        treeview.insert("", _num_, values=[col for col in item])
+                                        _num_ += 1
+                                        displayed_results.append(item)
                         elif var_checkbutton_1.get() == "1" and var_checkbutton_2.get() == "0":
                             if item[2] == "N/A":
                                 pass
                             elif item[0] == 3546:
                                 pass
                             else:
-                                control_items.append(item)
-                                treeview.insert("", _num_, values=[col for col in item])
-                                _num_ += 1
-                                displayed_results.append(item)
+                                if var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "0":
+                                    if item[2] == "M":
+                                        pass
+                                    else:
+                                        control_items.append(item)
+                                        treeview.insert("", _num_, values=[col for col in item])
+                                        _num_ += 1
+                                        displayed_results.append(item)
+                                elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "1":
+                                    if item[2] == "F":
+                                        pass
+                                    else:
+                                        control_items.append(item)
+                                        treeview.insert("", _num_, values=[col for col in item])
+                                        _num_ += 1
+                                        displayed_results.append(item)
+                                elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "0":
+                                    control_items.append(item)
+                                    treeview.insert("", _num_, values=[col for col in item])
+                                    _num_ += 1
+                                    displayed_results.append(item)
+                                elif var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "1":
+                                    if item[2] == "F" or item[2] == "M":
+                                        pass
+                                    else:
+                                        control_items.append(item)
+                                        treeview.insert("", _num_, values=[col for col in item])
+                                        _num_ += 1
+                                        displayed_results.append(item)
                         elif var_checkbutton_1.get() == "0" and var_checkbutton_2.get() == "1":
                             if item[2] != "N/A" or item[0] == 68092:
                                 pass
@@ -678,7 +729,7 @@ treeview.bind("<Button-1>", lambda event: destroy(event))
 treeview.bind("<Button-3>", lambda event: button_3_on_treeview(event))
 
 display_button = tk.Button(master=top_frame, text="Display Records", command=display_results)
-display_button.grid(row=6, column=0, columnspan=2, pady=10)
+display_button.grid(row=8, column=0, columnspan=2, pady=10)
 
 y_scrollbar.configure(command=treeview.yview)
 x_scrollbar = tk.Scrollbar(master=master, orient="horizontal", command=treeview.xview)
