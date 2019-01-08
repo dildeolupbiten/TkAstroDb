@@ -28,10 +28,6 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 ### For Unix
 
     python3 TkAstroDb.py
-    # or
-    chmod +x TkAstroDb.py # (For once)
-    ./TkAstroDb.py
-    
 
 ### For Windows
 
