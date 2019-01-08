@@ -23,7 +23,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ## Usage
 
-**1.** Run the program as follows. (Users should wait a bit the program to be opened. Because the program will try to find all records and categories from the xml file.)
+**1.** Run the program by writing the below to **cmd** for Windows or to **bash** for Unix. (Users should wait a bit the program to be opened. Because the program will try to find all records and categories from the xml file.)
 
 ### For Unix
 
@@ -33,7 +33,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
     python TkAstroDb.py
 
-**Note:** When the program first run in Windows, users will get a **Permission Error**  during the installation of **Pyswisseph** library unless they run the **cmd** as Administrator.
+#### Note: When the program first run in Windows, users will get a **Permission Error**  during the installation of Pyswisseph** library unless they run the **cmd** as Administrator.
 
 **2.** Users should see a window after 10-15 minutes which is similar to below. 
 
