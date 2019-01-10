@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.1.4"
+__version__ = "1.1.5"
 
 import os
 import sys
@@ -67,7 +67,7 @@ for _i in os.listdir(os.getcwd()):
 tree = xml.etree.ElementTree.parse(f"{xml_file}")
 root = tree.getroot()
 
-for _i in range(100000):
+for _i in range(1000000):
     try:
         user_data = []
         for gender, roddenrating, bdata, adb_link, categories in zip(
