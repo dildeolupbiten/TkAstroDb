@@ -1701,11 +1701,11 @@ def main():
             if var_1 == var_3:
                 msgbox.showinfo(title="Update", message="Program is up-to-date.")
             else:
-                with open("README.md", "w", encoding:"utf-8") as g:
+                with open("README.md", "w", encoding="utf-8") as g:
                     for i in var_2:
                         g.write(i)
                         g.flush()
-                with open("TkAstroDb.py", "w", encoding:"utf-8") as h:
+                with open("TkAstroDb.py", "w", encoding="utf-8") as h:
                     for i in var_1:
                         h.write(i)
                         h.flush()
