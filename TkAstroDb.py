@@ -1219,7 +1219,7 @@ def find_observed_values():
         trine, sesquiquadrate, biquintile, quincunx, opposite
     ]
     orb_factor = [str(i) for i in orb_factor]
-    with open("output.log", "w", encoding:"utf-8") as log:
+    with open("output.log", "w", encoding="utf-8") as log:
         log.write(f"Adb Version: {xml_file.replace('.xml', '')}\n")
         log.write(f"House System: {house_systems[hsys]}\n")
         log.write(f"Rodden Rating: {'+'.join(selected_ratings)}\n")
@@ -1606,7 +1606,7 @@ def main():
         apply_button.pack()
 
     def export_link():
-        with open("links.txt", "w", encoding:"utf-8") as f:
+        with open("links.txt", "w", encoding="utf-8") as f:
             for i, j in enumerate(displayed_results):
                 f.write(f"{i + 1}. {j[12]}\n")
         msgbox.showinfo(title="Export Links", message=f"{len(displayed_results)} links were exported.")
@@ -1615,7 +1615,7 @@ def main():
         min_, max_, step_ = date_entries[:]
         min_, max_, step_ = int(min_.get()), int(max_.get()), int(step_.get())
         freq_frmt[0], freq_frmt[1], freq_frmt[2] = min_, max_, step_
-        with open("year-frequency.txt", "w", encoding:"utf-8") as f:
+        with open("year-frequency.txt", "w", encoding="utf-8") as f:
             year_dict = dict()
             count = 0
             for i in range(min_, max_, step_):
