@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.1.3"
+__version__ = "1.1.4"
 
 import os
 import sys
@@ -67,7 +67,7 @@ for _i in os.listdir(os.getcwd()):
 tree = xml.etree.ElementTree.parse(f"{xml_file}")
 root = tree.getroot()
 
-for _i in range(1000000):
+for _i in range(100000):
     try:
         user_data = []
         for gender, roddenrating, bdata, adb_link, categories in zip(
@@ -106,7 +106,6 @@ for _i in range(1000000):
     except IndexError:
         break
 
-
 for _i in range(5000):
     _records_ = []
     category_groups = {}
@@ -143,7 +142,7 @@ planets = [
     "Saturn", "Uranus", "Neptune", "Pluto", "North Node", "Chiron"
 ]
 
-houses = ["Asc", "2", "3", "Ic", "5", "6", "Dsc", "8", "9", "Mc", "11", "12"]
+houses = [f"{i + 1}" for i in range(12)]
 
 hsys = "P"
 
@@ -240,18 +239,6 @@ class Chart:
         calc = self.convert_angle(swe.calc_ut(self.julian_date, planet)[0])
         return calc[0], calc[1]
 
-    def append_house(self, house, i, j, name=""):
-        if name == "":
-            house.append((
-                f"{i + 1}",
-                f"{self.convert_angle(j)[0]}",
-                f"{self.convert_angle(j)[1]}"))
-        else:
-            house.append((
-                f"{name}",
-                f"{self.convert_angle(j)[0]}",
-                f"{self.convert_angle(j)[1]}"))
-
     def house_cusps(self):
         global hsys
         house = []
@@ -262,16 +249,10 @@ class Chart:
             if i == 0:
                 asc += j
             angle.append(j)
-            if i + 1 == 1:
-                self.append_house(house, i, j, name="Asc")
-            elif i + 1 == 4:
-                self.append_house(house, i, j, name="Ic")
-            elif i + 1 == 7:
-                self.append_house(house, i, j, name="Dsc")
-            elif i + 1 == 10:
-                self.append_house(house, i, j, name="Mc")
-            else:
-                self.append_house(house, i, j)
+            house.append((
+                f"{i + 1}",
+                f"{self.convert_angle(j)[0]}",
+                f"{self.convert_angle(j)[1]}"))
         return house, asc, angle
 
     def house_pos(self):
@@ -783,14 +764,16 @@ def _font_(name="Arial", bold=False):
 
 
 def get_excel_datas(sheet):
-    global r1, r2, selection
+    global r1, r2, _r1, _r2, selection
     datas = []
+    if r1.count("/") == 2 and r2.count("/") == 2:
+        r1, r2 = "", ""
     for row in range(sheet.nrows):
         if selection == "expected":
             if row == 1:
                 r1 += f"{sheet.cell_value(row, 4).split(': ')[1]} / "
             elif row == 2:
-                r2 += f"{sheet.cell_value(row, 4).split(': ')[1]} / "   
+                r2 += f"{sheet.cell_value(row, 4).split(': ')[1]} / "
             elif row == 0 or row == 213 or row == 228 or row == 243 \
                     or row == 258 or row == 273 or row == 288 or row == 303 \
                     or row == 318 or row == 333 or row == 348 or row == 363 or row == 378:
@@ -979,21 +962,8 @@ def write_datas_to_excel(get_datas):
         sheet.write(i + 5, 0, j[0], style=style)
         sheet.write(i + 33, 0, j[0], style=style)
     for i in range(12):
-        if i == 0:
-            sheet.write(i + 19, 0, "Asc", style=style)
-            sheet.write(32, i + 1, "Asc", style=style)
-        elif i == 3:
-            sheet.write(i + 19, 0, "Ic", style=style)
-            sheet.write(32, i + 1, "Ic", style=style)
-        elif i == 6:
-            sheet.write(i + 19, 0, "Dsc", style=style)
-            sheet.write(32, i + 1, "Dsc", style=style)
-        elif i == 9:
-            sheet.write(i + 19, 0, "Mc", style=style)
-            sheet.write(32, i + 1, "Mc", style=style)
-        else:
-            sheet.write(i + 19, 0, f"House {i + 1}", style=style)
-            sheet.write(32, i + 1, f"House {i + 1}", style=style)
+        sheet.write(i + 19, 0, f"House {i + 1}", style=style)
+        sheet.write(32, i + 1, f"House {i + 1}", style=style)
     for i, j in enumerate(planet_info):
         for k, m in enumerate(signs):
             if j[1] == m:
@@ -1052,25 +1022,25 @@ def write_datas_to_excel(get_datas):
     for i in __planets__:
         house_group = [[] for _ in range(12)]
         for m in i:
-            if m[2] == "Asc":
+            if m[2] == "1":
                 house_group[0].append(m[1])
             elif m[2] == "2":
                 house_group[1].append(m[1])
             elif m[2] == "3":
                 house_group[2].append(m[1])
-            elif m[2] == "Ic":
+            elif m[2] == "4":
                 house_group[3].append(m[1])
             elif m[2] == "5":
                 house_group[4].append(m[1])
             elif m[2] == "6":
                 house_group[5].append(m[1])
-            elif m[2] == "Dsc":
+            elif m[2] == "7":
                 house_group[6].append(m[1])
             elif m[2] == "8":
                 house_group[7].append(m[1])
             elif m[2] == "9":
                 house_group[8].append(m[1])
-            elif m[2] == "Mc":
+            elif m[2] == "10":
                 house_group[9].append(m[1])
             elif m[2] == "11":
                 house_group[10].append(m[1])
@@ -1128,6 +1098,20 @@ def write_datas_to_excel(get_datas):
         create_a_new_table()
 
 
+def modify_category_names():
+    cat = selected_categories[0].split(":")
+    for i, j in enumerate(cat):
+        if j.startswith(" ") and j.endswith(" "):
+            cat[i] = j[1:-1]
+        elif j.startswith(" "):
+            cat[i] = j[1:]
+        elif j.endswith(" "):
+            cat[i] = j[:-1]
+        if " " in j:
+            cat[i] = cat[i].replace(" ", "_")
+    return cat
+
+
 def find_observed_values():
     global selection
     selection = "observed"
@@ -1141,7 +1125,21 @@ def find_observed_values():
     pframe.pack()
     pbar.pack(side="left")
     plabel.pack(side="left")
+    orb_factor = [
+        conjunction, semi_sextile, semi_square, sextile, quintile, square,
+        trine, sesquiquadrate, biquintile, quincunx, opposite
+    ]
+    orb_factor = [str(i) for i in orb_factor]
     with open("output.log", "w") as log:
+        log.write(f"Adb Version: {xml_file.replace('.xml', '')}\n")
+        log.write(f"House System: {house_systems[hsys]}\n")
+        log.write(f"Rodden Rating: {'+'.join(selected_ratings)}\n")
+        log.write(f"Orb Factor: {'_'.join(orb_factor)}\n")
+        if len(selected_categories) == 1:
+            log.write(f"Category: {selected_categories[0]}\n\n")
+        elif len(selected_categories) > 1:
+            log.write(f"Category: Control Group\n\n")
+
         log.write(f"|{str(datetime.now())[:-7]}| Process started.\n\n")
         log.flush()
         for records in displayed_results:
@@ -1166,23 +1164,25 @@ def find_observed_values():
             if __received__ != __size__:
                 pbar["value"] = __received__
                 pbar["maximum"] = __size__
-                pstring.set("{} %, {} seconds remaining.".format(
+                pstring.set("{} %, {} minutes remaining.".format(
                     int(100 * __received__ / __size__),
-                    int(__size__ / (__received__ / (time.time() - __now__))) - int(
-                        time.time() - __now__)))
+                    round((int(__size__ / (__received__ / (time.time() - __now__))) - int(
+                        time.time() - __now__)) / 60)))
             else:
                 pframe.destroy()
                 pbar.destroy()
                 plabel.destroy()
+                dir2 = ""
                 try:
                     os.rename("table0.xlsx", "observed_values.xlsx")
+                    cat = []
+                    if len(selected_categories) == 1:
+                        cat = modify_category_names()
+                    elif len(selected_categories) > 1:
+                        cat = ["Control_Group"]
                     dir1 = f"Rodden_Rating_{'+'.join(selected_ratings)}"
-                    orb_factor = [
-                        conjunction, semi_sextile, semi_square, sextile, quintile, square,
-                        trine, sesquiquadrate, biquintile, quincunx, opposite
-                    ]
-                    orb_factor = [str(i) for i in orb_factor]
-                    dir2 = os.path.join(
+                    dir2 += os.path.join(
+                        *cat,
                         dir1,
                         f"Orb_Factor_{'_'.join(orb_factor)}",
                         f"House_System_{house_systems[hsys]}"
@@ -1198,6 +1198,8 @@ def find_observed_values():
                     pass
                 master.update()
                 log.write(f"|{str(datetime.now())[:-7]}| Process finished.")
+                shutil.move(src=os.path.join(os.getcwd(), "output.log"),
+                            dst=os.path.join(os.getcwd(), dir2, "output.log"))
                 msgbox.showinfo(title="Find Observed Values", message="Process finished successfully.")
 
 
@@ -1362,6 +1364,8 @@ def find_effect_size_values():
 
 
 def main():
+    freq_frmt = [0, 2000, 100]
+
     def func1():
         t1 = threading.Thread(target=find_observed_values)
         t1.start()
@@ -1463,7 +1467,10 @@ def main():
         checkbuttons = dict()
         for i, j in enumerate(_house_systems_):
             _var_ = tk.StringVar()
-            _var_.set(value="0")
+            if j == house_systems[hsys]:
+                _var_.set(value="1")
+            else:
+                _var_.set(value="0")
             _checkbutton_ = tk.Checkbutton(
                 master=hsys_frame,
                 text=j,
@@ -1491,13 +1498,53 @@ def main():
                                      _house_systems_=_house_systems_))
         apply_button.pack()
 
-    def export():
-        count = 0
+    def export_link():
         with open("links.txt", "w") as f:
             for i, j in enumerate(displayed_results):
                 f.write(f"{i + 1}. {j[12]}\n")
+        msgbox.showinfo(title="Export Links", message=f"{len(displayed_results)} links were exported.")
+
+    def year_frequency_command(parent, date_entries, years):
+        min_, max_, step_ = date_entries[:]
+        min_, max_, step_ = int(min_.get()), int(max_.get()), int(step_.get())
+        freq_frmt[0], freq_frmt[1], freq_frmt[2] = min_, max_, step_
+        with open("year-frequency.txt", "w") as f:
+            year_dict = dict()
+            count = 0
+            for i in range(min_, max_, step_):
+                year_dict[(count * step_, (count * step_) + step_)] = []
                 count += 1
-        msgbox.showinfo(title="Export Links", message=f"{count} links were exported.")
+            for i in years:
+                for keys, values in year_dict.items():
+                    if keys[0] < i < keys[1]:
+                        year_dict[keys[0], keys[1]] += i,
+            for keys, values in year_dict.items():
+                f.write(f"{keys} = {len(values)}\n")
+            f.write(f"Total = {len(displayed_results)}")
+            parent.destroy()
+            msgbox.showinfo(title="Export Year Frequency",
+                            message=f"{len(displayed_results)} dates were exported.")
+
+    def export_year_frequency():
+        toplevel5 = tk.Toplevel()
+        toplevel5.title("Year Frequency")
+        toplevel5.geometry("200x100")
+        toplevel5.resizable(width=False, height=False)
+        t5frame = tk.Frame(master=toplevel5)
+        t5frame.pack()
+        date_entries = []
+        years = [int(i[4].split(" ")[2]) for i in displayed_results]
+        for i, j in enumerate(("Minimum", "Maximum", "Step")):
+            date_label = tk.Label(master=t5frame, text=j)
+            date_label.grid(row=i, column=0, sticky="w")
+            date_entry = tk.Entry(master=t5frame, width=5)
+            date_entry.grid(row=i, column=1, sticky="w")
+            date_entry.insert("1", f"{freq_frmt[i]}")
+            date_entries.append(date_entry)
+        apply_button = tk.Button(master=t5frame, text="Apply",
+                                 command=lambda: year_frequency_command(
+                                     parent=toplevel5, date_entries=date_entries, years=years))
+        apply_button.grid(row=3, column=0, columnspan=3)
 
     def callback(event, url):
         webbrowser.open_new(url)
@@ -1508,6 +1555,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
+        update_date, _update_date = "Update Date:", "10 January 2019"
         developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
@@ -1518,10 +1566,10 @@ def main():
         tframe2.pack(fill="both")
         tlabel_title = tk.Label(master=tframe1, text=name, font="Arial 25")
         tlabel_title.pack()
-        for i, j in enumerate((version, build_date, developed_by, thanks_to, contact, github)):
+        for i, j in enumerate((version, build_date, update_date, developed_by, thanks_to, contact, github)):
             tlabel_info_1 = tk.Label(master=tframe2, text=j, font="Arial 12", fg="red")
             tlabel_info_1.grid(row=i, column=0, sticky="w")
-        for i, j in enumerate((_version, _build_date, _developed_by, _thanks_to, _contact, _github)):
+        for i, j in enumerate((_version, _build_date, _update_date, _developed_by, _thanks_to, _contact, _github)):
             if j == _github:
                 tlabel_info_2 = tk.Label(master=tframe2, text=j, font="Arial 12", fg="blue", cursor="hand2")
                 url1 = "https://github.com/dildeolupbiten/TkAstroDb"
@@ -1584,7 +1632,8 @@ def main():
     method_menu.add_command(label="Flavia's method", command=set_method_to_true)
     method_menu.add_command(label="Sjoerd's method", command=set_method_to_false)
 
-    export_menu.add_command(label="Adb Links", command=export)
+    export_menu.add_command(label="Adb Links", command=export_link)
+    export_menu.add_command(label="Year Frequency", command=export_year_frequency)
 
     options_menu.add_command(label="House System", command=create_hsys_checkbuttons)
     options_menu.add_command(label="Orb Factor", command=choose_orb_factor)
