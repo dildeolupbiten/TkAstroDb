@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.1.5"
+__version__ = "1.1.6"
 
 import os
 import sys
@@ -141,6 +141,36 @@ planets = [
     "Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", 
     "Saturn", "Uranus", "Neptune", "Pluto", "North Node", "Chiron"
 ]
+
+modern_rulership = {
+    "Aries": "Pluto",
+    "Taurus": "Venus",
+    "Gemini": "Mercury",
+    "Cancer": "Moon",
+    "Leo": "Sun",
+    "Virgo": "Mercury",
+    "Libra": "Venus",
+    "Scorpio": "Pluto",
+    "Sagittarius": "Neptune",
+    "Capricorn": "Uranus",
+    "Aquarius": "Uranus",
+    "Pisces": "Neptune"
+}
+
+traditional_rulership = {
+    "Aries": "Mars",
+    "Taurus": "Venus",
+    "Gemini": "Mercury",
+    "Cancer": "Moon",
+    "Leo": "Sun",
+    "Virgo": "Mercury",
+    "Libra": "Venus",
+    "Scorpio": "Mars",
+    "Sagittarius": "Jupiter",
+    "Capricorn": "Saturn",
+    "Aquarius": "Saturn",
+    "Pisces": "Jupiter"
+}
 
 houses = [f"{i + 1}" for i in range(12)]
 
@@ -330,7 +360,16 @@ class Chart:
                         self.PLANET_SIGN_HOUSE.append([j[0], j[2], self.HOUSE_SIGN[k][0]])
 
     def get_chart_data(self):
-        return self.PLANET_SIGN_HOUSE, self.HOUSE_SIGN, self.PLANET_DEGREES
+        traditional_ruler, modern_ruler = [], []
+        for i, j in enumerate(self.house_cusps()[0]):
+            traditional = traditional_rulership[self.house_cusps()[0][i][2]]
+            modern = modern_rulership[self.house_cusps()[0][i][2]]
+            for k, m in enumerate(self.PLANET_SIGN_HOUSE):
+                if traditional == m[0]:
+                    traditional_ruler.append([f"Lord {i + 1}", f"House {m[2]}"])
+                if m[0] in modern:
+                    modern_ruler.append([f"Lord {i + 1}", f"House {m[2]}"])
+        return self.PLANET_SIGN_HOUSE, self.HOUSE_SIGN, self.PLANET_DEGREES, traditional_ruler, modern_ruler
 
 
 # --------------------------------------------- tkinter ---------------------------------------------
@@ -849,19 +888,27 @@ def write_title_of_total(sheet):
     sheet.write(4, 13, "Total", style=style)
     sheet.write(18, 13, "Total", style=style)
     sheet.write(32, 13, "Total", style=style)
+    sheet.write(381, 13, "Total", style=style)
+    sheet.write(396, 13, "Total", style=style)
     for i in range(12):
         sheet.write(200 + (i * 15), 13, "Total", style=style)
         sheet.write(213 + (i * 15), 0, "Total", style=style)
     style.font = _font_(bold=False)
 
 
-def save_file(file, sheet, table_name, table0="table0", table1="table1"):
+def write_total_data(sheet):
     write_total_horz(sheet=sheet, num=4)
     write_total_horz(sheet=sheet, num=18)
     write_total_horz(sheet=sheet, num=32)
+    write_total_horz(sheet=sheet, num=381)
+    write_total_horz(sheet=sheet, num=396)
     for i in range(12):
         write_total_horz(sheet=sheet, num=200 + (i * 15))
         write_total_vert(sheet=sheet, num=202 + (i * 15))
+
+
+def save_file(file, sheet, table_name, table0="table0", table1="table1"):
+    write_total_data(sheet=sheet)
     os.remove(f"{table0}.xlsx")
     os.remove(f"{table1}.xlsx")
     file.save(f"{table_name}.xlsx")
@@ -893,6 +940,12 @@ def create_a_new_table():
                             new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
                                                   label=i[1], style=style)
                             style.alignment = alignment
+                        elif i[1] == "Traditional House Rulership":
+                            new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
+                                                  label="Traditional House Rulership", style=style)
+                        elif i[1] == "Modern House Rulership":
+                            new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
+                                                  label="Modern House Rulership", style=style)
                         else:
                             new_sheet.write(*i[0], i[1], style=style)
                         style.font = _font_(bold=False)
@@ -911,8 +964,11 @@ def search_aspect(planet_pos, sheet, row: int, aspect: int, orb: int, name: str)
     _row = row
     n_ = 1
     name_frmt = f"{name}: Orb Factor: +- {orb}"
+    style.alignment = xlwt.Alignment()
     sheet.write_merge(r1=_row - 2, r2=_row - 2, c1=0, c2=2, label=name_frmt, style=style)
+    style.alignment = alignment
     for i, j in enumerate(planet_pos):
+        style.font = _font_(bold=True)
         sheet.write(i + row - 1, i, j[0], style=style)
         for k in range(12 - (i + 1)):
             degree_1 = planet_pos[i][1]
@@ -943,18 +999,21 @@ def search_aspect(planet_pos, sheet, row: int, aspect: int, orb: int, name: str)
             elif 150 < degree_2 < 180 and 330 < degree_1 < 360:
                 if degree_1 - degree_2 > 180:
                     degree_2 += 360
+            style.font = _font_(bold=False)
             if aspect - orb <= abs(degree_1 - degree_2) <= aspect + orb:
                 sheet.write(k + _row, i, 1, style=style)
             else:
                 sheet.write(k + _row, i, 0, style=style)
         n_ += 1
         _row += 1
+    style.font = _font_(bold=True)
 
 
 def write_datas_to_excel(get_datas):
     file = xlwt.Workbook()
     sheet = file.add_sheet("Sheet1")
-    planet_info, house_info, planet_pos = get_datas
+    planet_info, house_info, planet_pos, traditional_ruler, modern_ruler = get_datas
+    style.font = _font_(bold=True)
     for i, j in enumerate(signs):
         sheet.write(4, i + 1, j, style=style)
         sheet.write(18, i + 1, j, style=style)
@@ -964,6 +1023,7 @@ def write_datas_to_excel(get_datas):
     for i in range(12):
         sheet.write(i + 19, 0, f"House {i + 1}", style=style)
         sheet.write(32, i + 1, f"House {i + 1}", style=style)
+    style.font = _font_(bold=False)
     for i, j in enumerate(planet_info):
         for k, m in enumerate(signs):
             if j[1] == m:
@@ -1007,6 +1067,7 @@ def write_datas_to_excel(get_datas):
                 sheet.write(i + 33, k + 1, 1, style=style)
             else:
                 sheet.write(i + 33, k + 1, 0, style=style)
+    style.font = _font_(bold=True)
     search_aspect(planet_pos, sheet, row=48, aspect=0, orb=conjunction, name="Conjunction")
     search_aspect(planet_pos, sheet, row=62, aspect=30, orb=semi_sextile, name="Semi-Sextile")
     search_aspect(planet_pos, sheet, row=76, aspect=45, orb=semi_square, name="Semi-Square")
@@ -1048,6 +1109,7 @@ def write_datas_to_excel(get_datas):
                 house_group[11].append(m[1])
         new_order_of_planets.append(house_group)
     count = 0
+    style.font = _font_(bold=True)
     for _ in new_order_of_planets:
         for o, p in enumerate(signs):
             sheet.write(200 + count, o + 1, p, style=style)
@@ -1059,6 +1121,7 @@ def write_datas_to_excel(get_datas):
             sheet.write(200 + count + (j + 1), 0, form, style=style)
         count += 15
     count = 0
+    style.font = _font_(bold=False)
     for i in new_order_of_planets:
         for j, k in enumerate(i):
             if "Aries" in k:
@@ -1090,9 +1153,35 @@ def write_datas_to_excel(get_datas):
                     sheet.write(200 + count + (j + 1), m + 1, 0, style=style)
         count += 15
     count = 0
+    style.font = _font_(bold=True)
+    sheet.write_merge(r1=380, r2=380, c1=0, c2=13, label="Traditional House Rulership", style=style)
+    for i, j in enumerate(traditional_ruler):
+        style.font = _font_(bold=True)
+        sheet.write(381, i + 1, f"House {i + 1}", style=style)
+        sheet.write(382 + i, 0, j[0], style=style)
+        for k, m in enumerate(houses):
+            style.font = _font_(bold=False)
+            if j[1] == f"House {m}":
+                sheet.write(382 + i, k + 1, 1, style=style)
+            else:
+                sheet.write(382 + i, k + 1, 0, style=style)
+    style.font = _font_(bold=True)
+    sheet.write_merge(r1=395, r2=395, c1=0, c2=13, label="Modern House Rulership", style=style)
+    for i, j in enumerate(modern_ruler):
+        style.font = _font_(bold=True)
+        sheet.write(396, i + 1, f"House {i + 1}", style=style)
+        sheet.write(397 + i, 0, j[0], style=style)
+        for k, m in enumerate(houses):
+            style.font = _font_(bold=False)
+            if j[1] == f"House {m}":
+                sheet.write(397 + i, k + 1, 1, style=style)
+            else:
+                sheet.write(397 + i, k + 1, 0, style=style)
     for i in os.listdir(os.getcwd()):
         if i.startswith("table"):
             count += 1
+    write_title_of_total(sheet)
+    write_total_data(sheet)
     file.save(f"table{count}.xlsx")
     if count == 1:
         create_a_new_table()
@@ -1250,6 +1339,12 @@ def find_expected_values():
                             new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
                                                   label=i[1], style=style)
                             style.alignment = alignment
+                        elif i[1] == "Traditional House Rulership":
+                            new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
+                                                  label="Traditional House Rulership", style=style)
+                        elif i[1] == "Modern House Rulership":
+                            new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
+                                                  label="Modern House Rulership", style=style)
                         else:
                             new_sheet.write(*i[0], i[1], style=style)
                         style.font = _font_(bold=False)
@@ -1297,6 +1392,12 @@ def find_chi_square_values():
                             new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
                                                   label=i[1], style=style)
                             style.alignment = alignment
+                        elif i[1] == "Traditional House Rulership":
+                            new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
+                                                  label="Traditional House Rulership", style=style)
+                        elif i[1] == "Modern House Rulership":
+                            new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
+                                                  label="Modern House Rulership", style=style)
                         else:
                             new_sheet.write(*i[0], i[1], style=style)
                         style.font = _font_(bold=False)
@@ -1344,6 +1445,12 @@ def find_effect_size_values():
                             new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
                                                   label=i[1], style=style)
                             style.alignment = alignment
+                        elif i[1] == "Traditional House Rulership":
+                            new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
+                                                  label="Traditional House Rulership", style=style)
+                        elif i[1] == "Modern House Rulership":
+                            new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
+                                                  label="Modern House Rulership", style=style)
                         else:
                             new_sheet.write(*i[0], i[1], style=style)
                         style.font = _font_(bold=False)
