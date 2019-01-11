@@ -615,35 +615,29 @@ var_checkbutton_1, display_checkbutton_1, var_checkbutton_2, display_checkbutton
     var_checkbutton_5, display_checkbutton_5, var_checkbutton_6, display_checkbutton_6 = create_checkbutton()
 
 
+def insert_to_treeview(control_items, item):
+    control_items.append(item)
+    master.update()
+    treeview.insert("", _num_, values=[col for col in item])
+    info_var.set(len(displayed_results))
+    _num_ += 1
+    displayed_results.append(item)
+
+
 def south_north_check(control_items, item):
     global _num_
     if var_checkbutton_5.get() == "1" and var_checkbutton_6.get() == "0":
         if "n" in item[7]:
             pass
         else:
-            control_items.append(item)
-            master.update()
-            treeview.insert("", _num_, values=[col for col in item])
-            info_var.set(len(displayed_results))
-            _num_ += 1
-            displayed_results.append(item)
+            insert_to_treeview(control_items, item)
     elif var_checkbutton_5.get() == "0" and var_checkbutton_6.get() == "1":
         if "s" in item[7]:
             pass
         else:
-            control_items.append(item)
-            master.update()
-            treeview.insert("", _num_, values=[col for col in item])
-            info_var.set(len(displayed_results))
-            _num_ += 1
-            displayed_results.append(item)
+            insert_to_treeview(control_items, item)
     elif var_checkbutton_5.get() == "0" and var_checkbutton_6.get() == "0":
-        control_items.append(item)
-        master.update()
-        treeview.insert("", _num_, values=[col for col in item])
-        info_var.set(len(displayed_results))
-        _num_ += 1
-        displayed_results.append(item)
+        insert_to_treeview(control_items, item)
     elif var_checkbutton_5.get() == "1" and var_checkbutton_6.get() == "1":
         pass
 
