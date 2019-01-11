@@ -700,7 +700,7 @@ def display_results():
                             pass
     info_var.set(len(displayed_results))
     master.update()
-    msgbox.showinfo(title="Display Records", message=f"{len(displayed_results)} records inserted.")
+    msgbox.showinfo(title="Display Records", message=f"{len(displayed_results)} records are inserted.")
     
 
 def button_3_remove():
