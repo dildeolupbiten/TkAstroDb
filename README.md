@@ -85,15 +85,15 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **14.** In order to calculate the expected values, the users must have two tables which include the astrological pattern distributions of two different categories. The expected values are calculated by comparing this two different categories. One category will be used as a *control group*, the other category will be used as a *research group*. While the table which is wanted to use as a *control group* should be renamed as **control_group.xlsx**, there is no need to change the name of *research group*, so it's name should be **observed_values.xlsx**. Note that users should copy the related tables to the **TkAstroDb** folder. After that users can click **Calculations** menu button and they should select **Find Expected Values** option. There are two different methods to calculate the expected results. Users can select any of them. After the calculation finished, **control_group.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheet file will be created as **expected_values.xlsx**. And it is recommended to move **expected_values.xlsx** file to the related category folder:
 
-![img13](https://user-images.githubusercontent.com/29302909/50427153-6ea43680-08b1-11e9-9b56-672613b507b8.png)
+![img13](https://user-images.githubusercontent.com/29302909/51046081-3b161b80-15d6-11e9-81d9-936c39d982e0.png)
 
 **15.** In order to calculate the chi-square values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to **TkAstroDb** folder. Then they should select **Calculations** menu button. After that, they should click **Find Chi-Square Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheed file will be created as **chi-square.xlsx** in **TkAstroDb** folder. It is recommended that the users cut the file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **chi-square.xlsx** file to the related folder:
 
-![img14](https://user-images.githubusercontent.com/29302909/50427148-3866b700-08b1-11e9-834c-4787196c7604.png)
+![img14](https://user-images.githubusercontent.com/29302909/51046111-48330a80-15d6-11e9-8e05-d3e21d619b61.png)
 
 **16.** In order to calculate the effect size values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to the **TkAstroDb** directory. Then they should select **Calculations** menu button. After that, they should select **Find Effect Size Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** will be deleted and a new excel spreadsheed file will be created as **effect-size.xlsx** in **TkAstroDb** folder. It is recommended that the users cut this file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **effect-size.xlsx** file to the related folder:
 
-![img15](https://user-images.githubusercontent.com/29302909/50427129-c68e6d80-08b0-11e9-962d-16e25a55570e.png)
+![img15](https://user-images.githubusercontent.com/29302909/51046129-54b76300-15d6-11e9-9c18-ac49810666cb.png)
 
 ## Spreadsheets
 
