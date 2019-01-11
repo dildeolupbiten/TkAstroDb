@@ -123,7 +123,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
     x1 = [randrange(0, 100, 1) for i in range(12)]  
     y1 = [randrange(0, 100, 1) for i in range(12)]
 
-    exp_x, exp_y = calculate(x=x1, y=y1) 
+    exp_x, exp_y = formula(x=x1, y=y1) 
 
     print(f"x1: {sum(x1)}, Expected x1: {sum(exp_x)}\n\
     y1: {sum(y1)}, Expected y1: {sum(exp_y)}")    
