@@ -37,17 +37,17 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **2.** Users should see a window after 10-15 minutes which is similar to below. 
 
-![img1](https://user-images.githubusercontent.com/29302909/50402991-0f103300-07ac-11e9-98e1-fab84856cd47.png)
+![img1](https://user-images.githubusercontent.com/29302909/51044209-985b9e00-15d1-11e9-8e7e-c132928287a2.png)
 
 **3.** If users want to add single records to the displayed records according to the selection, they should type the name of the record. For example suppose a user wants to add **Albert Einstein** to the displayed records, the user should write **Einstein, Albert** to the **Search A Record By Name** section. While typing the name, if the record is found, the user will see an **Add** button which is used for adding records to the treeview.
 
-![img2](https://user-images.githubusercontent.com/29302909/50403025-729a6080-07ac-11e9-85a5-a83d45b76661.png)
+![img2](https://user-images.githubusercontent.com/29302909/51044229-a9a4aa80-15d1-11e9-98e1-7dbbd4fd7e53.png)
 
-![img3](https://user-images.githubusercontent.com/29302909/50403053-9d84b480-07ac-11e9-828b-03095fe4232d.png)
+![img3](https://user-images.githubusercontent.com/29302909/51044247-b4f7d600-15d1-11e9-93cb-1634bd008519.png)
 
 **4.** If users right click on the search entry field, the following options will be opened in the right click menu. 
 
-![img4](https://user-images.githubusercontent.com/29302909/50403086-db81d880-07ac-11e9-91e7-53d65e7d99df.png)
+![img4](https://user-images.githubusercontent.com/29302909/51044263-c214c500-15d1-11e9-850e-ecfa1743f6f1.png)
 
 **5.** Click **Select** button which is near to **Categories** label. After that a small window should be opened as below. Select one category or more categories to study, then press **Apply** button.
 
@@ -59,11 +59,11 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **7.** Before clicking **Display Records** button, users can click the check buttons in order to filter the records. Because some human records can be in event categories or some event records can be in human categories. But if users want to display all records, they should not click the check buttons. Then, users can click **Display Records** button. After clicked to that button, users should wait a bit. Finally the records will be displayed at treeview as follows:
 
-![img7](https://user-images.githubusercontent.com/29302909/50403111-0ff59480-07ad-11e9-83dd-07d6d0d4e14a.png)
+![img7](https://user-images.githubusercontent.com/29302909/51044370-043e0680-15d2-11e9-8cf5-f63edde5660b.png)
 
 **8.** Users can focus on a record then by right clicking to that record they can see some options that can be done with the focused record. One of the options is deleting the record from displayed results. The deleted record will not be used in the computation later. The other option opens the Adb webpage of that record.
 
-![img8](https://user-images.githubusercontent.com/29302909/50403125-37e4f800-07ad-11e9-9482-0e6e314b940e.png)
+![img8](https://user-images.githubusercontent.com/29302909/51044409-1455e600-15d2-11e9-8895-5d007c9b64c5.png)
 
 **9.** If users click **Export** menu button, they can see **Adb Links** option. By clicking **Adb Links** option, they can export the links of displayed results to **links.txt** file. This file will be created at **TkAstroDb** directory.
 
@@ -77,11 +77,9 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **12.** If users click **Calculations** menu button, they can see options which are as follows: **Find Observed Values**, **Find Expected Values**, **Find Chi-Square Values** and **Find Effect Size Values**.. If users want to find the astrological pattern distributions of any category, they should click **Find Observed Values** button. After clicked that menu button, a progress bar should be created as follows:
 
-![img11](https://user-images.githubusercontent.com/29302909/50379493-f8f35d00-065b-11e9-8c5c-361096cc1579.png)
+![img11](https://user-images.githubusercontent.com/29302909/51044436-23d52f00-15d2-11e9-8dcd-f51f244c09b1.png)
 
 **13.** After the computation finished, an excel spreadsheet will be created as **observed_values.xlsx** in nested directories like **Rodden_Rating_AA/Orb_Factor_6_2_2_4_2_6_6_2_2_2_6/House_System_Placidus**. The directory names can be different according to the settings that users selected. This file include the astrological pattern distributions of displayed records. Since third party users may want to find the pattern distributions of different categories, it is recommended to create a folder which name is **Categories**. And previously created excel file can be moved to that folder. Below can be seen a sample of the directory tree which is recommended. **Vocation** is the first category name. And there may be a lot of subcategories in that category. **Occult_Fields** is a subcategory of **Vocation** category. And **Astrologer** is the subcategory of **Occult_Fields** category. Thus users can know that the results came from the Rodden Rating AA. So there can be many sub directories in **Occult_Fields** category which relates to the different Rodden Ratings. Normally the default house system is **Placidus.** So **House_System_Placidus** directory is a sub directory of **Orb_Factor_6_2_2_4_2_6_6_2_2_2_6**. There can be many sub directories in **Orb_Factor_6_2_2_4_2_6_6_2_2_2_6** directory which relate to different house systems. **Orb_Factor_6_2_2_4_2_6_6_2_2_2_6** directory is in the **Rodden_Rating_AA** directory. The orb factors of the aspects can also be different and the orb factors can be defined by the user. So in **Rodden_Rating_AA** directory, there can be many sub directories which relates to different orb factors and different house systems. **links.txt** file includes the links of the records that are displayed on the treeview. And as can be seen, **observed_values.xlsx** file is in the **House_System_Placidus** directory.
-
-![img12](https://user-images.githubusercontent.com/29302909/50403168-71b5fe80-07ad-11e9-90a3-ff1015787932.png)
 
 **14.** In order to calculate the expected values, the users must have two tables which include the astrological pattern distributions of two different categories. The expected values are calculated by comparing this two different categories. One category will be used as a *control group*, the other category will be used as a *research group*. While the table which is wanted to use as a *control group* should be renamed as **control_group.xlsx**, there is no need to change the name of *research group*, so it's name should be **observed_values.xlsx**. Note that users should copy the related tables to the **TkAstroDb** folder. After that users can click **Calculations** menu button and they should select **Find Expected Values** option. There are two different methods to calculate the expected results. Users can select any of them. After the calculation finished, **control_group.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheet file will be created as **expected_values.xlsx**. And it is recommended to move **expected_values.xlsx** file to the related category folder:
 
