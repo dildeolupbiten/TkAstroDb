@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 
 import os
 import sys
@@ -1670,7 +1670,7 @@ def main():
             year_dict = dict()
             count = 0
             for i in range(min_, max_, step_):
-                year_dict[(count * step_, (count * step_) + step_)] = []
+                year_dict[(min_ + count * step_, min_ + (count * step_) + step_)] = []
                 count += 1
             for i in years:
                 for keys, values in year_dict.items():
