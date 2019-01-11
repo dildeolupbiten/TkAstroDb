@@ -25,11 +25,11 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **1.** Run the program by writing the below to **cmd** for Windows or to **bash** for Unix. (Users should wait a bit the program to be opened. Because the program will try to find all records and categories from the xml file.)
 
-### For Unix
+**For Unix**
 
     python3 TkAstroDb.py
 
-### For Windows
+**For Windows**
 
     python TkAstroDb.py
 
