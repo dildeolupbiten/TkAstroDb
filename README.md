@@ -71,7 +71,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **10.** If users click **Options** menu button, they can see **House System** option. And by clicking that menu button, they can define the house system they want to use. If they don't click this menu button, the house system will be defined according to the default setting. The default house system were defined as **Placidus**.
 
-![img10](https://user-images.githubusercontent.com/29302909/51044436-23d52f00-15d2-11e9-8dcd-f51f244c09b1.png)
+![img10](https://user-images.githubusercontent.com/29302909/51045506-d1e1d880-15d4-11e9-88f6-b63011273862.png)
 
 **11.** If users click **Options** menu button, they can see **Orb Factor** option. And by clicking that menu button, they can define the orb factors for each astrological aspect. If users don't click this menu button, the orb factors will be defined according to their default settings. The default orb factors were defined as +-6 for Conjunction, +-2 for Semi-Sextile, +-2 Semi-Square, +-4 for Sextile, +-2 for Quintile, +-6 for Square, +-6 for Trine, +-2 for Sesquiquadrate, +-2 for BiQuintile, +-2 for Quincunx and +-6 for Opposite aspects.
 
