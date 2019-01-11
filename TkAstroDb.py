@@ -700,7 +700,12 @@ def display_results():
                             pass
     info_var.set(len(displayed_results))
     master.update()
-    msgbox.showinfo(title="Display Records", message=f"{len(displayed_results)} records are inserted.")
+    if len(displayed_results) == 0:
+        msgbox.showinfo(title="Display Records", message="No record is inserted.")
+    elif len(displayed_results) == 1:
+        msgbox.showinfo(title="Display Records", message="1 record is inserted.")
+    else:
+        msgbox.showinfo(title="Display Records", message=f"{len(displayed_results)} records are inserted.")
     
 
 def button_3_remove():
