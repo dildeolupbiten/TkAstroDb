@@ -81,7 +81,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img12](https://user-images.githubusercontent.com/29302909/51044436-23d52f00-15d2-11e9-8dcd-f51f244c09b1.png)
 
-**13.** After the computation finished, a log file (**output.log**) and an excel spreadsheet will be created as **observed_values.xlsx** in nested directories like **Vocation/Occult_Fields/Astrologer/Rodden_Rating_AA/Orb_Factor_6_2_2_4_2_6_6_2_2_2_6/House_System_Placidus**.The directory names can be different according to the settings that users selected. This file include the astrological pattern distributions of displayed records. Since third party users may want to find the pattern distributions of different categories, it is recommended to create a folder which name is **Categories**.
+**13.** After the computation finished, a log file (**output.log**) and an excel spreadsheet file (**observed_values.xlsx**) can be found inside nested directories like **Vocation/Occult_Fields/Astrologer/Rodden_Rating_AA/Orb_Factor_6_2_2_4_2_6_6_2_2_2_6/House_System_Placidus**.The directory names can be different according to the settings that users selected. This file include the astrological pattern distributions of displayed records. Since third party users may want to find the pattern distributions of different categories, it is recommended to create a folder which name is **Categories**.
 
 ![img13](https://user-images.githubusercontent.com/29302909/51046181-79133f80-15d6-11e9-8457-cc72a010e63f.png)
 
