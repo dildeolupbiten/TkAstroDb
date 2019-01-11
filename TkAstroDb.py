@@ -1252,7 +1252,6 @@ def find_observed_values():
                 log.write(f"Category: {selected_categories[0]}\n\n")
             elif len(selected_categories) > 1:
                 log.write(f"Category: Control Group\n\n")
-
             log.write(f"|{str(datetime.now())[:-7]}| Process started.\n\n")
             log.flush()
             for records in displayed_results:
