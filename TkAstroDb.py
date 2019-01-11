@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.1.8"
+__version__ = "1.2.0"
 
 import os
 import sys
@@ -383,6 +383,7 @@ _num_ = 0
 
 master = tk.Tk()
 master.title("TkAstroDb")
+master.geometry(f"{master.winfo_screenwidth()}x{master.winfo_screenheight()}")
 
 info_var = tk.StringVar()
 info_var.set("0")
@@ -401,7 +402,7 @@ columns = ["Adb ID", "Name", "Gender", "Rodden Rating", "Date",
            "Country", "Country Code", "Adb Link", "Category"]
 
 treeview = Treeview(master=bottom_frame, show="headings",
-                    columns=[f"#{_i_ + 1}" for _i_ in range(len(columns))], height=10)
+                    columns=[f"#{_i_ + 1}" for _i_ in range(len(columns))], height=17)
 for _i_, _j_ in enumerate(columns):
     treeview.heading(f"#{_i_ + 1}", text=_j_)
 treeview.pack()
@@ -602,7 +603,7 @@ def create_checkbutton():
             master=top_frame,
             text=f"Do not display {j} charts.",
             variable=_var_)
-        _checkbutton_.grid(row=i + 4, column=0, columnspan=2, pady=5, sticky="w")
+        _checkbutton_.grid(row=i, column=2, columnspan=2, sticky="w") 
         yield _var_
         yield _checkbutton_
     
@@ -634,7 +635,9 @@ def display_results():
                                         pass
                                     else:
                                         control_items.append(item)
+                                        master.update()
                                         treeview.insert("", _num_, values=[col for col in item])
+                                        info_var.set(len(displayed_results))
                                         _num_ += 1
                                         displayed_results.append(item)
                                 elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "1":
@@ -642,12 +645,16 @@ def display_results():
                                         pass
                                     else:
                                         control_items.append(item)
+                                        master.update()
                                         treeview.insert("", _num_, values=[col for col in item])
+                                        info_var.set(len(displayed_results))
                                         _num_ += 1
                                         displayed_results.append(item)
                                 elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "0":
                                     control_items.append(item)
+                                    master.update()
                                     treeview.insert("", _num_, values=[col for col in item])
+                                    info_var.set(len(displayed_results))
                                     _num_ += 1
                                     displayed_results.append(item)
                                 elif var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "1":
@@ -655,7 +662,9 @@ def display_results():
                                         pass
                                     else:
                                         control_items.append(item)
+                                        master.update()
                                         treeview.insert("", _num_, values=[col for col in item])
+                                        info_var.set(len(displayed_results))
                                         _num_ += 1
                                         displayed_results.append(item)
                         elif var_checkbutton_1.get() == "1" and var_checkbutton_2.get() == "0":
@@ -669,7 +678,9 @@ def display_results():
                                         pass
                                     else:
                                         control_items.append(item)
+                                        master.update()
                                         treeview.insert("", _num_, values=[col for col in item])
+                                        info_var.set(len(displayed_results))
                                         _num_ += 1
                                         displayed_results.append(item)
                                 elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "1":
@@ -677,12 +688,16 @@ def display_results():
                                         pass
                                     else:
                                         control_items.append(item)
+                                        master.update()
                                         treeview.insert("", _num_, values=[col for col in item])
+                                        info_var.set(len(displayed_results))
                                         _num_ += 1
                                         displayed_results.append(item)
                                 elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "0":
                                     control_items.append(item)
+                                    master.update()
                                     treeview.insert("", _num_, values=[col for col in item])
+                                    info_var.set(len(displayed_results))
                                     _num_ += 1
                                     displayed_results.append(item)
                                 elif var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "1":
@@ -690,7 +705,9 @@ def display_results():
                                         pass
                                     else:
                                         control_items.append(item)
+                                        master.update()
                                         treeview.insert("", _num_, values=[col for col in item])
+                                        info_var.set(len(displayed_results))
                                         _num_ += 1
                                         displayed_results.append(item)
                         elif var_checkbutton_1.get() == "0" and var_checkbutton_2.get() == "1":
@@ -698,13 +715,17 @@ def display_results():
                                 pass
                             else:
                                 control_items.append(item)
+                                master.update()
                                 treeview.insert("", _num_, values=[col for col in item])
+                                info_var.set(len(displayed_results))
                                 _num_ += 1
                                 displayed_results.append(item) 
                         elif var_checkbutton_1.get() == "1" and var_checkbutton_2.get() == "1":
                             pass
     info_var.set(len(displayed_results))
-
+    master.update()
+    msgbox.showinfo(title="Display Records", message=f"{len(displayed_results)} records inserted.")
+    
 
 def button_3_remove():
     focused = treeview.focus()
@@ -749,7 +770,7 @@ treeview.bind("<Button-1>", lambda event: destroy(event))
 treeview.bind("<Button-3>", lambda event: button_3_on_treeview(event))
 
 display_button = tk.Button(master=top_frame, text="Display Records", command=display_results)
-display_button.grid(row=8, column=0, columnspan=2, pady=10)
+display_button.grid(row=8, column=0, columnspan=4, pady=10)
 
 y_scrollbar.configure(command=treeview.yview)
 x_scrollbar = tk.Scrollbar(master=master, orient="horizontal", command=treeview.xview)
@@ -1204,92 +1225,95 @@ def modify_category_names():
 def find_observed_values():
     global selection
     selection = "observed"
-    __size__ = len(displayed_results)
-    __received__ = 0
-    __now__ = time.time()
-    pframe = tk.Frame(master=master)
-    pbar = Progressbar(master=pframe, orient="horizontal", length=200, mode="determinate")
-    pstring = tk.StringVar()
-    plabel = tk.Label(master=pframe, textvariable=pstring)
-    pframe.pack()
-    pbar.pack(side="left")
-    plabel.pack(side="left")
-    orb_factor = [
-        conjunction, semi_sextile, semi_square, sextile, quintile, square,
-        trine, sesquiquadrate, biquintile, quincunx, opposite
-    ]
-    orb_factor = [str(i) for i in orb_factor]
-    with open("output.log", "w", encoding="utf-8") as log:
-        log.write(f"Adb Version: {xml_file.replace('.xml', '')}\n")
-        log.write(f"House System: {house_systems[hsys]}\n")
-        log.write(f"Rodden Rating: {'+'.join(selected_ratings)}\n")
-        log.write(f"Orb Factor: {'_'.join(orb_factor)}\n")
-        if len(selected_categories) == 1:
-            log.write(f"Category: {selected_categories[0]}\n\n")
-        elif len(selected_categories) > 1:
-            log.write(f"Category: Control Group\n\n")
+    if len(displayed_results) == 0:
+        msgbox.showinfo(title="Find Observed Values", message=f"{len(displayed_results)} records selected.")
+    else:
+        __size__ = len(displayed_results)
+        __received__ = 0
+        __now__ = time.time()
+        pframe = tk.Frame(master=master)
+        pbar = Progressbar(master=pframe, orient="horizontal", length=200, mode="determinate")
+        pstring = tk.StringVar()
+        plabel = tk.Label(master=pframe, textvariable=pstring)
+        pframe.pack()
+        pbar.pack(side="left")
+        plabel.pack(side="left")
+        orb_factor = [
+            conjunction, semi_sextile, semi_square, sextile, quintile, square,
+            trine, sesquiquadrate, biquintile, quincunx, opposite
+        ]
+        orb_factor = [str(i) for i in orb_factor]
+        with open("output.log", "w", encoding="utf-8") as log:
+            log.write(f"Adb Version: {xml_file.replace('.xml', '')}\n")
+            log.write(f"House System: {house_systems[hsys]}\n")
+            log.write(f"Rodden Rating: {'+'.join(selected_ratings)}\n")
+            log.write(f"Orb Factor: {'_'.join(orb_factor)}\n")
+            if len(selected_categories) == 1:
+                log.write(f"Category: {selected_categories[0]}\n\n")
+            elif len(selected_categories) > 1:
+                log.write(f"Category: Control Group\n\n")
 
-        log.write(f"|{str(datetime.now())[:-7]}| Process started.\n\n")
-        log.flush()
-        for records in displayed_results:
-            julian_date = float(records[6])
-            longitude = records[8]
-            if "e" in longitude:
-                longitude = float(longitude.replace("e", "."))
-            elif "w" in longitude:
-                longitude = -1 * float(longitude.replace("w", "."))
-            latitude = records[7]
-            if "n" in latitude:
-                latitude = float(latitude.replace("n", "."))
-            elif "s" in latitude:
-                latitude = -1 * float(latitude.replace("s", "."))
-            try:
-                chart = Chart(julian_date, longitude, latitude)
-                write_datas_to_excel(chart.get_chart_data())
-            except BaseException as err:
-                log.write(f"|{str(datetime.now())[:-7]}| Error Type: {err}\n{' ' * 22}Record: {records}\n\n")
-                log.flush()
-            __received__ += 1
-            if __received__ != __size__:
-                pbar["value"] = __received__
-                pbar["maximum"] = __size__
-                pstring.set("{} %, {} minutes remaining.".format(
-                    int(100 * __received__ / __size__),
-                    round((int(__size__ / (__received__ / (time.time() - __now__))) - int(
-                        time.time() - __now__)) / 60)))
-            else:
-                pframe.destroy()
-                pbar.destroy()
-                plabel.destroy()
-                dir2 = ""
+            log.write(f"|{str(datetime.now())[:-7]}| Process started.\n\n")
+            log.flush()
+            for records in displayed_results:
+                julian_date = float(records[6])
+                longitude = records[8]
+                if "e" in longitude:
+                    longitude = float(longitude.replace("e", "."))
+                elif "w" in longitude:
+                    longitude = -1 * float(longitude.replace("w", "."))
+                latitude = records[7]
+                if "n" in latitude:
+                    latitude = float(latitude.replace("n", "."))
+                elif "s" in latitude:
+                    latitude = -1 * float(latitude.replace("s", "."))
                 try:
-                    os.rename("table0.xlsx", "observed_values.xlsx")
-                    cat = []
-                    if len(selected_categories) == 1:
-                        cat = modify_category_names()
-                    elif len(selected_categories) > 1:
-                        cat = ["Control_Group"]
-                    dir1 = f"Rodden_Rating_{'+'.join(selected_ratings)}"
-                    dir2 += os.path.join(
-                        *cat,
-                        dir1,
-                        f"Orb_Factor_{'_'.join(orb_factor)}",
-                        f"House_System_{house_systems[hsys]}"
-                    )
+                    chart = Chart(julian_date, longitude, latitude)
+                    write_datas_to_excel(chart.get_chart_data())
+                except BaseException as err:
+                    log.write(f"|{str(datetime.now())[:-7]}| Error Type: {err}\n{' ' * 22}Record: {records}\n\n")
+                    log.flush()
+                __received__ += 1
+                if __received__ != __size__:
+                    pbar["value"] = __received__
+                    pbar["maximum"] = __size__
+                    pstring.set("{} %, {} minutes remaining.".format(
+                        int(100 * __received__ / __size__),
+                        round((int(__size__ / (__received__ / (time.time() - __now__))) - int(
+                            time.time() - __now__)) / 60)))
+                else:
+                    pframe.destroy()
+                    pbar.destroy()
+                    plabel.destroy()
+                    dir2 = ""
                     try:
-                        os.makedirs(dir2)
-                        shutil.move(src=os.path.join(os.getcwd(), "observed_values.xlsx"),
-                                    dst=os.path.join(os.getcwd(), dir2, "observed_values.xlsx"))
-                    except FileExistsError as err:
-                        log.write(f"|{str(datetime.now())[:-7]}| Error Type: {err}\n\n")
-                        log.flush()
-                except FileNotFoundError:
-                    pass
-                master.update()
-                log.write(f"|{str(datetime.now())[:-7]}| Process finished.")
-                shutil.move(src=os.path.join(os.getcwd(), "output.log"),
-                            dst=os.path.join(os.getcwd(), dir2, "output.log"))
-                msgbox.showinfo(title="Find Observed Values", message="Process finished successfully.")
+                        os.rename("table0.xlsx", "observed_values.xlsx")
+                        cat = []
+                        if len(selected_categories) == 1:
+                            cat = modify_category_names()
+                        elif len(selected_categories) > 1:
+                            cat = ["Control_Group"]
+                        dir1 = f"Rodden_Rating_{'+'.join(selected_ratings)}"
+                        dir2 += os.path.join(
+                            *cat,
+                            dir1,
+                            f"Orb_Factor_{'_'.join(orb_factor)}",
+                            f"House_System_{house_systems[hsys]}"
+                        )
+                        try:
+                            os.makedirs(dir2)
+                            shutil.move(src=os.path.join(os.getcwd(), "observed_values.xlsx"),
+                                        dst=os.path.join(os.getcwd(), dir2, "observed_values.xlsx"))
+                        except FileExistsError as err:
+                            log.write(f"|{str(datetime.now())[:-7]}| Error Type: {err}\n\n")
+                            log.flush()
+                    except FileNotFoundError:
+                        pass
+                    master.update()
+                    log.write(f"|{str(datetime.now())[:-7]}| Process finished.")
+                    shutil.move(src=os.path.join(os.getcwd(), "output.log"),
+                                dst=os.path.join(os.getcwd(), dir2, "output.log"))
+                    msgbox.showinfo(title="Find Observed Values", message="Process finished successfully.")
 
 
 def sum_of_row(table):
@@ -1305,60 +1329,69 @@ def find_expected_values():
     selection = "expected"
     file_name_1 = "control_group.xlsx"
     file_name_2 = "observed_values.xlsx"
-    read_file_1 = xlrd.open_workbook(file_name_1)
-    read_file_2 = xlrd.open_workbook(file_name_2)
-    sheet_1 = read_file_1.sheet_by_name("Sheet1")
-    sheet_2 = read_file_2.sheet_by_name("Sheet1")
-    new_file = xlwt.Workbook()
-    new_sheet = new_file.add_sheet("Sheet1")
-    data_1 = get_excel_datas(sheet_1)
-    data_2 = get_excel_datas(sheet_2)
-    control_list = []
-    ratio = sum_of_row(data_2) / sum_of_row(data_1)
-    sum_of_all = sum_of_row(data_2) + sum_of_row(data_1)
-    write_title_of_total(new_sheet)
-    for i in data_1:
-        for j in data_2:
-            if i[0] == j[0]:
-                if i[1] != "" and j[1] != "":
-                    if type(i[1]) == float or type(j[1]) == float:
-                        if method is False:
-                            # Sjoerd Visser's method
-                            new_sheet.write(*i[0], i[1] * ratio, style=style)
-                        elif method is True:
-                            # Flavia Minghetti's method
-                            new_sheet.write(
-                                *i[0],
-                                sum_of_row(data_2) * ((i[1] + j[1]) / sum_of_all * 100) / 100,
-                                style=style
-                            )
-                    else:
-                        style.font = _font_(bold=True)
-                        if "Orb" in i[1]:
-                            style.alignment = xlwt.Alignment()
-                            new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
-                                                  label=i[1], style=style)
-                            style.alignment = alignment
-                        elif i[1] == "Traditional House Rulership":
-                            new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
-                                                  label="Traditional House Rulership", style=style)
-                        elif i[1] == "Modern House Rulership":
-                            new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
-                                                  label="Modern House Rulership", style=style)
+    read_file_1 = None
+    read_file_2 = None
+    try:
+        read_file_1 = xlrd.open_workbook(file_name_1)
+    except FileNotFoundError:
+        msgbox.showinfo(title="Find Expected Values", message="No such file or directory: 'control_group.xlsx'")
+    try:
+        read_file_2 = xlrd.open_workbook(file_name_2)
+    except FileNotFoundError:
+        msgbox.showinfo(title="Find Expected Values", message="No such file or directory: 'observed_values.xlsx'")
+    if read_file_1 is not None and read_file_2 is not None:
+        sheet_1 = read_file_1.sheet_by_name("Sheet1")
+        sheet_2 = read_file_2.sheet_by_name("Sheet1")
+        new_file = xlwt.Workbook()
+        new_sheet = new_file.add_sheet("Sheet1")
+        data_1 = get_excel_datas(sheet_1)
+        data_2 = get_excel_datas(sheet_2)
+        control_list = []
+        ratio = sum_of_row(data_2) / sum_of_row(data_1)
+        sum_of_all = sum_of_row(data_2) + sum_of_row(data_1)
+        write_title_of_total(new_sheet)
+        for i in data_1:
+            for j in data_2:
+                if i[0] == j[0]:
+                    if i[1] != "" and j[1] != "":
+                        if type(i[1]) == float or type(j[1]) == float:
+                            if method is False:
+                                # Sjoerd Visser's method
+                                new_sheet.write(*i[0], i[1] * ratio, style=style)
+                            elif method is True:
+                                # Flavia Minghetti's method
+                                new_sheet.write(
+                                    *i[0],
+                                    sum_of_row(data_2) * ((i[1] + j[1]) / sum_of_all * 100) / 100,
+                                    style=style
+                                )
                         else:
-                            new_sheet.write(*i[0], i[1], style=style)
-                        style.font = _font_(bold=False)
-                elif i[1] != "" and j[1] == "":
-                    new_sheet.write(*i[0], i[1], style=style)
-                elif i[1] == "" and j[1] != "":
-                    new_sheet.write(*j[0], j[1], style=style)
-                if i[0] not in control_list:
-                    control_list.append(i[0])
-                if j[0] not in control_list:
-                    control_list.append(j[0])
-    save_file(new_file, new_sheet, "expected_values", "control_group", "observed_values")
-    master.update()
-    msgbox.showinfo(title="Find Expected Values", message="Process finished successfully.")
+                            style.font = _font_(bold=True)
+                            if "Orb" in i[1]:
+                                style.alignment = xlwt.Alignment()
+                                new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
+                                                      label=i[1], style=style)
+                                style.alignment = alignment
+                            elif i[1] == "Traditional House Rulership":
+                                new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
+                                                      label="Traditional House Rulership", style=style)
+                            elif i[1] == "Modern House Rulership":
+                                new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
+                                                      label="Modern House Rulership", style=style)
+                            else:
+                                new_sheet.write(*i[0], i[1], style=style)
+                            style.font = _font_(bold=False)
+                    elif i[1] != "" and j[1] == "":
+                        new_sheet.write(*i[0], i[1], style=style)
+                    elif i[1] == "" and j[1] != "":
+                        new_sheet.write(*j[0], j[1], style=style)
+                    if i[0] not in control_list:
+                        control_list.append(i[0])
+                    if j[0] not in control_list:
+                        control_list.append(j[0])
+        save_file(new_file, new_sheet, "expected_values", "control_group", "observed_values")
+        master.update()
+        msgbox.showinfo(title="Find Expected Values", message="Process finished successfully.")
 
 
 def find_chi_square_values():
@@ -1366,52 +1399,61 @@ def find_chi_square_values():
     selection = "chisquare"
     file_name_1 = "expected_values.xlsx"
     file_name_2 = "observed_values.xlsx"
-    read_file_1 = xlrd.open_workbook(file_name_1)
-    read_file_2 = xlrd.open_workbook(file_name_2)
-    sheet_1 = read_file_1.sheet_by_name("Sheet1")
-    sheet_2 = read_file_2.sheet_by_name("Sheet1")
-    new_file = xlwt.Workbook()
-    new_sheet = new_file.add_sheet("Sheet1")
-    data_1 = get_excel_datas(sheet_1)
-    data_2 = get_excel_datas(sheet_2)
-    control_list = []
-    write_title_of_total(new_sheet)
-    for i in data_1:
-        for j in data_2:
-            if i[0] == j[0]:
-                if i[1] != "" and j[1] != "":
-                    if type(i[1]) == float or type(j[1]) == float:
-                        try:
-                            new_sheet.write(*i[0], (i[1] - j[1]) ** 2 / i[1], style=style)
-                        except ZeroDivisionError:
-                            new_sheet.write(*i[0], 0, style=style)
-                    else:
-                        style.font = _font_(bold=True)
-                        if "Orb" in i[1]:
-                            style.alignment = xlwt.Alignment()
-                            new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
-                                                  label=i[1], style=style)
-                            style.alignment = alignment
-                        elif i[1] == "Traditional House Rulership":
-                            new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
-                                                  label="Traditional House Rulership", style=style)
-                        elif i[1] == "Modern House Rulership":
-                            new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
-                                                  label="Modern House Rulership", style=style)
+    read_file_1 = None
+    read_file_2 = None
+    try:
+        read_file_1 = xlrd.open_workbook(file_name_1)
+    except FileNotFoundError:
+        msgbox.showinfo(title="Find Chi-Square Values", message="No such file or directory: 'expected_values.xlsx'")
+    try:
+        read_file_2 = xlrd.open_workbook(file_name_2)
+    except FileNotFoundError:
+        msgbox.showinfo(title="Find Chi-Square Values", message="No such file or directory: 'observed_values.xlsx'")
+    if read_file_1 is not None and read_file_2 is not None:
+        sheet_1 = read_file_1.sheet_by_name("Sheet1")
+        sheet_2 = read_file_2.sheet_by_name("Sheet1")
+        new_file = xlwt.Workbook()
+        new_sheet = new_file.add_sheet("Sheet1")
+        data_1 = get_excel_datas(sheet_1)
+        data_2 = get_excel_datas(sheet_2)
+        control_list = []
+        write_title_of_total(new_sheet)
+        for i in data_1:
+            for j in data_2:
+                if i[0] == j[0]:
+                    if i[1] != "" and j[1] != "":
+                        if type(i[1]) == float or type(j[1]) == float:
+                            try:
+                                new_sheet.write(*i[0], (i[1] - j[1]) ** 2 / i[1], style=style)
+                            except ZeroDivisionError:
+                                new_sheet.write(*i[0], 0, style=style)
                         else:
-                            new_sheet.write(*i[0], i[1], style=style)
-                        style.font = _font_(bold=False)
-                elif i[1] != "" and j[1] == "":
-                    new_sheet.write(*i[0], i[1], style=style)
-                elif i[1] == "" and j[1] != "":
-                    new_sheet.write(*j[0], j[1], style=style)
-                if i[0] not in control_list:
-                    control_list.append(i[0])
-                if j[0] not in control_list:
-                    control_list.append(j[0])
-    save_file(new_file, new_sheet, "chi-square", "expected_values", "observed_values")
-    master.update()
-    msgbox.showinfo(title="Find Chi-Square Values", message="Process finished successfully.")
+                            style.font = _font_(bold=True)
+                            if "Orb" in i[1]:
+                                style.alignment = xlwt.Alignment()
+                                new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
+                                                      label=i[1], style=style)
+                                style.alignment = alignment
+                            elif i[1] == "Traditional House Rulership":
+                                new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
+                                                      label="Traditional House Rulership", style=style)
+                            elif i[1] == "Modern House Rulership":
+                                new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
+                                                      label="Modern House Rulership", style=style)
+                            else:
+                                new_sheet.write(*i[0], i[1], style=style)
+                            style.font = _font_(bold=False)
+                    elif i[1] != "" and j[1] == "":
+                        new_sheet.write(*i[0], i[1], style=style)
+                    elif i[1] == "" and j[1] != "":
+                        new_sheet.write(*j[0], j[1], style=style)
+                    if i[0] not in control_list:
+                        control_list.append(i[0])
+                    if j[0] not in control_list:
+                        control_list.append(j[0])
+        save_file(new_file, new_sheet, "chi-square", "expected_values", "observed_values")
+        master.update()
+        msgbox.showinfo(title="Find Chi-Square Values", message="Process finished successfully.")
 
 
 def find_effect_size_values():
@@ -1419,52 +1461,61 @@ def find_effect_size_values():
     selection = "effectsize"
     file_name_1 = "observed_values.xlsx"
     file_name_2 = "expected_values.xlsx"
-    read_file_1 = xlrd.open_workbook(file_name_1)
-    read_file_2 = xlrd.open_workbook(file_name_2)
-    sheet_1 = read_file_1.sheet_by_name("Sheet1")
-    sheet_2 = read_file_2.sheet_by_name("Sheet1")
-    new_file = xlwt.Workbook()
-    new_sheet = new_file.add_sheet("Sheet1")
-    data_1 = get_excel_datas(sheet_1)
-    data_2 = get_excel_datas(sheet_2)
-    control_list = []
-    write_title_of_total(new_sheet)
-    for i in data_1:
-        for j in data_2:
-            if i[0] == j[0]:
-                if i[1] != "" and j[1] != "":
-                    if type(i[1]) == float or type(j[1]) == float:
-                        try:
-                            new_sheet.write(*i[0], i[1] / j[1], style=style)
-                        except ZeroDivisionError:
-                            new_sheet.write(*i[0], 0, style=style)
-                    else:
-                        style.font = _font_(bold=True)
-                        if "Orb" in i[1]:
-                            style.alignment = xlwt.Alignment()
-                            new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
-                                                  label=i[1], style=style)
-                            style.alignment = alignment
-                        elif i[1] == "Traditional House Rulership":
-                            new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
-                                                  label="Traditional House Rulership", style=style)
-                        elif i[1] == "Modern House Rulership":
-                            new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
-                                                  label="Modern House Rulership", style=style)
+    read_file_1 = None
+    read_file_2 = None
+    try:
+        read_file_1 = xlrd.open_workbook(file_name_1)
+    except FileNotFoundError:
+        msgbox.showinfo(title="Find Effect Size Values", message="No such file or directory: 'observed_values.xlsx'")
+    try:
+        read_file_2 = xlrd.open_workbook(file_name_2)
+    except FileNotFoundError:
+        msgbox.showinfo(title="Find Effect Size Values", message="No such file or directory: 'expected_values.xlsx'")
+    if read_file_1 is not None and read_file_2 is not None:
+        sheet_1 = read_file_1.sheet_by_name("Sheet1")
+        sheet_2 = read_file_2.sheet_by_name("Sheet1")
+        new_file = xlwt.Workbook()
+        new_sheet = new_file.add_sheet("Sheet1")
+        data_1 = get_excel_datas(sheet_1)
+        data_2 = get_excel_datas(sheet_2)
+        control_list = []
+        write_title_of_total(new_sheet)
+        for i in data_1:
+            for j in data_2:
+                if i[0] == j[0]:
+                    if i[1] != "" and j[1] != "":
+                        if type(i[1]) == float or type(j[1]) == float:
+                            try:
+                                new_sheet.write(*i[0], i[1] / j[1], style=style)
+                            except ZeroDivisionError:
+                                new_sheet.write(*i[0], 0, style=style)
                         else:
-                            new_sheet.write(*i[0], i[1], style=style)
-                        style.font = _font_(bold=False)
-                elif i[1] != "" and j[1] == "":
-                    new_sheet.write(*i[0], i[1], style=style)
-                elif i[1] == "" and j[1] != "":
-                    new_sheet.write(*j[0], j[1], style=style)
-                if i[0] not in control_list:
-                    control_list.append(i[0])
-                if j[0] not in control_list:
-                    control_list.append(j[0])
-    save_file(new_file, new_sheet, "effect-size", "observed_values", "expected_values")
-    master.update()
-    msgbox.showinfo(title="Find Effect Size Values", message="Process finished successfully.")
+                            style.font = _font_(bold=True)
+                            if "Orb" in i[1]:
+                                style.alignment = xlwt.Alignment()
+                                new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
+                                                      label=i[1], style=style)
+                                style.alignment = alignment
+                            elif i[1] == "Traditional House Rulership":
+                                new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
+                                                      label="Traditional House Rulership", style=style)
+                            elif i[1] == "Modern House Rulership":
+                                new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
+                                                      label="Modern House Rulership", style=style)
+                            else:
+                                new_sheet.write(*i[0], i[1], style=style)
+                            style.font = _font_(bold=False)
+                    elif i[1] != "" and j[1] == "":
+                        new_sheet.write(*i[0], i[1], style=style)
+                    elif i[1] == "" and j[1] != "":
+                        new_sheet.write(*j[0], j[1], style=style)
+                    if i[0] not in control_list:
+                        control_list.append(i[0])
+                    if j[0] not in control_list:
+                        control_list.append(j[0])
+        save_file(new_file, new_sheet, "effect-size", "observed_values", "expected_values")
+        master.update()
+        msgbox.showinfo(title="Find Effect Size Values", message="Process finished successfully.")
 
 
 # --------------------------------------------- main ---------------------------------------------
