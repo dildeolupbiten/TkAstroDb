@@ -1669,7 +1669,7 @@ def main():
             year_dict = dict()
             count = 0
             for i in range(min_, max_, step_):
-                year_dict[(min_ + count * step_, min_ + (count * step_) + step_)] = []
+                year_dict[(min_ + (count * step_), min_ + (count * step_) + step_)] = []
                 count += 1
             for i in years:
                 for keys, values in year_dict.items():
