@@ -616,6 +616,7 @@ var_checkbutton_1, display_checkbutton_1, var_checkbutton_2, display_checkbutton
 
 
 def insert_to_treeview(control_items, item):
+    global _num_
     control_items.append(item)
     master.update()
     treeview.insert("", _num_, values=[col for col in item])
@@ -625,7 +626,6 @@ def insert_to_treeview(control_items, item):
 
 
 def south_north_check(control_items, item):
-    global _num_
     if var_checkbutton_5.get() == "1" and var_checkbutton_6.get() == "0":
         if "n" in item[7]:
             pass
