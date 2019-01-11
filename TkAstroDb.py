@@ -402,21 +402,24 @@ columns = ["Adb ID", "Name", "Gender", "Rodden Rating", "Date",
            "Country", "Country Code", "Adb Link", "Category"]
 
 treeview = Treeview(master=bottom_frame, show="headings",
-                    columns=[f"#{_i_ + 1}" for _i_ in range(len(columns))], height=14)
+                    columns=[f"#{_i_ + 1}" for _i_ in range(len(columns))], height=18)
 for _i_, _j_ in enumerate(columns):
     treeview.heading(f"#{_i_ + 1}", text=_j_)
 treeview.pack()
 
-search_label = tk.Label(master=top_frame, text="Search A Record By Name: ", fg="red")
+entry_button_frame = tk.Frame(master=top_frame)
+entry_button_frame.grid(row=0, column=0)
+
+search_label = tk.Label(master=entry_button_frame, text="Search A Record By Name: ", fg="red")
 search_label.grid(row=0, column=0, padx=5, sticky="w", pady=5)
 
-search_entry = tk.Entry(master=top_frame)
+search_entry = tk.Entry(master=entry_button_frame)
 search_entry.grid(row=0, column=1, padx=5, pady=5)
 
-found_record = tk.Label(master=top_frame, text="")
+found_record = tk.Label(master=entry_button_frame, text="")
 found_record.grid(row=1, column=0, padx=5, pady=5)
 
-add_button = tk.Button(master=top_frame, text="Add")
+add_button = tk.Button(master=entry_button_frame, text="Add")
 
 
 def add_command(record):
@@ -477,10 +480,10 @@ search_entry.bind("<Button-1>", lambda event: destroy_entry(event))
 search_entry.bind("<Button-3>", lambda event: button_3_on_entry(event))
 search_entry.bind("<KeyRelease>", search_func)
 
-category_label = tk.Label(master=top_frame, text="Categories:", fg="red")
+category_label = tk.Label(master=entry_button_frame, text="Categories:", fg="red")
 category_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
 
-rrating_label = tk.Label(master=top_frame, text="Rodden Rating:", fg="red")
+rrating_label = tk.Label(master=entry_button_frame, text="Rodden Rating:", fg="red")
 rrating_label.grid(row=3, column=0, padx=5, pady=5, sticky="w")
 
 
@@ -588,16 +591,16 @@ def select_categories():
         check_uncheck.configure(command=lambda: check_all_command(check_all, cvar_list, checkbutton_list))
 
 
-category_button = tk.Button(master=top_frame, text="Select", command=select_categories)
+category_button = tk.Button(master=entry_button_frame, text="Select", command=select_categories)
 category_button.grid(row=2, column=1, padx=5, pady=5)
 
-rating_button = tk.Button(master=top_frame, text="Select", command=select_ratings)
+rating_button = tk.Button(master=entry_button_frame, text="Select", command=select_ratings)
 rating_button.grid(row=3, column=1, padx=5, pady=5)
 
 
 def create_checkbutton():
     check_frame = tk.Frame(master=top_frame)
-    check_frame.grid(row=2, column=2)
+    check_frame.grid(row=0, column=2)
     for i, j in enumerate(("event", "human", "male", "female", "North Hemisphere", "South Hemisphere")):
         _var_ = tk.StringVar()
         _var_.set(value="0")
