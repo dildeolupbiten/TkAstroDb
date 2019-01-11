@@ -663,7 +663,7 @@ def male_female_check(control_items, item):
 
 
 def display_results():
-    global displayed_results, _num_
+    global displayed_results
     treeview.delete(*treeview.get_children())
     displayed_results = []
     control_items = []
