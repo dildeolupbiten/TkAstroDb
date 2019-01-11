@@ -1185,18 +1185,18 @@ def write_datas_to_excel(get_datas):
 
 
 def modify_category_names():
-    cat = selected_categories[0].split(":")
+    cat = selected_categories[0].split(" : ")
     for i, j in enumerate(cat):
-        if j.startswith(" ") and j.endswith(" "):
-            cat[i] = j[1:-1]
-        elif j.startswith(" "):
-            cat[i] = j[1:]
-        elif j.endswith(" "):
-            cat[i] = j[:-1]
+        if "/ " in j:
+            cat[i] = cat[i].replace("/ ", "_", j.count("/"))
+        if "/" in j:
+            cat[i] = cat[i].replace("/", "_", j.count("/"))
+        if " - " in j:
+            cat[i] = cat[i].replace(" - ", "_", j.count(" - "))
+        if "-" in j:
+            cat[i] = cat[i].replace("-", "_", j.count(" - "))
         if " " in j:
-            cat[i] = cat[i].replace(" ", "_")
-        elif "/" in j:
-            cat[i] = cat[i].replace("/", "_")            
+            cat[i] = cat[i].replace(" ", "_", j.count(" "))
     return cat
 
 
@@ -1265,12 +1265,16 @@ def find_observed_values():
                     dir2 = ""
                     try:
                         os.rename("table0.xlsx", "observed_values.xlsx")
+                        dir1 = f"Rodden_Rating_{'+'.join(selected_ratings)}"
                         cat = []
                         if len(selected_categories) == 1:
-                            cat = modify_category_names()
+                            if len(displayed_results) == 1:
+                                cat = [displayed_results[0][1].replace(" ", "_", displayed_results[0][1].count(" "))]
+                                dir1 = f"Rodden_Rating_{displayed_results[0][3]}"
+                            else:
+                                cat = modify_category_names()
                         elif len(selected_categories) > 1:
                             cat = ["Control_Group"]
-                        dir1 = f"Rodden_Rating_{'+'.join(selected_ratings)}"
                         dir2 += os.path.join(
                             *cat,
                             dir1,
