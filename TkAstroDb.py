@@ -1678,7 +1678,8 @@ def main():
         t5frame.pack()
         date_entries = []
         years = [int(i[4].split(" ")[2]) for i in displayed_results]
-        freq_frmt[0], freq_frmt[1], freq_frmt[2] = min(years), max(years), 100
+        if len(years) != 0:
+            freq_frmt[0], freq_frmt[1], freq_frmt[2] = min(years), max(years), 100
         for i, j in enumerate(("Minimum", "Maximum", "Step")):
             date_label = tk.Label(master=t5frame, text=j)
             date_label.grid(row=i, column=0, sticky="w")
