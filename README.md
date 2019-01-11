@@ -81,11 +81,55 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img12](https://user-images.githubusercontent.com/29302909/51044436-23d52f00-15d2-11e9-8dcd-f51f244c09b1.png)
 
-**13.** After the computation finished, a log file (**output.log**) and an excel spreadsheet file (**observed_values.xlsx**) can be found inside nested directories like **Vocation/Occult_Fields/Astrologer/Rodden_Rating_AA/Orb_Factor_6_2_2_4_2_6_6_2_2_2_6/House_System_Placidus**.The directory names can be different according to the settings that users selected. This file include the astrological pattern distributions of displayed records. Since third party users may want to find the pattern distributions of different categories, it is recommended to create a folder which name is **Categories**.
+**13.** After the computation finished, a log file (**output.log**) and an excel spreadsheet file (**observed_values.xlsx**) can be found inside nested directories like **Vocation/Occult_Fields/Astrologer/Rodden_Rating_AA/Orb_Factor_6_2_2_4_2_6_6_2_2_2_6/House_System_Placidus**. The directory names can be different according to the settings selected by the users. The spreadsheet file contains the astrological pattern distributions of displayed records.
 
 ![img13](https://user-images.githubusercontent.com/29302909/51046181-79133f80-15d6-11e9-8457-cc72a010e63f.png)
 
-**14.** In order to calculate the expected values, the users must have two tables which include the astrological pattern distributions of two different categories. The expected values are calculated by comparing this two different categories. One category will be used as a *control group*, the other category will be used as a *research group*. While the table which is wanted to use as a *control group* should be renamed as **control_group.xlsx**, there is no need to change the name of *research group*, so it's name should be **observed_values.xlsx**. Note that users should copy the related tables to the **TkAstroDb** folder. After that users can click **Calculations** menu button and they should select **Find Expected Values** option. There are two different methods to calculate the expected results. Users can select any of them. After the calculation finished, **control_group.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheet file will be created as **expected_values.xlsx**. And it is recommended to move **expected_values.xlsx** file to the related category folder:
+**14.** In order to calculate the expected values, the users must have two tables which include the astrological pattern distributions of two different categories. The expected values are calculated by comparing this two different categories. One category will be used as a *control group*, the other category will be used as a *research group*. While the table which is wanted to use as a *control group* should be renamed as **control_group.xlsx**, there is no need to change the name of *research group*, so it's name should be **observed_values.xlsx**. Note that users should copy the related tables to the **TkAstroDb** folder, then users can click **Calculations** menu button and they should select **Find Expected Values** option. There are two different methods to calculate the expected results.
+
+**14.1. Flavia's Method:** This method is recommended to be used when the population number of the control group is small. For example this method can be used when the control group is another Adb category.
+    
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+       
+    from random import randrange
+
+       
+    def formula(x: list, y: list):
+        return [sum(x) * ((x[i] + y[i]) / (sum(x) + sum(y)) * 100) / 100 for i in range(12)],\
+            [sum(y) * ((x[i] + y[i]) / (sum(x) + sum(y)) * 100) / 100 for i in range(12)]
+        
+           
+    x1 = [randrange(0, 100, 1) for i in range(12)]
+    y1 = [randrange(0, 100, 1) for i in range(12)]
+
+    exp_x, exp_y = formula(x=x1, y=y1) 
+
+    print(f"x1: {sum(x1)}, Expected x1: {sum(exp_x)}\n\
+    y1: {sum(y1)}, Expected y1: {sum(exp_y)}")
+       
+**14.2. Sjoerd's Method:** This method is recommended to be used when the population number of the control group is larger.
+       
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+       
+    from random import randrange
+
+       
+    def formula(x: list, y: list):
+        return [i * sum(x) / sum(y) for i in y], [i * sum(y) / sum(x) for i in x] 
+        
+         
+    x1 = [randrange(0, 100, 1) for i in range(12)]  
+    y1 = [randrange(0, 100, 1) for i in range(12)]
+
+    exp_x, exp_y = calculate(x=x1, y=y1) 
+
+    print(f"x1: {sum(x1)}, Expected x1: {sum(exp_x)}\n\
+    y1: {sum(y1)}, Expected y1: {sum(exp_y)}")    
+    
+
+After the calculation finished, **control_group.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheet file will be created as **expected_values.xlsx**. And it is recommended to move **expected_values.xlsx** file to the related category folder:
 
 ![img14](https://user-images.githubusercontent.com/29302909/51046081-3b161b80-15d6-11e9-81d9-936c39d982e0.png)
 
@@ -124,4 +168,3 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 ## Licenses
 
 TkAstroDb is released under the terms of the GNU GENERAL PUBLIC LICENSE. Please refer to the LICENSE file.
-
