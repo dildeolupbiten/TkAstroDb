@@ -1219,6 +1219,8 @@ def modify_category_names():
             cat[i] = j[:-1]
         if " " in j:
             cat[i] = cat[i].replace(" ", "_")
+        elif "/" in j:
+            cat[i] = cat[i].replace("/", "_")            
     return cat
 
 
