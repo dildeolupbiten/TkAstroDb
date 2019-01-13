@@ -96,8 +96,8 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
        
     def formula(x: list, y: list):
-        return [sum(x) * ((x[i] + y[i]) / (sum(x) + sum(y)) * 100) / 100 for i in range(12)],\
-            [sum(y) * ((x[i] + y[i]) / (sum(x) + sum(y)) * 100) / 100 for i in range(12)]
+        return [sum(x) * (x[i] + y[i]) / (sum(x) + sum(y)) for i in range(12)],\
+            [sum(y) * (x[i] + y[i]) / (sum(x) + sum(y)) for i in range(12)]
         
            
     x1 = [randrange(0, 100, 1) for i in range(12)]
