@@ -145,19 +145,19 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **observed_values.xlsx**
 
-![img17](https://user-images.githubusercontent.com/29302909/50789196-9ee5cf00-12cc-11e9-978f-e8bc4547a1ed.png)
+![img17](https://user-images.githubusercontent.com/29302909/51140511-cc47f500-1857-11e9-9867-ae413c28c379.png)
 
 **expected_values.xlsx**
 
-![img18](https://user-images.githubusercontent.com/29302909/50789206-a4431980-12cc-11e9-9174-d1c6506ecf02.png)
+![img18](https://user-images.githubusercontent.com/29302909/51140623-103afa00-1858-11e9-9a8b-c7862cfe6654.png)
 
 **chi-square.xlsx**
 
-![img19](https://user-images.githubusercontent.com/29302909/50789208-a7d6a080-12cc-11e9-8953-9f1adf827f97.png)
+![img19](https://user-images.githubusercontent.com/29302909/51140580-f0a3d180-1857-11e9-8c4f-a81b37974b4a.png)
 
 **effect-size.xlsx**
 
-![img20](https://user-images.githubusercontent.com/29302909/50789212-ab6a2780-12cc-11e9-8b84-58a0bd030275.png)
+![img20](https://user-images.githubusercontent.com/29302909/51140744-6445de80-1858-11e9-883a-3c68e7dbe97d.png)
 
 ## Notes
 
