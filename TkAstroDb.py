@@ -819,7 +819,6 @@ def get_excel_datas(sheet):
                 r2 += f"{sheet.cell_value(row, 5)} / "
             elif row == 3:
                 r3 += f"{sheet.cell_value(row, 5)} / "
-                # 14
             elif row == 0 or row == 4 or row == 5 or row == 230 or row == 245 or row == 260 \
                     or row == 275 or row == 290 or row == 305 or row == 320 \
                     or row == 335 or row == 350 or row == 365 or row == 380 or row == 395 or row == 411 \
