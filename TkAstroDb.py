@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.2.3"
+__version__ = "1.2.4"
 
 import os
 import sys
@@ -9,8 +9,6 @@ import ssl
 import time
 import shutil
 import threading
-import traceback
-import numpy as np
 import webbrowser
 import tkinter as tk
 import xml.etree.ElementTree
@@ -20,6 +18,11 @@ import tkinter.messagebox as msgbox
 from datetime import datetime
 from tkinter.ttk import Progressbar, Treeview
 
+try:
+    import numpy as np
+except ModuleNotFoundError:
+    os.system("pip3 install numpy")
+    import numpy as np  
 try:
     import xlrd
 except ModuleNotFoundError:
@@ -1578,7 +1581,6 @@ def find_observed_values():
                     chart = Chart(julian_date, longitude, latitude)
                     write_datas_to_excel(chart.get_chart_data())
                 except BaseException as err:
-                    traceback.print_exc(file=sys.stdout)
                     log.write(f"|{str(datetime.now())[:-7]}| Error Type: {err}\n{' ' * 22}Record: {records}\n\n")
                     log.flush()
                 __received__ += 1
@@ -1981,7 +1983,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "14 January 2019"
+        update_date, _update_date = "Update Date:", "15 January 2019"
         developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
