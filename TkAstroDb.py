@@ -1104,19 +1104,6 @@ def special_cells(new_sheet, i):
     style.font = _font_(bold=False)
 
 
-def sum_all_aspects(sheet, row=205, num=52, cols="ABCDEFGHIJK"):
-    for __, _ in enumerate(cols):
-        sheet.write(
-            row, __,
-            xlwt.Formula(
-                f"SUM({_}{num};{_}{num + 14};{_}{num + 14 * 2};{_}{num + 14 * 3};"
-                f"{_}{num + 14 * 4};{_}{num + 14 * 5};{_}{num + 14 * 6};{_}{num + 14 * 7};"
-                f"{_}{num + 14 * 8};{_}{num + 14 * 9};{_}{num + 14 * 10})"),
-            style=style)
-        num += 1
-        row += 1
-
-
 def create_a_new_table():
     file_1 = "table0.xlsx"
     file_2 = "table1.xlsx"
