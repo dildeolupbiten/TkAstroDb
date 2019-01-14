@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.2.2"
+__version__ = "1.2.3"
 
 import os
 import sys
@@ -9,6 +9,8 @@ import ssl
 import time
 import shutil
 import threading
+import traceback
+import numpy as np
 import webbrowser
 import tkinter as tk
 import xml.etree.ElementTree
@@ -784,9 +786,9 @@ biquintile = 2
 quincunx = 2
 opposite = 6
 
-r1, r2 = "", ""
+r1, r2, r3, dir2 = "", "", "", ""
 
-_r1, _r2 = [], []
+_r1, _r2, _r3 = [], [], []
 
 method, selection = False, False
 
@@ -805,108 +807,273 @@ def _font_(name="Arial", bold=False):
 
 
 def get_excel_datas(sheet):
-    global r1, r2, _r1, _r2, selection
+    global r1, r2, r3, _r1, _r2, _r3, selection
     datas = []
-    if r1.count("/") == 2 and r2.count("/") == 2:
-        r1, r2 = "", ""
+    if r1.count("/") == 2 and r2.count("/") == 2 and r3.count("/") == 2:
+        r1, r2, r3 = "", "", ""
     for row in range(sheet.nrows):
         if selection == "expected":
             if row == 1:
-                r1 += f"{sheet.cell_value(row, 4).split(': ')[1]} / "
+                r1 += f"{sheet.cell_value(row, 5)} / "
             elif row == 2:
-                r2 += f"{sheet.cell_value(row, 4).split(': ')[1]} / "
-            elif row == 0 or row == 213 or row == 228 or row == 243 \
-                    or row == 258 or row == 273 or row == 288 or row == 303 \
-                    or row == 318 or row == 333 or row == 348 or row == 363 or row == 378:
+                r2 += f"{sheet.cell_value(row, 5)} / "
+            elif row == 3:
+                r3 += f"{sheet.cell_value(row, 5)} / "
+                # 14
+            elif row == 0 or row == 4 or row == 5 or row == 230 or row == 245 or row == 260 \
+                    or row == 275 or row == 290 or row == 305 or row == 320 \
+                    or row == 335 or row == 350 or row == 365 or row == 380 or row == 395 or row == 411 \
+                    or row == 427:
                 pass
             else:
                 for col in range(sheet.ncols):
-                    if col != 13:
+                    if col < 13:
+                        datas.append(([row, col], sheet.cell_value(row, col)))
+                    elif col == 13 and 216 < row < 398:
                         datas.append(([row, col], sheet.cell_value(row, col)))
         elif selection == "chisquare" or selection == "effectsize":
             if row == 1:
-                _r1.append(f"{sheet.cell_value(row, 4).split(': ')[1]}")
+                _r1.append(f"{sheet.cell_value(row, 5)}")
                 for i in _r1:
                     if "/" in i:
                         r1 = i
             elif row == 2:
-                _r2.append(f"{sheet.cell_value(row, 4).split(': ')[1]}")
+                _r2.append(f"{sheet.cell_value(row, 5)}")
                 for i in _r2:
                     if "/" in i:
                         r2 = i
-            elif row == 0 or row == 213 or row == 228 or row == 243 \
-                    or row == 258 or row == 273 or row == 288 or row == 303 \
-                    or row == 318 or row == 333 or row == 348 or row == 363 or row == 378:
+            elif row == 3:
+                _r3.append(f"{sheet.cell_value(row, 5)}")
+                for i in _r3:
+                    if "/" in i:
+                        r3 = i
+            elif row == 0 or row == 4 or row == 5 or row == 230 or row == 245 or row == 260 \
+                    or row == 275 or row == 290 or row == 305 or row == 320 \
+                    or row == 335 or row == 350 or row == 365 or row == 380 or row == 395 or row == 411 \
+                    or row == 427:
                 pass
             else:
                 for col in range(sheet.ncols):
-                    if col != 13:
+                    if col < 13:
+                        datas.append(([row, col], sheet.cell_value(row, col)))
+                    elif col == 13 and 216 < row < 398:
                         datas.append(([row, col], sheet.cell_value(row, col)))
         elif selection == "observed":  
-            if row == 0 or row == 1 or row == 2 or row == 213 or row == 228 or row == 243 \
-                    or row == 258 or row == 273 or row == 288 or row == 303 \
-                    or row == 318 or row == 333 or row == 348 or row == 363 or row == 378:
+            if row == 0 or row == 1 or row == 2 or row == 3 or row == 4 or row == 5 \
+                    or row == 230 or row == 245 or row == 260 \
+                    or row == 275 or row == 290 or row == 305 or row == 320 \
+                    or row == 335 or row == 350 or row == 365 or row == 380 or row == 395 or row == 411 \
+                    or row == 427:
                 pass
             else:
                 for col in range(sheet.ncols):
-                    if col != 13:
+                    if col < 13:
+                        datas.append(([row, col], sheet.cell_value(row, col)))
+                    elif col == 13 and 216 < row < 398:
                         datas.append(([row, col], sheet.cell_value(row, col)))
     return datas
 
 
-def write_total_horz(sheet, num=4):
+def write_total_horz(sheet, num=7, col=13):
     for _ in range(12):
         v = _ + num
-        sheet.write(
-            v + 1, 13,
-            xlwt.Formula(
-                f"SUM(B{v + 2};C{v + 2};D{v + 2};E{v + 2};F{v + 2};G{v + 2};H{v + 2};\
-                I{v + 2};J{v + 2};K{v + 2};L{v + 2};M{v + 2})"),
-            style=style)
+        if col == 13:
+            sheet.write(
+                v + 1, col,
+                xlwt.Formula(
+                    f"SUM(B{v + 2};C{v + 2};D{v + 2};E{v + 2};F{v + 2};G{v + 2};H{v + 2};\
+                    I{v + 2};J{v + 2};K{v + 2};L{v + 2};M{v + 2})"),
+                style=style)
+        elif col == 14:
+            sheet.write(
+                v + 1, col,
+                xlwt.Formula(
+                    f"SUM(C{v + 2};D{v + 2};E{v + 2};F{v + 2};G{v + 2};H{v + 2};I{v + 2};\
+                    J{v + 2};K{v + 2};L{v + 2};M{v + 2};N{v + 2})"),
+                style=style)
 
 
-def write_total_vert(sheet, num=4):
-    for __, _ in enumerate("BCDEFGHIJKLMN"):
-        sheet.write(
-            num + 11, __ + 1,
-            xlwt.Formula(
-                f"SUM({_}{num};{_}{num + 1};{_}{num + 2};{_}{num + 3};{_}{num + 4};{_}{num + 5};\
-                {_}{num + 6};{_}{num + 7};{_}{num + 8};{_}{num + 9};{_}{num + 10};{_}{num + 11})"),
-            style=style)
+def write_total_vert(sheet, num=7, col=1):
+    if col == 1:
+        for __, _ in enumerate("BCDEFGHIJKLMN"):
+            sheet.write(
+                num + 11, __ + col,
+                xlwt.Formula(
+                    f"SUM({_}{num};{_}{num + 1};{_}{num + 2};{_}{num + 3};{_}{num + 4};{_}{num + 5};\
+                            {_}{num + 6};{_}{num + 7};{_}{num + 8};{_}{num + 9};{_}{num + 10};{_}{num + 11})"),
+                style=style)
+    elif col == 2:
+        for __, _ in enumerate("CDEFGHIJKLMNO"):
+            sheet.write(
+                num + 11, __ + col,
+                xlwt.Formula(
+                    f"SUM({_}{num};{_}{num + 1};{_}{num + 2};{_}{num + 3};{_}{num + 4};{_}{num + 5};\
+                            {_}{num + 6};{_}{num + 7};{_}{num + 8};{_}{num + 9};{_}{num + 10};{_}{num + 11})"),
+                style=style)
+
+
+def modify_category_names():
+    cat = selected_categories[0].split(" : ")
+    for i, j in enumerate(cat):
+        if "/ " in j:
+            cat[i] = cat[i].replace("/ ", "_", j.count("/"))
+        if "/" in j:
+            cat[i] = cat[i].replace("/", "_", j.count("/"))
+        if " - " in j:
+            cat[i] = cat[i].replace(" - ", "_", j.count(" - "))
+        if "-" in j:
+            cat[i] = cat[i].replace("-", "_", j.count("-"))
+        if " " in j:
+            cat[i] = cat[i].replace(" ", "_", j.count(" "))
+    return cat
 
 
 def write_title_of_total(sheet):
+    try:
+        record_name = f"{displayed_results[0][1].replace(' ', '_', displayed_results[0][1].count(' '))}"
+    except IndexError:
+        record_name = ""
+    style.alignment = xlwt.Alignment()
+
     style.font = _font_(bold=True)
-    sheet.write_merge(r1=0, r2=0, c1=4, c2=9, label=f"Adb Version: {xml_file.replace('.xml', '')}", style=style)
+    sheet.write_merge(r1=0, r2=0, c1=3, c2=4, label="Adb Version:", style=style)
+    style.font = _font_(bold=False)
+    sheet.write_merge(r1=0, r2=0, c1=5, c2=13, label=f"{xml_file.replace('.xml', '')}", style=style)
+
+    style.font = _font_(bold=True)
+    sheet.write_merge(r1=0, r2=0, c1=0, c2=1, label="Event:", style=style)
+    style.font = _font_(bold=False)
+    if var_checkbutton_1.get() == "0":
+        sheet.write(0, 2, label="True", style=style)
+    else:
+        sheet.write(0, 2, label="False", style=style)
+
+    style.font = _font_(bold=True)
+    sheet.write_merge(r1=1, r2=1, c1=0, c2=1, label="Human:", style=style)
+    style.font = _font_(bold=False)
+    if var_checkbutton_2.get() == "0":
+        sheet.write(1, 2, label="True", style=style)
+    else:
+        sheet.write(1, 2, label="False", style=style)
+
+    style.font = _font_(bold=True)
+    sheet.write_merge(r1=2, r2=2, c1=0, c2=1, label="Male:", style=style)
+    style.font = _font_(bold=False)
+    if var_checkbutton_3.get() == "0":
+        sheet.write(2, 2, label="True", style=style)
+    else:
+        sheet.write(2, 2, label="False", style=style)
+
+    style.font = _font_(bold=True)
+    sheet.write_merge(r1=3, r2=3, c1=0, c2=1, label="Female:", style=style)
+    style.font = _font_(bold=False)
+    if var_checkbutton_4.get() == "0":
+        sheet.write(3, 2, label="True", style=style)
+    else:
+        sheet.write(3, 2, label="False", style=style)
+
+    style.font = _font_(bold=True)
+    sheet.write_merge(r1=4, r2=4, c1=0, c2=1, label="North Hemisphere:", style=style)
+    style.font = _font_(bold=False)
+    if var_checkbutton_5.get() == "0":
+        sheet.write(4, 2, label="True", style=style)
+    else:
+        sheet.write(4, 2, label="False", style=style)
+
+    style.font = _font_(bold=True)
+    sheet.write_merge(r1=5, r2=5, c1=0, c2=1, label="South Hemisphere:", style=style)
+    style.font = _font_(bold=False)
+    if var_checkbutton_6.get() == "0":
+        sheet.write(5, 2, label="True", style=style)
+    else:
+        sheet.write(5, 2, label="False", style=style)
+
+    style.font = _font_(bold=True)
     if selection == "observed":
-        sheet.write_merge(r1=1, r2=1, c1=4, c2=9, label=f"House System: {house_systems[hsys]}", style=style)
-        sheet.write_merge(r1=2, r2=2, c1=4, c2=9, label=f"Rodden Rating: {'+'.join(selected_ratings)}", style=style)
+        sheet.write_merge(r1=1, r2=1, c1=3, c2=4, label="House System:", style=style)
+        style.font = _font_(bold=False)
+        sheet.write_merge(r1=1, r2=1, c1=5, c2=13, label=f"{house_systems[hsys]}", style=style)
+        style.font = _font_(bold=True)
+        if len(displayed_results) == 1:
+            sheet.write_merge(r1=2, r2=2, c1=3, c2=4, label="Rodden Rating:", style=style)
+            style.font = _font_(bold=False)
+            sheet.write_merge(r1=2, r2=2, c1=5, c2=13, label=f"{displayed_results[0][3]}", style=style)
+        else:
+            sheet.write_merge(r1=2, r2=2, c1=3, c2=4, label="Rodden Rating:", style=style)
+            style.font = _font_(bold=False)
+            sheet.write_merge(r1=2, r2=2, c1=5, c2=13, label=f"{'+'.join(selected_ratings)}", style=style)
+        style.font = _font_(bold=True)
+        if len(selected_categories) == 1:
+            if len(displayed_results) == 1:
+                sheet.write_merge(r1=3, r2=3, c1=3, c2=4, label="Category:", style=style)
+                style.font = _font_(bold=False)
+                sheet.write_merge(r1=3, r2=3, c1=5, c2=13, label=f"{record_name}", style=style)
+            else:
+                sheet.write_merge(r1=3, r2=3, c1=3, c2=4, label="Category:", style=style)
+                style.font = _font_(bold=False)
+                sheet.write_merge(r1=3, r2=3, c1=5, c2=13,
+                                  label=f"{'/'.join(modify_category_names())}", style=style)
+        else:
+            sheet.write_merge(r1=3, r2=3, c1=3, c2=4, label="Category:", style=style)
+            style.font = _font_(bold=False)
+            sheet.write_merge(r1=3, r2=3, c1=5, c2=13, label="Control_Group", style=style)
     elif selection == "expected":
-        sheet.write_merge(r1=1, r2=1, c1=4, c2=9, label=f"House System: {r1[:-3]}", style=style)
-        sheet.write_merge(r1=2, r2=2, c1=4, c2=9, label=f"Rodden Rating: {r2[:-3]}", style=style)
+        sheet.write_merge(r1=1, r2=1, c1=3, c2=4, label="House System:", style=style)
+        style.font = _font_(bold=False)
+        sheet.write_merge(r1=1, r2=1, c1=5, c2=13, label=f"{r1[:-3]}", style=style)
+        style.font = _font_(bold=True)
+        sheet.write_merge(r1=2, r2=2, c1=3, c2=4, label="Rodden Rating:", style=style)
+        style.font = _font_(bold=False)
+        sheet.write_merge(r1=2, r2=2, c1=5, c2=13, label=f"{r2[:-3]}", style=style)
+        style.font = _font_(bold=True)
+        sheet.write_merge(r1=3, r2=3, c1=3, c2=4, label="Category:", style=style)
+        style.font = _font_(bold=False)
+        sheet.write_merge(r1=3, r2=3, c1=5, c2=13, label=f"{r3[:-3]}", style=style)
     elif selection == "chisquare" or selection == "effectsize":
-        sheet.write_merge(r1=1, r2=1, c1=4, c2=9, label=f"House System: {r1}", style=style)
-        sheet.write_merge(r1=2, r2=2, c1=4, c2=9, label=f"Rodden Rating: {r2}", style=style)
-    sheet.write(4, 13, "Total", style=style)
-    sheet.write(18, 13, "Total", style=style)
-    sheet.write(32, 13, "Total", style=style)
-    sheet.write(381, 13, "Total", style=style)
-    sheet.write(396, 13, "Total", style=style)
-    for i in range(12):
-        sheet.write(200 + (i * 15), 13, "Total", style=style)
-        sheet.write(213 + (i * 15), 0, "Total", style=style)
+        sheet.write_merge(r1=1, r2=1, c1=3, c2=4, label="House System:", style=style)
+        style.font = _font_(bold=False)
+        sheet.write_merge(r1=1, r2=1, c1=5, c2=13, label=f"{r1}", style=style)
+        style.font = _font_(bold=True)
+        sheet.write_merge(r1=2, r2=2, c1=3, c2=4, label="Rodden Rating:", style=style)
+        style.font = _font_(bold=False)
+        sheet.write_merge(r1=2, r2=2, c1=5, c2=13, label=f"{r2}", style=style)
+        style.font = _font_(bold=True)
+        sheet.write_merge(r1=3, r2=3, c1=3, c2=4, label="Category:", style=style)
+        style.font = _font_(bold=False)
+        sheet.write_merge(r1=3, r2=3, c1=5, c2=13, label=f"{r3}", style=style)
+
+    style.alignment = alignment
+    style.font = _font_(bold=True)
+    sheet.write(7, 13, "Total", style=style)
+    sheet.write(21, 13, "Total", style=style)
+    sheet.write(35, 13, "Total", style=style)
+    for i in range(14):
+        if i == 12:
+            sheet.write(218 + (i * 15), 13, "Total", style=style)
+            sheet.write(231 + (i * 15), 0, "Total", style=style)
+        elif i == 13:
+            sheet.write(219 + (i * 15), 13, "Total", style=style)
+            sheet.write(232 + (i * 15), 0, "Total", style=style)
+        else:
+            sheet.write(217 + (i * 15), 14, "Total", style=style)
+            sheet.write_merge(r1=230 + (i * 15), r2=230 + (i * 15), c1=0, c2=1, label="Total", style=style)
     style.font = _font_(bold=False)
 
 
 def write_total_data(sheet):
-    write_total_horz(sheet=sheet, num=4)
-    write_total_horz(sheet=sheet, num=18)
-    write_total_horz(sheet=sheet, num=32)
-    write_total_horz(sheet=sheet, num=381)
-    write_total_horz(sheet=sheet, num=396)
-    for i in range(12):
-        write_total_horz(sheet=sheet, num=200 + (i * 15))
-        write_total_vert(sheet=sheet, num=202 + (i * 15))
+    write_total_horz(sheet=sheet, num=7)
+    write_total_horz(sheet=sheet, num=21)
+    write_total_horz(sheet=sheet, num=35)
+    for i in range(14):
+        if i == 12:
+            write_total_horz(sheet=sheet, num=218 + (i * 15))
+            write_total_vert(sheet=sheet, num=220 + (i * 15))
+        elif i == 13:
+            write_total_horz(sheet=sheet, num=219 + (i * 15))
+            write_total_vert(sheet=sheet, num=221 + (i * 15))
+        else:
+            write_total_horz(sheet=sheet, num=217 + (i * 15), col=14)
+            write_total_vert(sheet=sheet, num=219 + (i * 15), col=2)
 
 
 def save_file(file, sheet, table_name, table0="table0", table1="table1"):
@@ -914,6 +1081,40 @@ def save_file(file, sheet, table_name, table0="table0", table1="table1"):
     os.remove(f"{table0}.xlsx")
     os.remove(f"{table1}.xlsx")
     file.save(f"{table_name}.xlsx")
+
+
+def special_cells(new_sheet, i):
+    style.font = _font_(bold=True)
+    if "Orb" in i[1]:
+        style.alignment = xlwt.Alignment()
+        new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
+                              label=i[1], style=style)
+        style.alignment = alignment
+    elif i[1] == "Traditional House Rulership":
+        new_sheet.write_merge(r1=397, r2=397, c1=0, c2=13,
+                              label="Traditional House Rulership", style=style)
+    elif i[1] == "Modern House Rulership":
+        new_sheet.write_merge(r1=413, r2=413, c1=0, c2=13,
+                              label="Modern House Rulership", style=style)
+    elif "in House" in i[1]:
+        new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 1,
+                              label=i[1], style=style)
+    else:
+        new_sheet.write(*i[0], i[1], style=style)
+    style.font = _font_(bold=False)
+
+
+def sum_all_aspects(sheet, row=205, num=52, cols="ABCDEFGHIJK"):
+    for __, _ in enumerate(cols):
+        sheet.write(
+            row, __,
+            xlwt.Formula(
+                f"SUM({_}{num};{_}{num + 14};{_}{num + 14 * 2};{_}{num + 14 * 3};"
+                f"{_}{num + 14 * 4};{_}{num + 14 * 5};{_}{num + 14 * 6};{_}{num + 14 * 7};"
+                f"{_}{num + 14 * 8};{_}{num + 14 * 9};{_}{num + 14 * 10})"),
+            style=style)
+        num += 1
+        row += 1
 
 
 def create_a_new_table():
@@ -936,21 +1137,7 @@ def create_a_new_table():
                     if type(i[1]) == float or type(j[1]) == float:
                         new_sheet.write(*i[0], i[1] + j[1], style=style)
                     else:
-                        style.font = _font_(bold=True)
-                        if "Orb" in i[1]:
-                            style.alignment = xlwt.Alignment()
-                            new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
-                                                  label=i[1], style=style)
-                            style.alignment = alignment
-                        elif i[1] == "Traditional House Rulership":
-                            new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
-                                                  label="Traditional House Rulership", style=style)
-                        elif i[1] == "Modern House Rulership":
-                            new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
-                                                  label="Modern House Rulership", style=style)
-                        else:
-                            new_sheet.write(*i[0], i[1], style=style)
-                        style.font = _font_(bold=False)
+                        special_cells(new_sheet, i)
                 elif i[1] != "" and j[1] == "":
                     new_sheet.write(*i[0], i[1], style=style)
                 elif i[1] == "" and j[1] != "":
@@ -960,6 +1147,19 @@ def create_a_new_table():
                 if j[0] not in control_list:
                     control_list.append(j[0])
     save_file(new_file, new_sheet, "table0")
+
+
+_planets_ = {i: [] for i in planets}
+_planets = {i: [] for i in planets}
+
+
+def extract_aspects(planet, value, num=11):
+    if len(_planets_[f"{planet}"]) == num:
+        _planets[f"{planet}"].append(_planets_[f"{planet}"])
+        _planets_[f"{planet}"] = []
+        _planets_[f"{planet}"].append(value)
+    elif len(_planets_[f"{planet}"]) < num:
+        _planets_[f"{planet}"].append(value)
 
 
 def search_aspect(planet_pos, sheet, row: int, aspect: int, orb: int, name: str):
@@ -1004,40 +1204,99 @@ def search_aspect(planet_pos, sheet, row: int, aspect: int, orb: int, name: str)
             style.font = _font_(bold=False)
             if aspect - orb <= abs(degree_1 - degree_2) <= aspect + orb:
                 sheet.write(k + _row, i, 1, style=style)
-            else:
+                if j[0] == "Sun":
+                    extract_aspects(planet="Sun", value=1, num=11)
+                elif j[0] == "Moon":
+                    extract_aspects(planet="Moon", value=1, num=10)
+                elif j[0] == "Mercury":
+                    extract_aspects(planet="Mercury", value=1, num=9)
+                elif j[0] == "Venus":
+                    extract_aspects(planet="Venus", value=1, num=8)
+                elif j[0] == "Mars":
+                    extract_aspects(planet="Mars", value=1, num=7)
+                elif j[0] == "Jupiter":
+                    extract_aspects(planet="Jupiter", value=1, num=6)
+                elif j[0] == "Saturn":
+                    extract_aspects(planet="Saturn", value=1, num=5)
+                elif j[0] == "Uranus":
+                    extract_aspects(planet="Uranus", value=1, num=4)
+                elif j[0] == "Neptune":
+                    extract_aspects(planet="Neptune", value=1, num=3)
+                elif j[0] == "Pluto":
+                    extract_aspects( planet="Pluto", value=1, num=2)
+                elif j[0] == "North Node":
+                    extract_aspects(planet="North Node", value=1, num=1)
+                elif j[0] == "Chiron":
+                    extract_aspects(planet="Chiron", value=1, num=0)
+            else: 
                 sheet.write(k + _row, i, 0, style=style)
+                if j[0] == "Sun":
+                    extract_aspects(planet="Sun", value=0, num=11)
+                elif j[0] == "Moon":
+                    extract_aspects(planet="Moon", value=0, num=10)
+                elif j[0] == "Mercury":
+                    extract_aspects(planet="Mercury", value=0, num=9)
+                elif j[0] == "Venus":
+                    extract_aspects(planet="Venus", value=0, num=8)
+                elif j[0] == "Mars":
+                    extract_aspects(planet="Mars", value=0, num=7)
+                elif j[0] == "Jupiter":
+                    extract_aspects(planet="Jupiter", value=0, num=6)
+                elif j[0] == "Saturn":
+                    extract_aspects(planet="Saturn", value=0, num=5)
+                elif j[0] == "Uranus":
+                    extract_aspects(planet="Uranus", value=0, num=4)
+                elif j[0] == "Neptune":
+                    extract_aspects(planet="Neptune", value=0, num=3)
+                elif j[0] == "Pluto":
+                    extract_aspects(planet="Pluto", value=0, num=2)
+                elif j[0] == "North Node":
+                    extract_aspects(planet="North Node", value=0, num=1)
+                elif j[0] == "Chiron":
+                    extract_aspects(planet="Chiron", value=0, num=0)
         n_ += 1
         _row += 1
     style.font = _font_(bold=True)
 
 
+def sum_aspects(planet):
+    for i, j in enumerate(planet):
+        planet[i] = np.array(j)
+    new_list = list(planet[0] + planet[1] + planet[2] + planet[3] + planet[4] + planet[5] + planet[6] +
+                    planet[7] + planet[8] + planet[9] + planet[10])
+    return [float(i) for i in new_list]
+
+
 def write_datas_to_excel(get_datas):
+    global _planets_, _planets
+    _planets_ = {i: [] for i in planets}
+    _planets = {i: [] for i in planets}
     file = xlwt.Workbook()
     sheet = file.add_sheet("Sheet1")
     planet_info, house_info, planet_pos, traditional_ruler, modern_ruler = get_datas
     style.font = _font_(bold=True)
     for i, j in enumerate(signs):
-        sheet.write(4, i + 1, j, style=style)
-        sheet.write(18, i + 1, j, style=style)
+        sheet.write(7, i + 1, j, style=style)
+        sheet.write(21, i + 1, j, style=style)
     for i, j in enumerate(planet_info):
-        sheet.write(i + 5, 0, j[0], style=style)
-        sheet.write(i + 33, 0, j[0], style=style)
+        sheet.write(i + 8, 0, j[0], style=style)
+        sheet.write(i + 36, 0, j[0], style=style)
     for i in range(12):
-        sheet.write(i + 19, 0, f"House {i + 1}", style=style)
-        sheet.write(32, i + 1, f"House {i + 1}", style=style)
+        sheet.write(i + 22, 0, f"House {i + 1}", style=style)
+        sheet.write(35, i + 1, f"House {i + 1}", style=style)
     style.font = _font_(bold=False)
     for i, j in enumerate(planet_info):
         for k, m in enumerate(signs):
             if j[1] == m:
-                sheet.write(i + 5, k + 1, 1, style=style)
+                sheet.write(i + 8, k + 1, 1, style=style)
             else:
-                sheet.write(i + 5, k + 1, 0, style=style)
+                sheet.write(i + 8, k + 1, 0, style=style)
     for i, j in enumerate(house_info):
         for k, m in enumerate(signs):
             if j[1] == m:
-                sheet.write(i + 19, k + 1, 1, style=style)
+                sheet.write(i + 22, k + 1, 1, style=style)
             else:
-                sheet.write(i + 19, k + 1, 0, style=style)
+                sheet.write(i + 22, k + 1, 0, style=style)
     __planets__ = [[] for _ in planets]
     for i, j in enumerate(planet_info):
         for k, m in enumerate(house_info):
@@ -1066,21 +1325,43 @@ def write_datas_to_excel(get_datas):
                     __planets__[10].append(j)
                 elif j[0] == planets[11]:
                     __planets__[11].append(j)
-                sheet.write(i + 33, k + 1, 1, style=style)
+                sheet.write(i + 36, k + 1, 1, style=style)
             else:
-                sheet.write(i + 33, k + 1, 0, style=style)
+                sheet.write(i + 36, k + 1, 0, style=style)
     style.font = _font_(bold=True)
-    search_aspect(planet_pos, sheet, row=48, aspect=0, orb=conjunction, name="Conjunction")
-    search_aspect(planet_pos, sheet, row=62, aspect=30, orb=semi_sextile, name="Semi-Sextile")
-    search_aspect(planet_pos, sheet, row=76, aspect=45, orb=semi_square, name="Semi-Square")
-    search_aspect(planet_pos, sheet, row=90, aspect=60, orb=sextile, name="Sextile")
-    search_aspect(planet_pos, sheet, row=104, aspect=72, orb=quintile, name="Quintile")
-    search_aspect(planet_pos, sheet, row=118, aspect=90, orb=square, name="Square")
-    search_aspect(planet_pos, sheet, row=132, aspect=120, orb=trine, name="Trine")
-    search_aspect(planet_pos, sheet, row=146, aspect=135, orb=sesquiquadrate, name="Sesquiquadrate")
-    search_aspect(planet_pos, sheet, row=160, aspect=144, orb=biquintile, name="BiQuintile")
-    search_aspect(planet_pos, sheet, row=174, aspect=150, orb=quincunx, name="Quincunx")
-    search_aspect(planet_pos, sheet, row=188, aspect=180, orb=opposite, name="Opposite")
+    search_aspect(planet_pos, sheet, row=51, aspect=0, orb=conjunction, name="Conjunction")
+    search_aspect(planet_pos, sheet, row=65, aspect=30, orb=semi_sextile, name="Semi-Sextile")
+    search_aspect(planet_pos, sheet, row=79, aspect=45, orb=semi_square, name="Semi-Square")
+    search_aspect(planet_pos, sheet, row=93, aspect=60, orb=sextile, name="Sextile")
+    search_aspect(planet_pos, sheet, row=107, aspect=72, orb=quintile, name="Quintile")
+    search_aspect(planet_pos, sheet, row=121, aspect=90, orb=square, name="Square")
+    search_aspect(planet_pos, sheet, row=135, aspect=120, orb=trine, name="Trine")
+    search_aspect(planet_pos, sheet, row=149, aspect=135, orb=sesquiquadrate, name="Sesquiquadrate")
+    search_aspect(planet_pos, sheet, row=163, aspect=144, orb=biquintile, name="BiQuintile")
+    search_aspect(planet_pos, sheet, row=177, aspect=150, orb=quincunx, name="Quincunx")
+    search_aspect(planet_pos, sheet, row=191, aspect=180, orb=opposite, name="Opposite")
+    style.alignment = xlwt.Alignment()
+    sheet.write_merge(r1=203, r2=203, c1=0, c2=2, label="All Aspects", style=style)
+    style.alignment = alignment
+    for i, j in enumerate(planets):
+        sheet.write(204 + i, i, j, style=style)
+    style.font = _font_(bold=False)
+    for i in planets:
+        _planets[f"{i}"].append(_planets_[f"{i}"])
+    for keys, values in _planets.items():
+        try:
+            _planets[f"{keys}"] = sum_aspects(values)
+        except IndexError:
+            _planets[f"{keys}"] = []
+    col = 0
+    n = 0
+    for keys, values in _planets.items():
+        row = 0
+        for value in values:
+            sheet.write(205 + row + n, col, float(value), style=style)
+            row += 1
+        col += 1
+        n += 1
     new_order_of_planets = []
     for i in __planets__:
         house_group = [[] for _ in range(12)]
@@ -1114,71 +1395,72 @@ def write_datas_to_excel(get_datas):
     style.font = _font_(bold=True)
     for _ in new_order_of_planets:
         for o, p in enumerate(signs):
-            sheet.write(200 + count, o + 1, p, style=style)
+            sheet.write(217 + count, o + 2, p, style=style)
         count += 15
     count = 0
     for i in planets:
         for j, k in enumerate(houses):
-            form = f"{i}/{k}"
-            sheet.write(200 + count + (j + 1), 0, form, style=style)
+            form = f"{i} in House {k}"
+            sheet.write_merge(r1=217 + count + (j + 1), r2=217 + count + (j + 1), c1=0, c2=1,
+                              label=form, style=style)
         count += 15
     count = 0
     style.font = _font_(bold=False)
     for i in new_order_of_planets:
         for j, k in enumerate(i):
             if "Aries" in k:
-                sheet.write(200 + count + (j + 1), 1, 1, style=style)
+                sheet.write(217 + count + (j + 1), 2, 1, style=style)
             elif "Taurus" in k:
-                sheet.write(200 + count + (j + 1), 2, 1, style=style)
+                sheet.write(217 + count + (j + 1), 3, 1, style=style)
             elif "Gemini" in k:
-                sheet.write(200 + count + (j + 1), 3, 1, style=style)
+                sheet.write(217 + count + (j + 1), 4, 1, style=style)
             elif "Cancer" in k:
-                sheet.write(200 + count + (j + 1), 4, 1, style=style)
+                sheet.write(217 + count + (j + 1), 5, 1, style=style)
             elif "Leo" in k:
-                sheet.write(200 + count + (j + 1), 5, 1, style=style)
+                sheet.write(217 + count + (j + 1), 6, 1, style=style)
             elif "Virgo" in k:
-                sheet.write(200 + count + (j + 1), 6, 1, style=style)
+                sheet.write(217 + count + (j + 1), 7, 1, style=style)
             elif "Libra" in k:
-                sheet.write(200 + count + (j + 1), 7, 1, style=style)
+                sheet.write(217 + count + (j + 1), 8, 1, style=style)
             elif "Scorpio" in k:
-                sheet.write(200 + count + (j + 1), 8, 1, style=style)
+                sheet.write(217 + count + (j + 1), 9, 1, style=style)
             elif "Sagittarius" in k:
-                sheet.write(200 + count + (j + 1), 9, 1, style=style)
+                sheet.write(217 + count + (j + 1), 10, 1, style=style)
             elif "Capricorn" in k:
-                sheet.write(200 + count + (j + 1), 10, 1, style=style)
+                sheet.write(217 + count + (j + 1), 11, 1, style=style)
             elif "Aquarius" in k:
-                sheet.write(200 + count + (j + 1), 11, 1, style=style)
+                sheet.write(217 + count + (j + 1), 12, 1, style=style)
             elif "Pisces" in k:
-                sheet.write(200 + count + (j + 1), 12, 1, style=style)
+                sheet.write(217 + count + (j + 1), 13, 1, style=style)
             else:
                 for m in range(12):
-                    sheet.write(200 + count + (j + 1), m + 1, 0, style=style)
+                    sheet.write(217 + count + (j + 1), m + 2, 0, style=style)
         count += 15
     count = 0
     style.font = _font_(bold=True)
-    sheet.write_merge(r1=380, r2=380, c1=0, c2=13, label="Traditional House Rulership", style=style)
+    sheet.write_merge(r1=397, r2=397, c1=0, c2=13, label="Traditional House Rulership", style=style)
     for i, j in enumerate(traditional_ruler):
         style.font = _font_(bold=True)
-        sheet.write(381, i + 1, f"House {i + 1}", style=style)
-        sheet.write(382 + i, 0, j[0], style=style)
+        sheet.write(398, i + 1, f"House {i + 1}", style=style)
+        sheet.write(399 + i, 0, j[0], style=style)
         for k, m in enumerate(houses):
             style.font = _font_(bold=False)
             if j[1] == f"House {m}":
-                sheet.write(382 + i, k + 1, 1, style=style)
+                sheet.write(399 + i, k + 1, 1, style=style)
             else:
-                sheet.write(382 + i, k + 1, 0, style=style)
+                sheet.write(399 + i, k + 1, 0, style=style)
     style.font = _font_(bold=True)
-    sheet.write_merge(r1=395, r2=395, c1=0, c2=13, label="Modern House Rulership", style=style)
+    sheet.write_merge(r1=413, r2=413, c1=0, c2=13, label="Modern House Rulership", style=style)
     for i, j in enumerate(modern_ruler):
         style.font = _font_(bold=True)
-        sheet.write(396, i + 1, f"House {i + 1}", style=style)
-        sheet.write(397 + i, 0, j[0], style=style)
+        sheet.write(414, i + 1, f"House {i + 1}", style=style)
+        sheet.write(415 + i, 0, j[0], style=style)
         for k, m in enumerate(houses):
             style.font = _font_(bold=False)
             if j[1] == f"House {m}":
-                sheet.write(397 + i, k + 1, 1, style=style)
+                sheet.write(415 + i, k + 1, 1, style=style)
             else:
-                sheet.write(397 + i, k + 1, 0, style=style)
+                sheet.write(415 + i, k + 1, 0, style=style)
     for i in os.listdir(os.getcwd()):
         if i.startswith("table"):
             count += 1
@@ -1189,24 +1471,50 @@ def write_datas_to_excel(get_datas):
         create_a_new_table()
 
 
-def modify_category_names():
-    cat = selected_categories[0].split(" : ")
-    for i, j in enumerate(cat):
-        if "/ " in j:
-            cat[i] = cat[i].replace("/ ", "_", j.count("/"))
-        if "/" in j:
-            cat[i] = cat[i].replace("/", "_", j.count("/"))
-        if " - " in j:
-            cat[i] = cat[i].replace(" - ", "_", j.count(" - "))
-        if "-" in j:
-            cat[i] = cat[i].replace("-", "_", j.count(" - "))
-        if " " in j:
-            cat[i] = cat[i].replace(" ", "_", j.count(" "))
-    return cat
+def change_dir(cat, dir1, orb_factor, sub_dir):
+    return os.path.join(
+        *cat,
+        dir1,
+        f"ORB_{'_'.join(orb_factor)}",
+        f"{house_systems[hsys]}",
+        sub_dir
+    )
+
+
+def check_dir_names(cat, dir1, orb_factor, criteria):
+    if var_checkbutton_5.get() == "0" and var_checkbutton_6.get() == "0":
+        return change_dir(cat, dir1, orb_factor, sub_dir=f"{criteria}")
+    elif var_checkbutton_5.get() == "0" and var_checkbutton_6.get() == "1":
+        return change_dir(cat, dir1, orb_factor, sub_dir=os.path.join(f"{criteria}", "North"))
+    elif var_checkbutton_5.get() == "1" and var_checkbutton_6.get() == "0":
+        return change_dir(cat, dir1, orb_factor, sub_dir=os.path.join(f"{criteria}", "South"))
+
+
+def dir_names(cat, dir1, orb_factor):
+    if len(displayed_results) == 1:
+        return os.path.join(*cat, dir1, f"ORB_{'_'.join(orb_factor)}", f"{house_systems[hsys]}")
+    if var_checkbutton_1.get() == "0" and var_checkbutton_2.get() == "1":
+        return check_dir_names(cat, dir1, orb_factor, criteria="Event")
+    elif var_checkbutton_1.get() == "1" and var_checkbutton_2.get() == "0":
+        if var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "1":
+            return check_dir_names(cat, dir1, orb_factor, criteria="Male")
+        elif var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "0":
+            return check_dir_names(cat, dir1, orb_factor, criteria="Female")
+        elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "0":
+            return check_dir_names(cat, dir1, orb_factor, criteria="Human")
+    elif var_checkbutton_1.get() == "0" and var_checkbutton_2.get() == "0":
+        if var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "1":
+            return check_dir_names(cat, dir1, orb_factor, criteria="Male+Event")
+        elif var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "0":
+            return check_dir_names(cat, dir1, orb_factor, criteria="Female+Event")
+        elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "0":
+            return check_dir_names(cat, dir1, orb_factor, criteria="Human+Event")
+        elif var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "1":
+            return check_dir_names(cat, dir1, orb_factor, criteria="Event")
 
 
 def find_observed_values():
-    global selection
+    global selection, dir2
     selection = "observed"
     if len(displayed_results) == 0:
         msgbox.showinfo(title="Find Observed Values", message=f"{len(displayed_results)} records selected.")
@@ -1229,12 +1537,43 @@ def find_observed_values():
         with open("output.log", "w", encoding="utf-8") as log:
             log.write(f"Adb Version: {xml_file.replace('.xml', '')}\n")
             log.write(f"House System: {house_systems[hsys]}\n")
-            log.write(f"Rodden Rating: {'+'.join(selected_ratings)}\n")
+            if len(displayed_results) == 1:
+                log.write(f"Rodden Rating: {displayed_results[0][3]}\n")
+            else:
+                log.write(f"Rodden Rating: {'+'.join(selected_ratings)}\n")
             log.write(f"Orb Factor: {'_'.join(orb_factor)}\n")
             if len(selected_categories) == 1:
-                log.write(f"Category: {selected_categories[0]}\n\n")
+                if len(displayed_results) == 1:
+                    log.write(f"Category: \
+{displayed_results[0][1].replace(' ','_', displayed_results[0][1].count(' '))}\n\n")
+                else:
+                    log.write(f"Category: {'/'.join(modify_category_names())}\n\n")
             elif len(selected_categories) > 1:
-                log.write(f"Category: Control Group\n\n")
+                log.write(f"Category: Control_Group\n\n")
+                if var_checkbutton_1.get() == "0":
+                    log.write(f"Event: True\n")
+                else:
+                    log.write(f"Event: False\n")
+                if var_checkbutton_2.get() == "0":
+                    log.write(f"Human: True\n")
+                else:
+                    log.write(f"Human: False\n")
+                if var_checkbutton_3.get() == "0":
+                    log.write(f"Male: True\n")
+                else:
+                    log.write(f"Male: False\n")
+                if var_checkbutton_4.get() == "0":
+                    log.write(f"Female: True\n")
+                else:
+                    log.write(f"Female: False\n")
+                if var_checkbutton_5.get() == "0":
+                    log.write(f"North Hemisphere: True\n")
+                else:
+                    log.write(f"North Hemisphere: False\n")
+                if var_checkbutton_6.get() == "0":
+                    log.write(f"South Hemisphere: True\n\n")
+                else:
+                    log.write(f"South Hemisphere: False\n\n")
             log.write(f"|{str(datetime.now())[:-7]}| Process started.\n\n")
             log.flush()
             for records in displayed_results:
@@ -1253,6 +1592,7 @@ def find_observed_values():
                     chart = Chart(julian_date, longitude, latitude)
                     write_datas_to_excel(chart.get_chart_data())
                 except BaseException as err:
+                    traceback.print_exc(file=sys.stdout)
                     log.write(f"|{str(datetime.now())[:-7]}| Error Type: {err}\n{' ' * 22}Record: {records}\n\n")
                     log.flush()
                 __received__ += 1
@@ -1267,25 +1607,19 @@ def find_observed_values():
                     pframe.destroy()
                     pbar.destroy()
                     plabel.destroy()
-                    dir2 = ""
                     try:
                         os.rename("table0.xlsx", "observed_values.xlsx")
-                        dir1 = f"Rodden_Rating_{'+'.join(selected_ratings)}"
-                        cat = []
+                        dir1 = f"RR_{'+'.join(selected_ratings)}"
                         if len(selected_categories) == 1:
                             if len(displayed_results) == 1:
                                 cat = [displayed_results[0][1].replace(" ", "_", displayed_results[0][1].count(" "))]
-                                dir1 = f"Rodden_Rating_{displayed_results[0][3]}"
+                                dir1 = f"RR_{displayed_results[0][3]}"
                             else:
                                 cat = modify_category_names()
+                            dir2 = dir_names(cat, dir1, orb_factor)
                         elif len(selected_categories) > 1:
                             cat = ["Control_Group"]
-                        dir2 += os.path.join(
-                            *cat,
-                            dir1,
-                            f"Orb_Factor_{'_'.join(orb_factor)}",
-                            f"House_System_{house_systems[hsys]}"
-                        )
+                            dir2 = dir_names(cat, dir1, orb_factor)    
                         try:
                             os.makedirs(dir2)
                             shutil.move(src=os.path.join(os.getcwd(), "observed_values.xlsx"),
@@ -1305,7 +1639,7 @@ def find_observed_values():
 def sum_of_row(table):
     total = 0
     for item in table:
-        if item[0][0] == 5 and type(item[1]) == float:
+        if item[0][0] == 8 and type(item[1]) == float:
             total += item[1]
     return total
 
@@ -1348,25 +1682,11 @@ def find_expected_values():
                                 # Flavia Minghetti's method
                                 new_sheet.write(
                                     *i[0],
-                                    sum_of_row(data_2) * ((i[1] + j[1]) / sum_of_all * 100) / 100,
+                                    sum_of_row(data_2) * (i[1] + j[1]) / sum_of_all,
                                     style=style
                                 )
                         else:
-                            style.font = _font_(bold=True)
-                            if "Orb" in i[1]:
-                                style.alignment = xlwt.Alignment()
-                                new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
-                                                      label=i[1], style=style)
-                                style.alignment = alignment
-                            elif i[1] == "Traditional House Rulership":
-                                new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
-                                                      label="Traditional House Rulership", style=style)
-                            elif i[1] == "Modern House Rulership":
-                                new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
-                                                      label="Modern House Rulership", style=style)
-                            else:
-                                new_sheet.write(*i[0], i[1], style=style)
-                            style.font = _font_(bold=False)
+                            special_cells(new_sheet, i)
                     elif i[1] != "" and j[1] == "":
                         new_sheet.write(*i[0], i[1], style=style)
                     elif i[1] == "" and j[1] != "":
@@ -1414,21 +1734,7 @@ def find_chi_square_values():
                             except ZeroDivisionError:
                                 new_sheet.write(*i[0], 0, style=style)
                         else:
-                            style.font = _font_(bold=True)
-                            if "Orb" in i[1]:
-                                style.alignment = xlwt.Alignment()
-                                new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
-                                                      label=i[1], style=style)
-                                style.alignment = alignment
-                            elif i[1] == "Traditional House Rulership":
-                                new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
-                                                      label="Traditional House Rulership", style=style)
-                            elif i[1] == "Modern House Rulership":
-                                new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
-                                                      label="Modern House Rulership", style=style)
-                            else:
-                                new_sheet.write(*i[0], i[1], style=style)
-                            style.font = _font_(bold=False)
+                            special_cells(new_sheet, i)
                     elif i[1] != "" and j[1] == "":
                         new_sheet.write(*i[0], i[1], style=style)
                     elif i[1] == "" and j[1] != "":
@@ -1477,19 +1783,7 @@ def find_effect_size_values():
                                 new_sheet.write(*i[0], 0, style=style)
                         else:
                             style.font = _font_(bold=True)
-                            if "Orb" in i[1]:
-                                style.alignment = xlwt.Alignment()
-                                new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
-                                                      label=i[1], style=style)
-                                style.alignment = alignment
-                            elif i[1] == "Traditional House Rulership":
-                                new_sheet.write_merge(r1=380, r2=380, c1=0, c2=13,
-                                                      label="Traditional House Rulership", style=style)
-                            elif i[1] == "Modern House Rulership":
-                                new_sheet.write_merge(r1=395, r2=395, c1=0, c2=13,
-                                                      label="Modern House Rulership", style=style)
-                            else:
-                                new_sheet.write(*i[0], i[1], style=style)
+                            special_cells(new_sheet, i)
                             style.font = _font_(bold=False)
                     elif i[1] != "" and j[1] == "":
                         new_sheet.write(*i[0], i[1], style=style)
