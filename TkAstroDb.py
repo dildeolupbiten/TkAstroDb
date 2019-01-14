@@ -1689,18 +1689,18 @@ def find_expected_values():
 def find_chi_square_values():
     global selection
     selection = "chisquare"
-    file_name_1 = "expected_values.xlsx"
-    file_name_2 = "observed_values.xlsx"
+    file_name_1 = "observed_values.xlsx"
+    file_name_2 = "expected_values.xlsx"
     read_file_1 = None
     read_file_2 = None
     try:
         read_file_1 = xlrd.open_workbook(file_name_1)
     except FileNotFoundError:
-        msgbox.showinfo(title="Find Chi-Square Values", message="No such file or directory: 'expected_values.xlsx'")
+        msgbox.showinfo(title="Find Chi-Square Values", message="No such file or directory: 'observed_values.xlsx'")
     try:
         read_file_2 = xlrd.open_workbook(file_name_2)
     except FileNotFoundError:
-        msgbox.showinfo(title="Find Chi-Square Values", message="No such file or directory: 'observed_values.xlsx'")
+        msgbox.showinfo(title="Find Chi-Square Values", message="No such file or directory: 'expected_values.xlsx'")
     if read_file_1 is not None and read_file_2 is not None:
         sheet_1 = read_file_1.sheet_by_name("Sheet1")
         sheet_2 = read_file_2.sheet_by_name("Sheet1")
@@ -1716,7 +1716,7 @@ def find_chi_square_values():
                     if i[1] != "" and j[1] != "":
                         if type(i[1]) == float or type(j[1]) == float:
                             try:
-                                new_sheet.write(*i[0], (i[1] - j[1]) ** 2 / i[1], style=style)
+                                new_sheet.write(*i[0], (i[1] - j[1]) ** 2 / j[1], style=style)
                             except ZeroDivisionError:
                                 new_sheet.write(*i[0], 0, style=style)
                         else:
