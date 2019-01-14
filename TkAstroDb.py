@@ -1345,7 +1345,7 @@ def write_datas_to_excel(get_datas):
     for keys, values in _planets.items():
         row = 0
         for value in values:
-            sheet.write(205 + row + n, col, float(value), style=style)
+            sheet.write(205 + row + n, col, value, style=style)
             row += 1
         col += 1
         n += 1
