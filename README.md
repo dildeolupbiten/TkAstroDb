@@ -19,7 +19,7 @@ Windows, Linux and MacOSX
 
 ## Dependencies
 
-In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 version must be installed on your computer. Note that in order to use Python on the command prompt, Python should be added to the PATH. Users don't have to install manually the libraries that are used by the program, when the program first runs, the necessary libraries will be downloaded and installed automatically.
+In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 version must be installed on your computer. Note that in order to use Python on the command prompt, Python should be added to the PATH. Users have not to install manually the libraries that are used by the program, when the program first runs, the necessary libraries will be downloaded and installed automatically.
 
 ## Usage
 
