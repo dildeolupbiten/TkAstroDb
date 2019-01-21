@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.2.4"
+__version__ = "1.2.5"
 
 import os
 import sys
@@ -245,30 +245,9 @@ class Chart:
 
     @staticmethod
     def convert_angle(angle):
-        if 0 <= angle < 30:
-            return angle, signs[0]
-        elif 30 <= angle < 60:
-            return angle - 30, signs[1]
-        elif 60 <= angle < 90:
-            return angle - 60, signs[2]
-        elif 90 <= angle < 120:
-            return angle - 90, signs[3]
-        elif 120 <= angle < 150:
-            return angle - 120, signs[4]
-        elif 150 <= angle < 180:
-            return angle - 150, signs[5]
-        elif 180 <= angle < 210:
-            return angle - 180, signs[6]
-        elif 210 <= angle < 240:
-            return angle - 210, signs[7]
-        elif 240 <= angle < 270:
-            return angle - 240, signs[8]
-        elif 270 <= angle < 300:
-            return angle - 270, signs[9]
-        elif 300 <= angle < 330:
-            return angle - 300, signs[10]
-        elif 330 <= angle < 360:
-            return angle - 330, signs[11]
+        for i in range(12):
+            if i * 30 <= angle < (i + 1) * 30:
+                return angle - (30 * i), signs[i]
 
     def planet_pos(self, planet):
         calc = self.convert_angle(swe.calc_ut(self.julian_date, planet)[0])
@@ -364,17 +343,49 @@ class Chart:
                     if self.NEW_HOUSE_DEGREES[k][1] < j[1] < self.NEW_HOUSE_DEGREES[0][1]:
                         self.PLANET_SIGN_HOUSE.append([j[0], j[2], self.HOUSE_SIGN[k][0]])
 
+    def select_rulership(self, ruler_list, rulership, ruler_type, ruler_sign, i, m):
+        ruler_list.append([f"Lord {i + 1}", f"House {m[2]}"])
+        for n, o in enumerate(signs):
+            if rulership[o] == ruler_type:
+                if [f"{i + 1}", o] in self.HOUSE_SIGN:
+                    if n % 2 == 0:
+                        ruler_sign[o].append(
+                            [f"Lord {i + 1} is {ruler_type} (+)", f"House {m[2]}"])
+                    else:
+                        ruler_sign[o].append(
+                            [f"Lord {i + 1} is {ruler_type} (-)", f"House {m[2]}"])
+
+    @staticmethod
+    def set_lords(ruler_sign):
+        lords = dict()
+        for keys, values in ruler_sign.items():
+            for value in values:
+                for i in range(12):
+                    if f"Lord {i + 1} is" in value[0]:
+                        lords[f"Lord {i + 1}"] = value
+        return lords
+
     def get_chart_data(self):
         traditional_ruler, modern_ruler = [], []
+        trad_ruler_sign, mode_ruler_sign = {i: [] for i in signs}, {i: [] for i in signs}
         for i, j in enumerate(self.house_cusps()[0]):
             traditional = traditional_rulership[self.house_cusps()[0][i][2]]
             modern = modern_rulership[self.house_cusps()[0][i][2]]
             for k, m in enumerate(self.PLANET_SIGN_HOUSE):
                 if traditional == m[0]:
-                    traditional_ruler.append([f"Lord {i + 1}", f"House {m[2]}"])
-                if m[0] in modern:
-                    modern_ruler.append([f"Lord {i + 1}", f"House {m[2]}"])
-        return self.PLANET_SIGN_HOUSE, self.HOUSE_SIGN, self.PLANET_DEGREES, traditional_ruler, modern_ruler
+                    self.select_rulership(ruler_list=traditional_ruler,
+                                          rulership=traditional_rulership,
+                                          ruler_type=traditional,
+                                          ruler_sign=trad_ruler_sign, i=i, m=m)
+                if modern == m[0]:
+                    self.select_rulership(ruler_list=modern_ruler,
+                                          rulership=modern_rulership,
+                                          ruler_type=modern,
+                                          ruler_sign=mode_ruler_sign, i=i, m=m)
+        trad_lords = self.set_lords(ruler_sign=trad_ruler_sign)
+        mode_lords = self.set_lords(ruler_sign=mode_ruler_sign)
+        return self.PLANET_SIGN_HOUSE, self.HOUSE_SIGN, self.PLANET_DEGREES, traditional_ruler, modern_ruler, \
+            trad_ruler_sign, mode_ruler_sign, trad_lords, mode_lords
 
 
 # --------------------------------------------- tkinter ---------------------------------------------
@@ -822,16 +833,17 @@ def get_excel_datas(sheet):
                 r2 += f"{sheet.cell_value(row, 5)} / "
             elif row == 3:
                 r3 += f"{sheet.cell_value(row, 5)} / "
-            elif row == 0 or row == 4 or row == 5 or row == 230 or row == 245 or row == 260 \
-                    or row == 275 or row == 290 or row == 305 or row == 320 \
-                    or row == 335 or row == 350 or row == 365 or row == 380 or row == 395 or row == 411 \
-                    or row == 427:
+            elif row == 0 or row == 4 or row == 5 \
+                    or row in [i for i in range(230, 396, 15)] or row == 411 \
+                    or row == 427 \
+                    or row in [i for i in range(443, 609, 15)] \
+                    or row in [i for i in range(624, 790, 15)]:
                 pass
             else:
                 for col in range(sheet.ncols):
                     if col < 13:
                         datas.append(([row, col], sheet.cell_value(row, col)))
-                    elif col == 13 and 216 < row < 398:
+                    elif (col == 13 and 216 < row < 398) or (col == 13 and 429 < row < 789):
                         datas.append(([row, col], sheet.cell_value(row, col)))
         elif selection == "chisquare" or selection == "effectsize":
             if row == 1:
@@ -849,29 +861,30 @@ def get_excel_datas(sheet):
                 for i in _r3:
                     if "/" in i:
                         r3 = i
-            elif row == 0 or row == 4 or row == 5 or row == 230 or row == 245 or row == 260 \
-                    or row == 275 or row == 290 or row == 305 or row == 320 \
-                    or row == 335 or row == 350 or row == 365 or row == 380 or row == 395 or row == 411 \
-                    or row == 427:
+            elif row == 0 or row == 4 or row == 5 \
+                    or row in [i for i in range(230, 396, 15)] or row == 411 \
+                    or row == 427 \
+                    or row in [i for i in range(443, 609, 15)] \
+                    or row in [i for i in range(624, 790, 15)]:
                 pass
             else:
                 for col in range(sheet.ncols):
                     if col < 13:
                         datas.append(([row, col], sheet.cell_value(row, col)))
-                    elif col == 13 and 216 < row < 398:
+                    elif (col == 13 and 216 < row < 398) or (col == 13 and 429 < row < 789):
                         datas.append(([row, col], sheet.cell_value(row, col)))
         elif selection == "observed":  
-            if row == 0 or row == 1 or row == 2 or row == 3 or row == 4 or row == 5 \
-                    or row == 230 or row == 245 or row == 260 \
-                    or row == 275 or row == 290 or row == 305 or row == 320 \
-                    or row == 335 or row == 350 or row == 365 or row == 380 or row == 395 or row == 411 \
-                    or row == 427:
+            if row in [i for i in range(6)]\
+                    or row in [i for i in range(230, 396, 15)] or row == 411 \
+                    or row == 427 \
+                    or row in [i for i in range(443, 609, 15)] \
+                    or row in [i for i in range(624, 790, 15)]:
                 pass
             else:
                 for col in range(sheet.ncols):
                     if col < 13:
                         datas.append(([row, col], sheet.cell_value(row, col)))
-                    elif col == 13 and 216 < row < 398:
+                    elif (col == 13 and 216 < row < 398) or (col == 13 and 429 < row < 789):
                         datas.append(([row, col], sheet.cell_value(row, col)))
     return datas
 
@@ -1058,7 +1071,11 @@ def write_title_of_total(sheet):
             sheet.write(232 + (i * 15), 0, "Total", style=style)
         else:
             sheet.write(217 + (i * 15), 14, "Total", style=style)
+            sheet.write(430 + (i * 15), 14, "Total", style=style)
+            sheet.write(611 + (i * 15), 14, "Total", style=style)
             sheet.write_merge(r1=230 + (i * 15), r2=230 + (i * 15), c1=0, c2=1, label="Total", style=style)
+            sheet.write_merge(r1=443 + (i * 15), r2=443 + (i * 15), c1=0, c2=1, label="Total", style=style)
+            sheet.write_merge(r1=624 + (i * 15), r2=624 + (i * 15), c1=0, c2=1, label="Total", style=style)
     style.font = _font_(bold=False)
 
 
@@ -1076,6 +1093,10 @@ def write_total_data(sheet):
         else:
             write_total_horz(sheet=sheet, num=217 + (i * 15), col=14)
             write_total_vert(sheet=sheet, num=219 + (i * 15), col=2)
+            write_total_horz(sheet=sheet, num=430 + (i * 15), col=14)
+            write_total_vert(sheet=sheet, num=432 + (i * 15), col=2)
+            write_total_horz(sheet=sheet, num=611 + (i * 15), col=14)
+            write_total_vert(sheet=sheet, num=613 + (i * 15), col=2)
 
 
 def save_file(file, sheet, table_name, table0="table0", table1="table1"):
@@ -1098,8 +1119,20 @@ def special_cells(new_sheet, i):
     elif i[1] == "Modern House Rulership":
         new_sheet.write_merge(r1=413, r2=413, c1=0, c2=13,
                               label="Modern House Rulership", style=style)
-    elif "in House" in i[1]:
-        new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 1,
+    elif i[1] == "Detailed Traditional House Rulership":
+        new_sheet.write_merge(r1=429, r2=429, c1=0, c2=13,
+                              label="Detailed Traditional House Rulership", style=style)
+    elif i[1] == "Detailed Modern House Rulership":
+        new_sheet.write_merge(r1=610, r2=610, c1=0, c2=13,
+                              label="Detailed Modern House Rulership", style=style)
+    elif i[0][0] in [i for i in range(218, 394, 15)] and i[0][1] == 0:
+        new_sheet.write_merge(r1=i[0][0], r2=i[0][0] + 11, c1=0, c2=0,
+                              label=i[1], style=style)
+    elif i[0][0] in [i for i in range(431, 607, 15)] and i[0][1] == 0:
+        new_sheet.write_merge(r1=i[0][0], r2=i[0][0] + 11, c1=0, c2=0,
+                              label=i[1], style=style)
+    elif i[0][0] in [i for i in range(612, 788, 15)] and i[0][1] == 0:
+        new_sheet.write_merge(r1=i[0][0], r2=i[0][0] + 11, c1=0, c2=0,
                               label=i[1], style=style)
     else:
         new_sheet.write(*i[0], i[1], style=style)
@@ -1193,56 +1226,14 @@ def search_aspect(planet_pos, sheet, row: int, aspect: int, orb: int, name: str)
             style.font = _font_(bold=False)
             if aspect - orb <= abs(degree_1 - degree_2) <= aspect + orb:
                 sheet.write(k + _row, i, 1, style=style)
-                if j[0] == "Sun":
-                    extract_aspects(planet="Sun", value=1, num=11)
-                elif j[0] == "Moon":
-                    extract_aspects(planet="Moon", value=1, num=10)
-                elif j[0] == "Mercury":
-                    extract_aspects(planet="Mercury", value=1, num=9)
-                elif j[0] == "Venus":
-                    extract_aspects(planet="Venus", value=1, num=8)
-                elif j[0] == "Mars":
-                    extract_aspects(planet="Mars", value=1, num=7)
-                elif j[0] == "Jupiter":
-                    extract_aspects(planet="Jupiter", value=1, num=6)
-                elif j[0] == "Saturn":
-                    extract_aspects(planet="Saturn", value=1, num=5)
-                elif j[0] == "Uranus":
-                    extract_aspects(planet="Uranus", value=1, num=4)
-                elif j[0] == "Neptune":
-                    extract_aspects(planet="Neptune", value=1, num=3)
-                elif j[0] == "Pluto":
-                    extract_aspects( planet="Pluto", value=1, num=2)
-                elif j[0] == "North Node":
-                    extract_aspects(planet="North Node", value=1, num=1)
-                elif j[0] == "Chiron":
-                    extract_aspects(planet="Chiron", value=1, num=0)
+                for num, planet in enumerate(planets):
+                    if j[0] == planet:
+                        extract_aspects(planet=planet, value=1, num=11 - num)
             else: 
                 sheet.write(k + _row, i, 0, style=style)
-                if j[0] == "Sun":
-                    extract_aspects(planet="Sun", value=0, num=11)
-                elif j[0] == "Moon":
-                    extract_aspects(planet="Moon", value=0, num=10)
-                elif j[0] == "Mercury":
-                    extract_aspects(planet="Mercury", value=0, num=9)
-                elif j[0] == "Venus":
-                    extract_aspects(planet="Venus", value=0, num=8)
-                elif j[0] == "Mars":
-                    extract_aspects(planet="Mars", value=0, num=7)
-                elif j[0] == "Jupiter":
-                    extract_aspects(planet="Jupiter", value=0, num=6)
-                elif j[0] == "Saturn":
-                    extract_aspects(planet="Saturn", value=0, num=5)
-                elif j[0] == "Uranus":
-                    extract_aspects(planet="Uranus", value=0, num=4)
-                elif j[0] == "Neptune":
-                    extract_aspects(planet="Neptune", value=0, num=3)
-                elif j[0] == "Pluto":
-                    extract_aspects(planet="Pluto", value=0, num=2)
-                elif j[0] == "North Node":
-                    extract_aspects(planet="North Node", value=0, num=1)
-                elif j[0] == "Chiron":
-                    extract_aspects(planet="Chiron", value=0, num=0)
+                for num, planet in enumerate(planets):
+                    if j[0] == planet:
+                        extract_aspects(planet=planet, value=0, num=11 - num)
         n_ += 1
         _row += 1
     style.font = _font_(bold=True)
@@ -1256,13 +1247,75 @@ def sum_aspects(planet):
     return [float(i) for i in new_list]
 
 
+def detailed_traditional(sheet, row, label, rulership):
+    sheet.write_merge(r1=row, r2=row, c1=0, c2=13, label=label, style=style)
+    item0 = 0
+    item1 = 0
+    lords = []
+    for i, j in enumerate(rulership):
+        if i % 2 == 0:
+            lords.append(f"{j[1]} (+)")
+        else:
+            lords.append(f"{j[1]} (-)")
+    for i in range(12):
+        item2 = 0
+        sheet.write_merge(
+            r1=row + 2 + item0 + item2, r2=row + 2 + item0 + item2 + 11, c1=0, c2=0,
+            label=f"Lord {item1 + 1}\nis", style=style)
+        for lord in lords:
+            sheet.write_merge(
+                r1=row + 1 + item0, r2=row + 1 + item0, c1=item2 + 2, c2=item2 + 2,
+                label=f"House {item2 + 1}", style=style)
+            sheet.write(
+                row + 2 + item0 + item2, 1,
+                label=lord, style=style)
+            item2 += 1
+        item1 += 1
+        item0 += 15
+
+
+def detailed_values(sheet, lords, rulership, _row1=431, _row2=443):
+    num = 0
+    modify_rulership = dict()
+    for i, j in rulership.items():
+        if num % 2 == 0:
+            modify_rulership[i] = f"{j} (+)"
+        else:
+            modify_rulership[i] = f"{j} (-)"
+        num += 1
+    for keys, values in lords.items():
+        step = 0
+        for i, j in enumerate(signs):
+            lord_name = f"Lord {i + 1}"
+            if keys == lord_name:
+                rows = [i for i in range(_row1 + step, _row2 + step, 1)]
+                for _keys, _values in modify_rulership.items():
+                    if _values in values[0]:
+                        row = rows[signs.index(_keys)]
+                        for k in range(12):
+                            house = f"House {k + 1}"
+                            if house == values[1]:
+                                col = k + 2
+                                sheet.write(row, col, 1, style=style)
+                            else:
+                                col = k + 2
+                                sheet.write(row, col, 0, style=style)
+                    else:
+                        row = rows[signs.index(_keys)]
+                        for _ in range(12):
+                            sheet.write(row, _ + 2, 0, style=style)
+            else:
+                step += 15
+
+
 def write_datas_to_excel(get_datas):
     global _planets_, _planets
     _planets_ = {i: [] for i in planets}
     _planets = {i: [] for i in planets}
     file = xlwt.Workbook()
     sheet = file.add_sheet("Sheet1")
-    planet_info, house_info, planet_pos, traditional_ruler, modern_ruler = get_datas
+    planet_info, house_info, planet_pos, traditional_ruler, modern_ruler, \
+        trad_ruler_sign, mode_ruler_sign, trad_lords, mode_lords = get_datas
     style.font = _font_(bold=True)
     for i, j in enumerate(signs):
         sheet.write(7, i + 1, j, style=style)
@@ -1271,7 +1324,7 @@ def write_datas_to_excel(get_datas):
         sheet.write(i + 8, 0, j[0], style=style)
         sheet.write(i + 36, 0, j[0], style=style)
     for i in range(12):
-        sheet.write(i + 22, 0, f"House {i + 1}", style=style)
+        sheet.write(i + 22, 0, f"Cusp {i + 1}", style=style)
         sheet.write(35, i + 1, f"House {i + 1}", style=style)
     style.font = _font_(bold=False)
     for i, j in enumerate(planet_info):
@@ -1290,30 +1343,9 @@ def write_datas_to_excel(get_datas):
     for i, j in enumerate(planet_info):
         for k, m in enumerate(house_info):
             if j[-1] == m[0]:
-                if j[0] == planets[0]:
-                    __planets__[0].append(j)
-                elif j[0] == planets[1]:
-                    __planets__[1].append(j)
-                elif j[0] == planets[2]:
-                    __planets__[2].append(j)
-                elif j[0] == planets[3]:
-                    __planets__[3].append(j)
-                elif j[0] == planets[4]:
-                    __planets__[4].append(j)
-                elif j[0] == planets[5]:
-                    __planets__[5].append(j)
-                elif j[0] == planets[6]:
-                    __planets__[6].append(j)
-                elif j[0] == planets[7]:
-                    __planets__[7].append(j)
-                elif j[0] == planets[8]:
-                    __planets__[8].append(j)
-                elif j[0] == planets[9]:
-                    __planets__[9].append(j)
-                elif j[0] == planets[10]:
-                    __planets__[10].append(j)
-                elif j[0] == planets[11]:
-                    __planets__[11].append(j)
+                for _ in range(12):
+                    if j[0] == planets[_]:
+                        __planets__[_].append(j)
                 sheet.write(i + 36, k + 1, 1, style=style)
             else:
                 sheet.write(i + 36, k + 1, 0, style=style)
@@ -1355,30 +1387,9 @@ def write_datas_to_excel(get_datas):
     for i in __planets__:
         house_group = [[] for _ in range(12)]
         for m in i:
-            if m[2] == "1":
-                house_group[0].append(m[1])
-            elif m[2] == "2":
-                house_group[1].append(m[1])
-            elif m[2] == "3":
-                house_group[2].append(m[1])
-            elif m[2] == "4":
-                house_group[3].append(m[1])
-            elif m[2] == "5":
-                house_group[4].append(m[1])
-            elif m[2] == "6":
-                house_group[5].append(m[1])
-            elif m[2] == "7":
-                house_group[6].append(m[1])
-            elif m[2] == "8":
-                house_group[7].append(m[1])
-            elif m[2] == "9":
-                house_group[8].append(m[1])
-            elif m[2] == "10":
-                house_group[9].append(m[1])
-            elif m[2] == "11":
-                house_group[10].append(m[1])
-            elif m[2] == "12":
-                house_group[11].append(m[1])
+            for _ in range(12):
+                if m[2] == f"{_ + 1}":
+                    house_group[_].append(m[1])
         new_order_of_planets.append(house_group)
     count = 0
     style.font = _font_(bold=True)
@@ -1388,44 +1399,22 @@ def write_datas_to_excel(get_datas):
         count += 15
     count = 0
     for i in planets:
+        sheet.write_merge(r1=218 + count, r2=218 + count + 11, c1=0, c2=0,
+                          label=f"{i}\nin", style=style)
         for j, k in enumerate(houses):
-            form = f"{i} in House {k}"
-            sheet.write_merge(r1=217 + count + (j + 1), r2=217 + count + (j + 1), c1=0, c2=1,
-                              label=form, style=style)
+            sheet.write(217 + count + (j + 1), 1,
+                        label=f"House {k}", style=style)
         count += 15
     count = 0
     style.font = _font_(bold=False)
     for i in new_order_of_planets:
         for j, k in enumerate(i):
-            if "Aries" in k:
-                sheet.write(217 + count + (j + 1), 2, 1, style=style)
-            elif "Taurus" in k:
-                sheet.write(217 + count + (j + 1), 3, 1, style=style)
-            elif "Gemini" in k:
-                sheet.write(217 + count + (j + 1), 4, 1, style=style)
-            elif "Cancer" in k:
-                sheet.write(217 + count + (j + 1), 5, 1, style=style)
-            elif "Leo" in k:
-                sheet.write(217 + count + (j + 1), 6, 1, style=style)
-            elif "Virgo" in k:
-                sheet.write(217 + count + (j + 1), 7, 1, style=style)
-            elif "Libra" in k:
-                sheet.write(217 + count + (j + 1), 8, 1, style=style)
-            elif "Scorpio" in k:
-                sheet.write(217 + count + (j + 1), 9, 1, style=style)
-            elif "Sagittarius" in k:
-                sheet.write(217 + count + (j + 1), 10, 1, style=style)
-            elif "Capricorn" in k:
-                sheet.write(217 + count + (j + 1), 11, 1, style=style)
-            elif "Aquarius" in k:
-                sheet.write(217 + count + (j + 1), 12, 1, style=style)
-            elif "Pisces" in k:
-                sheet.write(217 + count + (j + 1), 13, 1, style=style)
-            else:
-                for m in range(12):
-                    sheet.write(217 + count + (j + 1), m + 2, 0, style=style)
+            for num, sign in enumerate(signs):
+                if sign in k:
+                    sheet.write(217 + count + (j + 1), num + 2, 1, style=style)
+                else:
+                    sheet.write(217 + count + (j + 1), num + 2, 0, style=style)
         count += 15
-    count = 0
     style.font = _font_(bold=True)
     sheet.write_merge(r1=397, r2=397, c1=0, c2=13, label="Traditional House Rulership", style=style)
     for i, j in enumerate(traditional_ruler):
@@ -1450,6 +1439,15 @@ def write_datas_to_excel(get_datas):
                 sheet.write(415 + i, k + 1, 1, style=style)
             else:
                 sheet.write(415 + i, k + 1, 0, style=style)
+    style.font = _font_(bold=True)
+    detailed_traditional(sheet, row=429, label="Detailed Traditional House Rulership",
+                         rulership=traditional_rulership.items())
+    detailed_traditional(sheet, row=610, label="Detailed Modern House Rulership",
+                         rulership=modern_rulership.items())
+    style.font = _font_(bold=False)
+    detailed_values(sheet, lords=trad_lords, rulership=traditional_rulership, _row1=431, _row2=443)
+    detailed_values(sheet, lords=mode_lords, rulership=modern_rulership, _row1=612, _row2=624)
+    count = 0
     for i in os.listdir(os.getcwd()):
         if i.startswith("table"):
             count += 1
@@ -1664,10 +1662,10 @@ def find_expected_values():
                     if i[1] != "" and j[1] != "":
                         if type(i[1]) == float or type(j[1]) == float:
                             if method is False:
-                                # Sjoerd Visser's method
+                                # Sjoerd's method
                                 new_sheet.write(*i[0], i[1] * ratio, style=style)
                             elif method is True:
-                                # Flavia Minghetti's method
+                                # Flavia's method
                                 new_sheet.write(
                                     *i[0],
                                     sum_of_row(data_2) * (i[1] + j[1]) / sum_of_all,
@@ -1983,7 +1981,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "15 January 2019"
+        update_date, _update_date = "Update Date:", "21 January 2019"
         developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
