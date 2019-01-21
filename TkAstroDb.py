@@ -943,6 +943,16 @@ def modify_category_names():
     return cat
 
 
+def write_title(sheet, row, var_checkbutton, label):
+    style.font = _font_(bold=True)
+    sheet.write_merge(r1=row, r2=row, c1=0, c2=1, label=f"{label}:", style=style)
+    style.font = _font_(bold=False)
+    if var_checkbutton.get() == "0":
+        sheet.write(row, 2, label="True", style=style)
+    else:
+        sheet.write(row, 2, label="False", style=style)
+
+
 def write_title_of_total(sheet):
     try:
         record_name = f"{displayed_results[0][1].replace(' ', '_', displayed_results[0][1].count(' '))}"
@@ -955,53 +965,12 @@ def write_title_of_total(sheet):
     style.font = _font_(bold=False)
     sheet.write_merge(r1=0, r2=0, c1=5, c2=13, label=f"{xml_file.replace('.xml', '')}", style=style)
 
-    style.font = _font_(bold=True)
-    sheet.write_merge(r1=0, r2=0, c1=0, c2=1, label="Event:", style=style)
-    style.font = _font_(bold=False)
-    if var_checkbutton_1.get() == "0":
-        sheet.write(0, 2, label="True", style=style)
-    else:
-        sheet.write(0, 2, label="False", style=style)
-
-    style.font = _font_(bold=True)
-    sheet.write_merge(r1=1, r2=1, c1=0, c2=1, label="Human:", style=style)
-    style.font = _font_(bold=False)
-    if var_checkbutton_2.get() == "0":
-        sheet.write(1, 2, label="True", style=style)
-    else:
-        sheet.write(1, 2, label="False", style=style)
-
-    style.font = _font_(bold=True)
-    sheet.write_merge(r1=2, r2=2, c1=0, c2=1, label="Male:", style=style)
-    style.font = _font_(bold=False)
-    if var_checkbutton_3.get() == "0":
-        sheet.write(2, 2, label="True", style=style)
-    else:
-        sheet.write(2, 2, label="False", style=style)
-
-    style.font = _font_(bold=True)
-    sheet.write_merge(r1=3, r2=3, c1=0, c2=1, label="Female:", style=style)
-    style.font = _font_(bold=False)
-    if var_checkbutton_4.get() == "0":
-        sheet.write(3, 2, label="True", style=style)
-    else:
-        sheet.write(3, 2, label="False", style=style)
-
-    style.font = _font_(bold=True)
-    sheet.write_merge(r1=4, r2=4, c1=0, c2=1, label="North Hemisphere:", style=style)
-    style.font = _font_(bold=False)
-    if var_checkbutton_5.get() == "0":
-        sheet.write(4, 2, label="True", style=style)
-    else:
-        sheet.write(4, 2, label="False", style=style)
-
-    style.font = _font_(bold=True)
-    sheet.write_merge(r1=5, r2=5, c1=0, c2=1, label="South Hemisphere:", style=style)
-    style.font = _font_(bold=False)
-    if var_checkbutton_6.get() == "0":
-        sheet.write(5, 2, label="True", style=style)
-    else:
-        sheet.write(5, 2, label="False", style=style)
+    write_title(sheet, row=0, var_checkbutton=var_checkbutton_1, label="Event")
+    write_title(sheet, row=1, var_checkbutton=var_checkbutton_2, label="Human")
+    write_title(sheet, row=2, var_checkbutton=var_checkbutton_3, label="Male")
+    write_title(sheet, row=3, var_checkbutton=var_checkbutton_4, label="Female")
+    write_title(sheet, row=4, var_checkbutton=var_checkbutton_5, label="North Hemisphere")
+    write_title(sheet, row=5, var_checkbutton=var_checkbutton_6, label="South Hemisphere")
 
     style.font = _font_(bold=True)
     if selection == "observed":
