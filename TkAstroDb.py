@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.2.5"
+__version__ = "1.2.6"
 
 import os
 import sys
@@ -845,7 +845,7 @@ def get_excel_datas(sheet):
                         datas.append(([row, col], sheet.cell_value(row, col)))
                     elif (col == 13 and 216 < row < 398) or (col == 13 and 429 < row < 789):
                         datas.append(([row, col], sheet.cell_value(row, col)))
-        elif selection == "chisquare" or selection == "effectsize":
+        elif selection == "chi-square" or selection == "effect-size":
             if row == 1:
                 _r1.append(f"{sheet.cell_value(row, 5)}")
                 for i in _r1:
@@ -1013,7 +1013,7 @@ def write_title_of_total(sheet):
         sheet.write_merge(r1=3, r2=3, c1=3, c2=4, label="Category:", style=style)
         style.font = _font_(bold=False)
         sheet.write_merge(r1=3, r2=3, c1=5, c2=13, label=f"{r3[:-3]}", style=style)
-    elif selection == "chisquare" or selection == "effectsize":
+    elif selection == "chi-square" or selection == "effect-size":
         sheet.write_merge(r1=1, r2=1, c1=3, c2=4, label="House System:", style=style)
         style.font = _font_(bold=False)
         sheet.write_merge(r1=1, r2=1, c1=5, c2=13, label=f"{r1}", style=style)
@@ -1506,30 +1506,14 @@ def find_observed_values():
                     log.write(f"Category: {'/'.join(modify_category_names())}\n\n")
             elif len(selected_categories) > 1:
                 log.write(f"Category: Control_Group\n\n")
-                if var_checkbutton_1.get() == "0":
-                    log.write(f"Event: True\n")
-                else:
-                    log.write(f"Event: False\n")
-                if var_checkbutton_2.get() == "0":
-                    log.write(f"Human: True\n")
-                else:
-                    log.write(f"Human: False\n")
-                if var_checkbutton_3.get() == "0":
-                    log.write(f"Male: True\n")
-                else:
-                    log.write(f"Male: False\n")
-                if var_checkbutton_4.get() == "0":
-                    log.write(f"Female: True\n")
-                else:
-                    log.write(f"Female: False\n")
-                if var_checkbutton_5.get() == "0":
-                    log.write(f"North Hemisphere: True\n")
-                else:
-                    log.write(f"North Hemisphere: False\n")
-                if var_checkbutton_6.get() == "0":
-                    log.write(f"South Hemisphere: True\n\n")
-                else:
-                    log.write(f"South Hemisphere: False\n\n")
+                criterias = ["Event", "Human", "Male", "Female", "North Hemisphere", "South Hemisphere"]
+                checkbuttons = [var_checkbutton_1, var_checkbutton_2, var_checkbutton_3,
+                                var_checkbutton_4, var_checkbutton_5, var_checkbutton_6]
+                for i in range(6):
+                    if checkbuttons[i].get() == "0":
+                        log.write(f"{criterias[i]}: True\n")
+                    else:
+                        log.write(f"{criterias[i]}: False\n")
             log.write(f"|{str(datetime.now())[:-7]}| Process started.\n\n")
             log.flush()
             for records in displayed_results:
@@ -1599,21 +1583,23 @@ def sum_of_row(table):
     return total
 
 
-def find_expected_values():
+def calculate(file_name_1, file_name_2, table_name, table0, table1, msg_title):
     global selection
-    selection = "expected"
-    file_name_1 = "control_group.xlsx"
-    file_name_2 = "observed_values.xlsx"
+    selection = table_name
+    file_name_1 = f"{file_name_1}.xlsx"
+    file_name_2 = f"{file_name_2}.xlsx"
     read_file_1 = None
     read_file_2 = None
     try:
         read_file_1 = xlrd.open_workbook(file_name_1)
     except FileNotFoundError:
-        msgbox.showinfo(title="Find Expected Values", message="No such file or directory: 'control_group.xlsx'")
+        msgbox.showinfo(title=f"Find {msg_title} Values",
+                        message=f"No such file or directory: '{file_name_1}.xlsx'")
     try:
         read_file_2 = xlrd.open_workbook(file_name_2)
     except FileNotFoundError:
-        msgbox.showinfo(title="Find Expected Values", message="No such file or directory: 'observed_values.xlsx'")
+        msgbox.showinfo(title=f"Find {msg_title} Values",
+                        message=f"No such file or directory: '{file_name_2}.xlsx'")
     if read_file_1 is not None and read_file_2 is not None:
         sheet_1 = read_file_1.sheet_by_name("Sheet1")
         sheet_2 = read_file_2.sheet_by_name("Sheet1")
@@ -1630,16 +1616,23 @@ def find_expected_values():
                 if i[0] == j[0]:
                     if i[1] != "" and j[1] != "":
                         if type(i[1]) == float or type(j[1]) == float:
-                            if method is False:
-                                # Sjoerd's method
-                                new_sheet.write(*i[0], i[1] * ratio, style=style)
-                            elif method is True:
-                                # Flavia's method
-                                new_sheet.write(
-                                    *i[0],
-                                    sum_of_row(data_2) * (i[1] + j[1]) / sum_of_all,
-                                    style=style
-                                )
+                            try:
+                                if selection == "expected":
+                                    if method is False:
+                                        # Sjoerd's method
+                                        new_sheet.write(*i[0], i[1] * ratio, style=style)
+                                    elif method is True:
+                                        # Flavia's method
+                                        new_sheet.write(
+                                            *i[0],
+                                            sum_of_row(data_2) * (i[1] + j[1]) / sum_of_all,
+                                            style=style)
+                                elif selection == "chi-square":
+                                    new_sheet.write(*i[0], (i[1] - j[1]) ** 2 / j[1], style=style)
+                                elif selection == "effect-size":
+                                    new_sheet.write(*i[0], i[1] / j[1], style=style)
+                            except ZeroDivisionError:
+                                new_sheet.write(*i[0], 0, style=style)
                         else:
                             special_cells(new_sheet, i)
                     elif i[1] != "" and j[1] == "":
@@ -1650,107 +1643,42 @@ def find_expected_values():
                         control_list.append(i[0])
                     if j[0] not in control_list:
                         control_list.append(j[0])
-        save_file(new_file, new_sheet, "expected_values", "control_group", "observed_values")
+        save_file(new_file, new_sheet, table_name, table0, table1)
         master.update()
-        msgbox.showinfo(title="Find Expected Values", message="Process finished successfully.")
+        msgbox.showinfo(title=f"Find {msg_title} Values", message="Process finished successfully.")
+
+
+def find_expected_values():
+    calculate(
+        file_name_1="control_group",
+        file_name_2="observed_values",
+        table_name="expected",
+        table0="control_group",
+        table1="observed_values",
+        msg_title="Expected"
+    )
 
 
 def find_chi_square_values():
-    global selection
-    selection = "chisquare"
-    file_name_1 = "observed_values.xlsx"
-    file_name_2 = "expected_values.xlsx"
-    read_file_1 = None
-    read_file_2 = None
-    try:
-        read_file_1 = xlrd.open_workbook(file_name_1)
-    except FileNotFoundError:
-        msgbox.showinfo(title="Find Chi-Square Values", message="No such file or directory: 'observed_values.xlsx'")
-    try:
-        read_file_2 = xlrd.open_workbook(file_name_2)
-    except FileNotFoundError:
-        msgbox.showinfo(title="Find Chi-Square Values", message="No such file or directory: 'expected_values.xlsx'")
-    if read_file_1 is not None and read_file_2 is not None:
-        sheet_1 = read_file_1.sheet_by_name("Sheet1")
-        sheet_2 = read_file_2.sheet_by_name("Sheet1")
-        new_file = xlwt.Workbook()
-        new_sheet = new_file.add_sheet("Sheet1")
-        data_1 = get_excel_datas(sheet_1)
-        data_2 = get_excel_datas(sheet_2)
-        control_list = []
-        write_title_of_total(new_sheet)
-        for i in data_1:
-            for j in data_2:
-                if i[0] == j[0]:
-                    if i[1] != "" and j[1] != "":
-                        if type(i[1]) == float or type(j[1]) == float:
-                            try:
-                                new_sheet.write(*i[0], (i[1] - j[1]) ** 2 / j[1], style=style)
-                            except ZeroDivisionError:
-                                new_sheet.write(*i[0], 0, style=style)
-                        else:
-                            special_cells(new_sheet, i)
-                    elif i[1] != "" and j[1] == "":
-                        new_sheet.write(*i[0], i[1], style=style)
-                    elif i[1] == "" and j[1] != "":
-                        new_sheet.write(*j[0], j[1], style=style)
-                    if i[0] not in control_list:
-                        control_list.append(i[0])
-                    if j[0] not in control_list:
-                        control_list.append(j[0])
-        save_file(new_file, new_sheet, "chi-square", "expected_values", "observed_values")
-        master.update()
-        msgbox.showinfo(title="Find Chi-Square Values", message="Process finished successfully.")
+    calculate(
+        file_name_1="observed_values",
+        file_name_2="expected_values",
+        table_name="chi-square",
+        table0="observed_values",
+        table1="expected_values",
+        msg_title="Chi-Square"
+    )
 
 
 def find_effect_size_values():
-    global selection
-    selection = "effectsize"
-    file_name_1 = "observed_values.xlsx"
-    file_name_2 = "expected_values.xlsx"
-    read_file_1 = None
-    read_file_2 = None
-    try:
-        read_file_1 = xlrd.open_workbook(file_name_1)
-    except FileNotFoundError:
-        msgbox.showinfo(title="Find Effect Size Values", message="No such file or directory: 'observed_values.xlsx'")
-    try:
-        read_file_2 = xlrd.open_workbook(file_name_2)
-    except FileNotFoundError:
-        msgbox.showinfo(title="Find Effect Size Values", message="No such file or directory: 'expected_values.xlsx'")
-    if read_file_1 is not None and read_file_2 is not None:
-        sheet_1 = read_file_1.sheet_by_name("Sheet1")
-        sheet_2 = read_file_2.sheet_by_name("Sheet1")
-        new_file = xlwt.Workbook()
-        new_sheet = new_file.add_sheet("Sheet1")
-        data_1 = get_excel_datas(sheet_1)
-        data_2 = get_excel_datas(sheet_2)
-        control_list = []
-        write_title_of_total(new_sheet)
-        for i in data_1:
-            for j in data_2:
-                if i[0] == j[0]:
-                    if i[1] != "" and j[1] != "":
-                        if type(i[1]) == float or type(j[1]) == float:
-                            try:
-                                new_sheet.write(*i[0], i[1] / j[1], style=style)
-                            except ZeroDivisionError:
-                                new_sheet.write(*i[0], 0, style=style)
-                        else:
-                            style.font = _font_(bold=True)
-                            special_cells(new_sheet, i)
-                            style.font = _font_(bold=False)
-                    elif i[1] != "" and j[1] == "":
-                        new_sheet.write(*i[0], i[1], style=style)
-                    elif i[1] == "" and j[1] != "":
-                        new_sheet.write(*j[0], j[1], style=style)
-                    if i[0] not in control_list:
-                        control_list.append(i[0])
-                    if j[0] not in control_list:
-                        control_list.append(j[0])
-        save_file(new_file, new_sheet, "effect-size", "observed_values", "expected_values")
-        master.update()
-        msgbox.showinfo(title="Find Effect Size Values", message="Process finished successfully.")
+    calculate(
+        file_name_1="observed_values",
+        file_name_2="expected_values",
+        table_name="effect-size",
+        table0="observed_values",
+        table1="expected_values",
+        msg_title="Effect Size"
+    )
 
 
 # --------------------------------------------- main ---------------------------------------------
@@ -1796,7 +1724,7 @@ def main():
         square = int(orb_entries[5].get())
         trine = int(orb_entries[6].get())
         sesquiquadrate = int(orb_entries[7].get())
-        biquintile = int(orb_entries[7].get())
+        biquintile = int(orb_entries[8].get())
         quincunx = int(orb_entries[9].get())
         opposite = int(orb_entries[10].get())
         parent.destroy()
@@ -1950,7 +1878,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "21 January 2019"
+        update_date, _update_date = "Update Date:", "30 January 2019"
         developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
