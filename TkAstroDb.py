@@ -826,7 +826,7 @@ def get_excel_datas(sheet):
     if r1.count("/") == 2 and r2.count("/") == 2 and r3.count("/") == 2:
         r1, r2, r3 = "", "", ""
     for row in range(sheet.nrows):
-        if selection == "expected":
+        if selection == "expected_values":
             if row == 1:
                 r1 += f"{sheet.cell_value(row, 5)} / "
             elif row == 2:
@@ -1001,7 +1001,7 @@ def write_title_of_total(sheet):
             sheet.write_merge(r1=3, r2=3, c1=3, c2=4, label="Category:", style=style)
             style.font = _font_(bold=False)
             sheet.write_merge(r1=3, r2=3, c1=5, c2=13, label="Control_Group", style=style)
-    elif selection == "expected":
+    elif selection == "expected_values":
         sheet.write_merge(r1=1, r2=1, c1=3, c2=4, label="House System:", style=style)
         style.font = _font_(bold=False)
         sheet.write_merge(r1=1, r2=1, c1=5, c2=13, label=f"{r1[:-3]}", style=style)
@@ -1617,7 +1617,7 @@ def calculate(file_name_1, file_name_2, table_name, table0, table1, msg_title):
                     if i[1] != "" and j[1] != "":
                         if type(i[1]) == float or type(j[1]) == float:
                             try:
-                                if selection == "expected":
+                                if selection == "expected_values":
                                     if method is False:
                                         # Sjoerd's method
                                         new_sheet.write(*i[0], i[1] * ratio, style=style)
@@ -1643,7 +1643,7 @@ def calculate(file_name_1, file_name_2, table_name, table0, table1, msg_title):
                         control_list.append(i[0])
                     if j[0] not in control_list:
                         control_list.append(j[0])
-        save_file(new_file, new_sheet, table_name, table0, table1)
+        save_file(new_file, new_sheet, table_name, file_name_1, file_name_2)
         master.update()
         msgbox.showinfo(title=f"Find {msg_title} Values", message="Process finished successfully.")
 
@@ -1652,9 +1652,7 @@ def find_expected_values():
     calculate(
         file_name_1="control_group",
         file_name_2="observed_values",
-        table_name="expected",
-        table0="control_group",
-        table1="observed_values",
+        table_name="expected_values",
         msg_title="Expected"
     )
 
@@ -1664,8 +1662,6 @@ def find_chi_square_values():
         file_name_1="observed_values",
         file_name_2="expected_values",
         table_name="chi-square",
-        table0="observed_values",
-        table1="expected_values",
         msg_title="Chi-Square"
     )
 
@@ -1675,8 +1671,6 @@ def find_effect_size_values():
         file_name_1="observed_values",
         file_name_2="expected_values",
         table_name="effect-size",
-        table0="observed_values",
-        table1="expected_values",
         msg_title="Effect Size"
     )
 
