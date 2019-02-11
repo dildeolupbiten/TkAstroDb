@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.2.6"
+__version__ = "1.2.7"
 
 import os
 import sys
@@ -192,6 +192,21 @@ house_systems = {
 }
 
 
+def dd_to_dms(dd):
+    degree = int(dd)
+    minute = int((dd - degree) * 60)
+    second = round(float((dd - degree - minute / 60) * 3600))
+    return f"{degree}\u00b0 {minute}\' {second}\""
+
+
+def dms_to_dd(dms):
+    dms = dms.replace("\u00b0", " ").replace("\'", " ").replace("\"", " ")
+    degree = int(dms.split(" ")[0])
+    minute = float(dms.split(" ")[1]) / 60
+    second = float(dms.split(" ")[2]) / 3600
+    return degree + minute + second
+
+
 class Chart:
     def __init__(self, julian_date: float, longitude: float, latitude: float):
         self.julian_date = julian_date
@@ -227,21 +242,6 @@ class Chart:
         self.convert_house_info()
         self.convert_house_degrees()
         self.find_planet_positions()
-
-    @staticmethod
-    def dd_to_dms(dd):
-        degree = int(dd)
-        minute = int((dd - degree) * 60)
-        second = round(float((dd - degree - minute / 60) * 3600))
-        return f"{degree}\u00b0 {minute}\' {second}\""
-
-    @staticmethod
-    def dms_to_dd(dms):
-        dms = dms.replace("\u00b0", "").replace("\'", "").replace("\"", "")
-        degree = int(dms.split(" ")[0])
-        minute = float(dms.split(" ")[1]) / 60
-        second = float(dms.split(" ")[2]) / 3600
-        return degree + minute + second
 
     @staticmethod
     def convert_angle(angle):
@@ -1583,7 +1583,7 @@ def sum_of_row(table):
     return total
 
 
-def calculate(file_name_1, file_name_2, table_name, table0, table1, msg_title):
+def calculate(file_name_1, file_name_2, table_name, msg_title):
     global selection
     selection = table_name
     file_name_1 = f"{file_name_1}.xlsx"
@@ -1819,6 +1819,40 @@ def main():
                 f.write(f"{i + 1}. {j[12]}\n")
         msgbox.showinfo(title="Export Links", message=f"{len(displayed_results)} links were exported.")
 
+    def export_lat_frequency():
+        latitude_freq_north = {f"{i}\u00b0 - {i + 1}\u00b0": [] for i in range(90)}
+        latitude_freq_south = {f"{-i - 1}\u00b0 - {-i}\u00b0": [] for i in range(90)}
+        latitudes = []
+        for item in displayed_results:
+            latitude = item[7]
+            if "n" in latitude:
+                latitude = latitude.replace("n", "\u00b0") + "'0\""
+                latitude = dms_to_dd(latitude)
+            elif "s" in latitude:
+                latitude = latitude.replace("s", "\u00b0") + "'0\""
+                latitude = -1 * dms_to_dd(latitude)
+            latitudes.append(latitude)
+        for i in latitudes:
+            for j in range(90):
+                if j <= i < j + 1:
+                    latitude_freq_north[f"{j}\u00b0 - {j + 1}\u00b0"].append(i)
+                elif -j - 1 <= i < -j:
+                    latitude_freq_south[f"{-j - 1}\u00b0 - {-j}\u00b0"].append(i)
+        edit_latitude_freq_north = {
+            keys: len(values) for keys, values in latitude_freq_north.items() if len(values) != 0}
+        edit_latitude_freq_south = {
+            keys: len(values) for keys, values in latitude_freq_south.items() if len(values) != 0}
+        with open("latitude-frequency.txt", "w", encoding="utf-8") as f:
+            f.write("Latitude Intervals\n\n")
+            for i, j in edit_latitude_freq_south.items():
+                f.write(f"{i} = {j}\n")
+            for i, j in edit_latitude_freq_north.items():
+                f.write(f"{i} = {j}\n")
+            f.write(f"\nMean Latitude = {dd_to_dms(sum(latitudes) / len(latitudes))}\n")
+            f.write(f"\nTotal = {len(displayed_results)}")
+            msgbox.showinfo(title="Export Latitude Frequency",
+                            message=f"{len(displayed_results)} records were exported.")
+
     def year_frequency_command(parent, date_entries, years):
         min_, max_, step_ = date_entries[:]
         min_, max_, step_ = int(min_.get()), int(max_.get()), int(step_.get())
@@ -1838,7 +1872,7 @@ def main():
             f.write(f"Total = {len(displayed_results)}")
             parent.destroy()
             msgbox.showinfo(title="Export Year Frequency",
-                            message=f"{len(displayed_results)} dates were exported.")
+                            message=f"{len(displayed_results)} records were exported.")
 
     def export_year_frequency():
         toplevel5 = tk.Toplevel()
@@ -1872,7 +1906,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "30 January 2019"
+        update_date, _update_date = "Update Date:", "11 February 2019"
         developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
@@ -1950,6 +1984,7 @@ def main():
     method_menu.add_command(label="Sjoerd's method", command=set_method_to_false)
 
     export_menu.add_command(label="Adb Links", command=export_link)
+    export_menu.add_command(label="Latitude Frequency", command=export_lat_frequency)
     export_menu.add_command(label="Year Frequency", command=export_year_frequency)
 
     options_menu.add_command(label="House System", command=create_hsys_checkbuttons)
