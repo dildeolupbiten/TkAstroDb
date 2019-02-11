@@ -1821,7 +1821,7 @@ def main():
 
     def export_lat_frequency():
         latitude_freq_north = {f"{i}\u00b0 - {i + 1}\u00b0": [] for i in range(90)}
-        latitude_freq_south = {f"{-i - 1}\u00b0 - {-i}\u00b0": [] for i in range(90)}
+        latitude_freq_south = {f"{-i}\u00b0 - {-i - 1}\u00b0": [] for i in range(90)}
         latitudes = []
         for item in displayed_results:
             latitude = item[7]
@@ -1837,7 +1837,7 @@ def main():
                 if j <= i < j + 1:
                     latitude_freq_north[f"{j}\u00b0 - {j + 1}\u00b0"].append(i)
                 elif -j - 1 <= i < -j:
-                    latitude_freq_south[f"{-j - 1}\u00b0 - {-j}\u00b0"].append(i)
+                    latitude_freq_south[f"{-j}\u00b0 - {-j - 1}\u00b0"].append(i)
         edit_latitude_freq_north = {
             keys: len(values) for keys, values in latitude_freq_north.items() if len(values) != 0}
         edit_latitude_freq_south = {
