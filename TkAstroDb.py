@@ -1070,8 +1070,8 @@ def write_total_data(sheet):
 
 def save_file(file, sheet, table_name, table0="table0", table1="table1"):
     write_total_data(sheet=sheet)
-    os.remove(f"{table0}.xlsx")
-    os.remove(f"{table1}.xlsx")
+    os.remove(f"{table0}")
+    os.remove(f"{table1}")
     file.save(f"{table_name}.xlsx")
 
 
