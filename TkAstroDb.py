@@ -1137,7 +1137,7 @@ def create_a_new_table():
                     control_list.append(i[0])
                 if j[0] not in control_list:
                     control_list.append(j[0])
-    save_file(new_file, new_sheet, "table0")
+    save_file(new_file, new_sheet, "table0", file_1, file_2)
 
 
 _planets_ = {i: [] for i in planets}
