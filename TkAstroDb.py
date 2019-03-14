@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.2.7"
+__version__ = "1.2.8"
 
 import os
 import sys
@@ -11,18 +11,39 @@ import shutil
 import threading
 import webbrowser
 import tkinter as tk
+import sqlite3 as sql
 import xml.etree.ElementTree
 import urllib.request as urllib
 import tkinter.messagebox as msgbox
 
-from datetime import datetime
 from tkinter.ttk import Progressbar, Treeview
+from datetime import datetime as dt
 
+try:
+    from dateutil import tz
+except ModuleNotFoundError:
+    os.system("pip3 install dateutil")
+    from dateutil import tz
+try:
+    from geopy.geocoders import Nominatim
+except ModuleNotFoundError:
+    os.system("pip3 install geopy")
+    from geopy.geocoders import Nominatim
+try:
+    from tzwhere import tzwhere
+except ModuleNotFoundError:
+    os.system("pip3 install tzwhere")
+    from tzwhere import tzwhere
+try:
+    from countryinfo import CountryInfo
+except ModuleNotFoundError:
+    os.system("pip3 install countryinfo")
+    from countryinfo import CountryInfo
 try:
     import numpy as np
 except ModuleNotFoundError:
     os.system("pip3 install numpy")
-    import numpy as np  
+    import numpy as np
 try:
     import xlrd
 except ModuleNotFoundError:
@@ -58,12 +79,21 @@ except ModuleNotFoundError:
     import swisseph as swe
 
 
-# --------------------------------------------- xml ---------------------------------------------
+# --------------------------------------------- sqlite3 & xml -----------------------------------
 
+
+connect = sql.connect("TkAstroDb.db")
+cursor = connect.cursor()
+cursor.execute("CREATE TABLE IF NOT EXISTS DATA(adb_id, name, gender, rr, date, time, "
+               "julian_date, lat, lon, place, country, adb_link, category)")
 
 xml_file = ""
 
 database, all_categories, category_names = [], [], []
+
+_count_ = 0
+
+category_dict = dict()
 
 for _i in os.listdir(os.getcwd()):
     if _i.endswith("xml"):
@@ -89,10 +119,12 @@ for _i in range(1000000):
             lon = bdata[3].get("slong")
             place = bdata[3].text
             country = bdata[4].text
-            sctr = bdata[4].get("sctr")
             category = [
                 (categories[_j].get("cat_id"), categories[_j].text)
                 for _j in range(len(categories))]
+            for cate in category:
+                if cate[0] not in category_dict.keys():
+                    category_dict[cate[0]] = cate[1]
             user_data.append(int(root[_i + 2].get("adb_id")))
             user_data.append(_name)
             user_data.append(gender.text)
@@ -104,32 +136,62 @@ for _i in range(1000000):
             user_data.append(lon)
             user_data.append(place)
             user_data.append(country)
-            user_data.append(sctr)
             user_data.append(adb_link.text)
             user_data.append(category)
         database.append(user_data)
     except IndexError:
         break
 
-for _i in range(5000):
-    _records_ = []
-    category_groups = {}
-    category_name = ""
-    for j_ in database:
-        for _k in j_[13]:
-            if _k[0] == f"{_i}":
-                _records_.append(j_)
-                category_name = _k[1]
-                if category_name is None:
-                    category_name = "No Category Name"
-    category_groups[(_i, category_name)] = _records_
-    if not _records_:
-        pass
-    else:
-        category_names.append(category_name)
-        all_categories.append(category_groups)
 
-category_names = sorted(category_names)
+def modify_database():
+    global category_names, _count_
+    reverse_category_list = {value: key for key, value in category_dict.items()}
+    for _i_ in cursor.execute("SELECT * FROM DATA"):
+        _data_ = list(_i_)
+        new_category = []
+        edit_data = _data_[:12]
+        if "|" in _data_[12]:
+            edit_category = _data_[12].split("|")
+            for _cat_ in edit_category:
+                if _cat_ in category_dict.values():
+                    new_category.append((reverse_category_list[_cat_], _cat_))
+                else:
+                    new_category.append((str(4014 + _count_), _cat_))
+                    category_dict[str(4014 + _count_)] = _cat_
+                    _count_ += 1
+                    reverse_category_list = {value: key for key, value in category_dict.items()}
+        else:
+            if _data_[12] in category_dict.values():
+                new_category.append((reverse_category_list[_data_[12]], _data_[12]))
+            else:
+                new_category.append((str(4014 + _count_), _data_[12]))
+                category_dict[str(4014 + _count_)] = _data_[12]
+                reverse_category_list = {value: key for key, value in category_dict.items()}
+                _count_ += 1
+        edit_data.append(new_category)
+        database.append(edit_data)
+    for _i_ in range(5000):
+        _records_ = []
+        category_groups = {}
+        category_name = ""
+        for j_ in database:
+            for _k in j_[12]:
+                if _k[0] == f"{_i_}":
+                    _records_.append(j_)
+                    category_name = _k[1]
+                    if category_name is None:
+                        category_name = "No Category Name"
+        category_groups[(_i_, category_name)] = _records_
+        if not _records_:
+            pass
+        else:
+            if category_name not in category_names:
+                category_names.append(category_name)
+            all_categories.append(category_groups)
+    category_names = sorted(category_names)
+
+
+modify_database()
 
 
 # --------------------------------------------- swisseph ---------------------------------------------
@@ -143,7 +205,7 @@ signs = [
 ]
 
 planets = [
-    "Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", 
+    "Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter",
     "Saturn", "Uranus", "Neptune", "Pluto", "North Node", "Chiron"
 ]
 
@@ -391,9 +453,11 @@ class Chart:
 # --------------------------------------------- tkinter ---------------------------------------------
 
 
-selected_categories, selected_ratings, displayed_results = [], [], []
+selected_categories, selected_ratings, displayed_results, record_categories = [], [], [], []
 
-toplevel1, toplevel2, menu, search_menu = None, None, None, None
+toplevel1, toplevel2, menu, search_menu, listbox_menu = None, None, None, None, None
+
+record = False
 
 _num_ = 0
 
@@ -415,7 +479,7 @@ y_scrollbar.pack(side="right", fill="y")
 
 columns = ["Adb ID", "Name", "Gender", "Rodden Rating", "Date",
            "Hour", "Julian Date", "Latitude", "Longitude", "Place",
-           "Country", "Country Code", "Adb Link", "Category"]
+           "Country", "Adb Link", "Category"]
 
 treeview = Treeview(master=bottom_frame, show="headings",
                     columns=[f"#{_i_ + 1}" for _i_ in range(len(columns))], height=18)
@@ -438,14 +502,14 @@ found_record.grid(row=1, column=0, padx=5, pady=5)
 add_button = tk.Button(master=entry_button_frame, text="Add")
 
 
-def add_command(record):
+def add_command(_record_):
     global _num_
-    if record in displayed_results:
+    if _record_ in displayed_results:
         pass
     else:
-        treeview.insert("", _num_, values=[col for col in record])
+        treeview.insert("", _num_, values=[col for col in _record_])
         _num_ += 1
-        displayed_results.append(record)
+        displayed_results.append(_record_)
         info_var.set(len(displayed_results))
     add_button.grid_forget()
     found_record.configure(text="")
@@ -456,28 +520,28 @@ def search_func(event):
     master.update()
     save_record = ""
     count = 0
-    for record in database:
-        if search_entry.get() == record[1]:
-            index = database.index(record)
+    for _record_ in database:
+        if search_entry.get() == _record_[1]:
+            index = database.index(_record_)
             count += 1
             found_record.configure(text=f"Record Found = {count}")
             add_button.grid(row=1, column=1, padx=5, pady=5)
-            add_button.configure(command=lambda: add_command(record=database[index]))
+            add_button.configure(command=lambda: add_command(_record_=database[index]))
             save_record += database[index][1]
     if save_record != search_entry.get() or save_record == search_entry.get() == "":
         found_record.configure(text="")
         add_button.grid_forget()
 
 
-def destroy_entry(event):
-    if search_menu is not None:
-        search_menu.destroy()
+def destroy_menu(event, _menu_):
+    if _menu_ is not None:
+        _menu_.destroy()
 
 
 def button_3_on_entry(event):
     global search_menu
     if search_menu is not None:
-        destroy_entry(event)
+        destroy_menu(event, search_menu)
     search_menu = tk.Menu(master=None, tearoff=False)
     search_menu.add_command(
         label="Copy", command=lambda: master.focus_get().event_generate('<<Copy>>'))
@@ -492,7 +556,12 @@ def button_3_on_entry(event):
     search_menu.post(event.x_root, event.y_root)
 
 
-search_entry.bind("<Button-1>", lambda event: destroy_entry(event))
+def select_range(event):
+    event.widget.select_range("0", "end")
+
+
+search_entry.bind("<Control-KeyRelease-a>", lambda event: select_range(event))
+search_entry.bind("<Button-1>", lambda event: destroy_menu(event, search_menu))
 search_entry.bind("<Button-3>", lambda event: button_3_on_entry(event))
 search_entry.bind("<KeyRelease>", search_func)
 
@@ -564,8 +633,8 @@ def select_ratings():
 
 
 def select_categories():
-    global selected_categories
-    selected_categories = []
+    global selected_categories, record_categories
+    selected_categories, record_categories = [], []
     global toplevel1
     try:
         if not toplevel1.winfo_exists():
@@ -603,8 +672,12 @@ def select_categories():
             checkbutton_list.append(checkbutton)
             cvar.set(False)
             checkbutton.grid(row=num, column=0, sticky="nw")
-        tbutton.configure(command=lambda: tbutton_command(cvar_list,  toplevel1, selected_categories))
+        if record is False:
+            tbutton.configure(command=lambda: tbutton_command(cvar_list, toplevel1, selected_categories))
+        else:
+            tbutton.configure(command=lambda: tbutton_command(cvar_list, toplevel1, record_categories))
         check_uncheck.configure(command=lambda: check_all_command(check_all, cvar_list, checkbutton_list))
+        master.update()
 
 
 category_button = tk.Button(master=entry_button_frame, text="Select", command=select_categories)
@@ -627,7 +700,7 @@ def create_checkbutton():
         _checkbutton_.grid(row=i, column=2, columnspan=2, sticky="w")
         yield _var_
         yield _checkbutton_
-    
+
 
 var_checkbutton_1, display_checkbutton_1, var_checkbutton_2, display_checkbutton_2, \
     var_checkbutton_3, display_checkbutton_3, var_checkbutton_4, display_checkbutton_4, \
@@ -722,17 +795,19 @@ def display_results():
         msgbox.showinfo(title="Display Records", message="1 record is inserted.")
     else:
         msgbox.showinfo(title="Display Records", message=f"{len(displayed_results)} records are inserted.")
-    
+    master.update()
+
 
 def button_3_remove():
-    focused = treeview.focus()
-    if not focused:
+    selected = treeview.selection()
+    if not selected:
         pass
     else:
-        for i in displayed_results:
-            if i[0] == treeview.item(focused)["values"][0]:
-                displayed_results.remove(i)
-        treeview.delete(focused)
+        for i in selected:
+            for j in displayed_results:
+                if j[0] == treeview.item(i)["values"][0]:
+                    displayed_results.remove(j)
+            treeview.delete(i)
         info_var.set(len(displayed_results))
 
 
@@ -743,7 +818,7 @@ def button_3_open_url():
     else:
         for i in displayed_results:
             if i[0] == treeview.item(focused)["values"][0]:
-                webbrowser.open(i[12])
+                webbrowser.open(i[11])
 
 
 def destroy(event):
@@ -763,6 +838,17 @@ def button_3_on_treeview(event):
     menu.post(event.x_root, event.y_root)
 
 
+def select_all_tree(event):
+    children = treeview.get_children()
+    treeview.selection_set(children)
+
+
+def delete_all_tree(event):
+    button_3_remove()
+
+
+treeview.bind("<Delete>", lambda event: delete_all_tree(event))
+treeview.bind("<Control-a>", lambda event: select_all_tree(event))
 treeview.bind("<Button-1>", lambda event: destroy(event))
 treeview.bind("<Button-3>", lambda event: button_3_on_treeview(event))
 
@@ -873,8 +959,8 @@ def get_excel_datas(sheet):
                         datas.append(([row, col], sheet.cell_value(row, col)))
                     elif (col == 13 and 216 < row < 398) or (col == 13 and 429 < row < 789):
                         datas.append(([row, col], sheet.cell_value(row, col)))
-        elif selection == "observed":  
-            if row in [i for i in range(6)]\
+        elif selection == "observed":
+            if row in [i for i in range(6)] \
                     or row in [i for i in range(230, 396, 15)] or row == 411 \
                     or row == 427 \
                     or row in [i for i in range(443, 609, 15)] \
@@ -1198,7 +1284,7 @@ def search_aspect(planet_pos, sheet, row: int, aspect: int, orb: int, name: str)
                 for num, planet in enumerate(planets):
                     if j[0] == planet:
                         extract_aspects(planet=planet, value=1, num=11 - num)
-            else: 
+            else:
                 sheet.write(k + _row, i, 0, style=style)
                 for num, planet in enumerate(planets):
                     if j[0] == planet:
@@ -1501,7 +1587,7 @@ def find_observed_values():
             if len(selected_categories) == 1:
                 if len(displayed_results) == 1:
                     log.write(f"Category: \
-{displayed_results[0][1].replace(' ','_', displayed_results[0][1].count(' '))}\n\n")
+{displayed_results[0][1].replace(' ', '_', displayed_results[0][1].count(' '))}\n\n")
                 else:
                     log.write(f"Category: {'/'.join(modify_category_names())}\n\n")
             elif len(selected_categories) > 1:
@@ -1514,7 +1600,7 @@ def find_observed_values():
                         log.write(f"{criterias[i]}: True\n")
                     else:
                         log.write(f"{criterias[i]}: False\n")
-            log.write(f"|{str(datetime.now())[:-7]}| Process started.\n\n")
+            log.write(f"|{str(dt.now())[:-7]}| Process started.\n\n")
             log.flush()
             for records in displayed_results:
                 julian_date = float(records[6])
@@ -1532,7 +1618,7 @@ def find_observed_values():
                     chart = Chart(julian_date, longitude, latitude)
                     write_datas_to_excel(chart.get_chart_data())
                 except BaseException as err:
-                    log.write(f"|{str(datetime.now())[:-7]}| Error Type: {err}\n{' ' * 22}Record: {records}\n\n")
+                    log.write(f"|{str(dt.now())[:-7]}| Error Type: {err}\n{' ' * 22}Record: {records}\n\n")
                     log.flush()
                 __received__ += 1
                 if __received__ != __size__:
@@ -1558,18 +1644,18 @@ def find_observed_values():
                             dir2 = dir_names(cat, dir1, orb_factor)
                         elif len(selected_categories) > 1:
                             cat = ["Control_Group"]
-                            dir2 = dir_names(cat, dir1, orb_factor)    
+                            dir2 = dir_names(cat, dir1, orb_factor)
                         try:
                             os.makedirs(dir2)
                             shutil.move(src=os.path.join(os.getcwd(), "observed_values.xlsx"),
                                         dst=os.path.join(os.getcwd(), dir2, "observed_values.xlsx"))
                         except FileExistsError as err:
-                            log.write(f"|{str(datetime.now())[:-7]}| Error Type: {err}\n\n")
+                            log.write(f"|{str(dt.now())[:-7]}| Error Type: {err}\n\n")
                             log.flush()
                     except FileNotFoundError:
                         pass
                     master.update()
-                    log.write(f"|{str(datetime.now())[:-7]}| Process finished.")
+                    log.write(f"|{str(dt.now())[:-7]}| Process finished.")
                     shutil.move(src=os.path.join(os.getcwd(), "output.log"),
                                 dst=os.path.join(os.getcwd(), dir2, "output.log"))
                     msgbox.showinfo(title="Find Observed Values", message="Process finished successfully.")
@@ -1900,20 +1986,242 @@ def main():
     def callback(event, url):
         webbrowser.open_new(url)
 
+    def from_local_to_utc(year, month, day, hour, minute, _lat, _lon):
+        nominatim = Nominatim()
+        location = nominatim.reverse([_lat, _lon])[0]
+        tzw = tzwhere.tzwhere()
+        timezone = tzw.tzNameAt(_lat, _lon)
+        local_zone = tz.gettz(timezone)
+        utc_zone = tz.gettz("UTC")
+        global_time = dt.strptime(f"{year}-{month}-{day} {hour}:{minute}:00", "%Y-%m-%d %H:%M:%S")
+        local_time = global_time.replace(tzinfo=local_zone)
+        utc_time = local_time.astimezone(utc_zone)
+        if location.split(", ")[0].isnumeric():
+            loc = location.split(", ")[2]
+        else:
+            loc = location.split(", ")[0]
+        return utc_time.hour, utc_time.minute, utc_time.second, \
+            loc, location.split(", ")[-1]
+
+    def julday(year, month, day, hour, minute, second):
+        julday_ = swe.julday(
+            year,
+            month,
+            day,
+            hour + (minute / 60) + (second / 3600),
+            swe.GREG_CAL
+        )
+        deltat = swe.deltat(julday_)
+        return {"JD": round(julday_ + deltat, 6), "TT": round(deltat * 86400, 1)}
+
+    def create_new_record():
+        toplevel6 = tk.Toplevel()
+        toplevel6.title("Create New Record")
+        toplevel6.resizable(width=False, height=False)
+        frames = []
+        entries = []
+        list_box = []
+        option_menu = []
+        for i in range(8):
+            frame = tk.Frame(toplevel6, bd=1, relief="sunken")
+            frame.grid(row=i, column=0, pady=4, padx=4)
+            frames.append(frame)
+
+        def add(cat_entry, listbox):
+            global record_categories
+            for rec in record_categories:
+                if rec not in listbox.get("0", "end"):
+                    listbox.insert("end", "".join(rec))
+                    list_box.append("".join(rec))
+                    master.update()
+            if cat_entry.get() != "":
+                if cat_entry.get() not in listbox.get("0", "end"):
+                    listbox.insert("end", cat_entry.get())
+                    list_box.append(cat_entry.get())
+            record_categories = []
+            cat_entry.delete("0", "end")
+
+        def cat_cmd():
+            global record
+            record = True
+            select_categories()
+            record = False
+
+        def delete(lb):
+            for item in lb.curselection()[::-1]:
+                lb.delete(item)
+
+        def button_3_on_listbox(event, lb):
+            global listbox_menu
+            if listbox_menu is not None:
+                destroy_menu(event, listbox_menu)
+            listbox_menu = tk.Menu(master=None, tearoff=False)
+            listbox_menu.add_command(
+                label="Remove", command=lambda: delete(lb))
+            listbox_menu.post(event.x_root, event.y_root)
+
+        def select_set(event):
+            event.widget.select_set("0", "end")
+
+        def delete_(event, lb):
+            delete(lb)
+
+        def widget(_frame, text, width, row1, col1, row2, col2):
+            label = tk.Label(master=_frame, text=text, fg="red")
+            if text == "Gender":
+                label.grid(row=row1, column=col1, columnspan=3)
+                menu_var = tk.StringVar()
+                gender_menu = tk.OptionMenu(_frame, menu_var, "Male", "Female", "N/A")
+                gender_menu.grid(row=row2, column=col2)
+                option_menu.append(menu_var)
+            elif text == "Add Category":
+                label.grid(row=row1, column=col1, columnspan=3)
+                cat_button = tk.Button(master=_frame, text="Select", width=10, command=cat_cmd)
+                cat_button.grid(row=1, column=0, columnspan=3)
+                cat_entry = tk.Entry(master=_frame)
+                cat_entry.grid(row=2, column=0, columnspan=3)
+                cat_entry.bind("<Control-KeyRelease-a>", lambda event: select_range(event))
+                cat_entry.bind("<Button-1>", lambda event: destroy_menu(event, search_menu))
+                cat_entry.bind("<Button-3>", lambda event: button_3_on_entry(event))
+                entries.append(cat_entry)
+                lbox_frame = tk.Frame(master=_frame)
+                lbox_frame.grid(row=4, column=0, columnspan=3)
+                listbox = tk.Listbox(master=lbox_frame, width=50, selectmode="extended")
+                listbox.pack(side="left")
+                listbox.bind("<Delete>", lambda event: delete_(event, listbox))
+                listbox.bind("<Control-a>", lambda event: select_set(event))
+                listbox.bind("<Button-1>", lambda event: destroy_menu(event, listbox_menu))
+                listbox.bind("<Button-3>", lambda event: button_3_on_listbox(event, listbox))
+                lbox_y_sbar = tk.Scrollbar(master=lbox_frame, orient="vertical", command=listbox.yview)
+                lbox_y_sbar.pack(side="left", fill="y")
+                listbox.configure(yscrollcommand=lbox_y_sbar.set)
+                _add_button = tk.Button(master=_frame, text="Add", command=lambda: add(cat_entry, listbox))
+                _add_button.grid(row=3, column=0, columnspan=3)
+            elif text == "Rodden Rating":
+                label.grid(row=row1, column=col1)
+                menu_var = tk.StringVar()
+                rodden_menu = tk.OptionMenu(_frame, menu_var, "AA", "A", "B", "C", "DD", "X", "XX", "AX")
+                rodden_menu.grid(row=row2, column=col2)
+                option_menu.append(menu_var)
+            else:
+                entry = tk.Entry(master=_frame, width=width)
+                entry.grid(row=row2, column=col2)
+                entry.bind("<Control-KeyRelease-a>", lambda event: select_range(event))
+                entry.bind("<Button-1>", lambda event: destroy_menu(event, search_menu))
+                entry.bind("<Button-3>", lambda event: button_3_on_entry(event))
+                entries.append(entry)
+                label.grid(row=row1, column=col1)
+
+        widget(frames[0], "Name", 28, row1=0, col1=0, row2=1, col2=0)
+        widget(frames[1], "Gender", 28, row1=0, col1=0, row2=1, col2=0)
+        widget(frames[2], "Rodden Rating", 28, row1=0, col1=0, row2=1, col2=0)
+        widget(frames[3], "Day", 2, row1=0, col1=0, row2=1, col2=0)
+        widget(frames[3], "Month", 2, row1=0, col1=1, row2=1, col2=1)
+        widget(frames[3], "Year", 4, row1=0, col1=2, row2=1, col2=2)
+        widget(frames[4], "Hour", 2, row1=0, col1=0, row2=1, col2=0)
+        widget(frames[4], "Minute", 2, row1=0, col1=1, row2=1, col2=1)
+        widget(frames[5], "Latitude", 10, row1=0, col1=0, row2=1, col2=0)
+        widget(frames[5], "Longitude", 10, row1=0, col1=1, row2=1, col2=1)
+        widget(frames[6], "Add Category", 28, row1=0, col1=0, row2=1, col2=0)
+
+        def get_record_data():
+            name = entries[0].get()
+            if option_menu[0].get() == "Male":
+                _gender = "M"
+            elif option_menu[0].get() == "Female":
+                _gender = "F"
+            else:
+                _gender = "N/A"
+            rr = option_menu[1].get()
+            day = entries[1].get()
+            month = entries[2].get()
+            year = entries[3].get()
+            hour = entries[4].get()
+            minute = entries[5].get()
+            _latitude_ = float(entries[6].get())
+            _longitude_ = float(entries[7].get())
+            try:
+                date = dt.strptime(f"{year} {month} {day}", "%Y %m %d")
+                _country_ = ""
+                try:
+                    utc_hour, utc_minute, utc_second, _place, country_ = from_local_to_utc(
+                        year, month, day, hour, minute, _latitude_, _longitude_)
+                    jd = julday(int(year), int(month), int(day), int(utc_hour), int(utc_minute), int(utc_second))["JD"]
+                    latitude, longitude = "", ""
+                    if _latitude_ < 0:
+                        _latitude_ *= -1
+                        _degree = int(_latitude_)
+                        _minute = int((_latitude_ - _degree) * 60)
+                        latitude += f"{_degree}s{_minute}"
+                    elif _latitude_ > 0:
+                        _degree = int(_latitude_)
+                        _minute = int((_latitude_ - _degree) * 60)
+                        latitude += f"{_degree}n{_minute}"
+                    if _longitude_ < 0:
+                        _longitude_ *= -1
+                        _degree = int(_longitude_)
+                        _minute = int((_longitude_ - _degree) * 60)
+                        latitude += f"{_degree}w{_minute}"
+                    elif _longitude_ > 0:
+                        _degree = int(_longitude_)
+                        _minute = int((_longitude_ - _degree) * 60)
+                        longitude += f"{_degree}e{_minute}"
+                    _country = CountryInfo()
+                    for keys, values in _country.all().items():
+                        for k, v in values.items():
+                            if k == "nativeName":
+                                if country_ in v or v in country_:
+                                    _country_ += values["name"]
+                    if not all([name, _gender, rr, list_box]):
+                        msgbox.showinfo(
+                            title="Create New Record",
+                            message=f"Fill the empty fields.")
+                        master.update()
+                    else:
+                        if len(list_box) > 1:
+                            _record_data = [
+                                "-", name, _gender, rr, date.strftime("%d %B %Y"), f"{hour}:{minute}",
+                                jd, latitude, longitude, _place, _country_, "-", "|".join(list_box)]
+                        else:
+                            _record_data = [
+                                "-", name, _gender, rr, date.strftime("%d %B %Y"), f"{hour}:{minute}",
+                                jd, latitude, longitude, _place, _country_, "-", "".join(list_box)]
+                        toplevel6.destroy()
+                        master.update()
+                        select_from_data = [list(_) for _ in cursor.execute("SELECT * FROM DATA")]
+                        if _record_data not in select_from_data:
+                            cursor.execute(
+                                f"INSERT INTO DATA VALUES({', '.join('?' * len(_record_data))})", _record_data)
+                            connect.commit()
+                            modify_database()
+                        else:
+                            msg = "This record is also stored in the database."
+                            msgbox.showinfo(title="Create New Record", message=f"Error: {msg}")
+                            master.update()
+                except BaseException as err:
+                    msgbox.showinfo(title="Create New Record", message=f"Error: {err}")
+                    master.update()
+            except ValueError as err:
+                master.update()
+                msgbox.showinfo(title="Create New Record", message=f"Error: {err}")
+
+        add_record_button = tk.Button(master=frames[7], text="Create", command=get_record_data)
+        add_record_button.grid(row=0, column=0)
+
     def about():
-        toplevel5 = tk.Toplevel()
-        toplevel5.title("About TkAstroDb")
+        toplevel7 = tk.Toplevel()
+        toplevel7.title("About TkAstroDb")
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "11 February 2019"
+        update_date, _update_date = "Update Date:", "14 March 2019"
         developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
         github, _github = "GitHub:", "https://github.com/dildeolupbiten/TkAstroDb"
-        tframe1 = tk.Frame(master=toplevel5, bd="2", relief="groove")
+        tframe1 = tk.Frame(master=toplevel7, bd="2", relief="groove")
         tframe1.pack(fill="both")
-        tframe2 = tk.Frame(master=toplevel5)
+        tframe2 = tk.Frame(master=toplevel7)
         tframe2.pack(fill="both")
         tlabel_title = tk.Label(master=tframe1, text=name, font="Arial 25")
         tlabel_title.pack()
@@ -1955,22 +2263,24 @@ def main():
                         h.flush()
                     msgbox.showinfo(title="Update", message="Program is updated.")
                     if os.name == "posix":
-                        import signal      
+                        import signal
                         os.kill(os.getpid(), signal.SIGKILL)
                     elif os.name == "nt":
                         os.system(f"TASKKILL /F /PID {os.getpid()}")
-              
+
     menubar = tk.Menu(master=master)
     master.configure(menu=menubar)
 
     calculations_menu = tk.Menu(master=menubar, tearoff=False)
     export_menu = tk.Menu(master=menubar, tearoff=False)
     options_menu = tk.Menu(master=menubar, tearoff=False)
+    records_menu = tk.Menu(master=menubar, tearoff=False)
     help_menu = tk.Menu(master=menubar, tearoff=False)
 
     menubar.add_cascade(label="Calculations", menu=calculations_menu)
     menubar.add_cascade(label="Export", menu=export_menu)
     menubar.add_cascade(label="Options", menu=options_menu)
+    menubar.add_cascade(label="Records", menu=records_menu)
     menubar.add_cascade(label="Help", menu=help_menu)
 
     method_menu = tk.Menu(master=calculations_menu, tearoff=False)
@@ -1989,6 +2299,8 @@ def main():
 
     options_menu.add_command(label="House System", command=create_hsys_checkbuttons)
     options_menu.add_command(label="Orb Factor", command=choose_orb_factor)
+
+    records_menu.add_command(label="Create New Record", command=create_new_record)
 
     help_menu.add_command(label="About", command=about)
     help_menu.add_command(label="Check for Updates", command=update)
