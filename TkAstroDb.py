@@ -22,7 +22,7 @@ from datetime import datetime as dt
 try:
     from dateutil import tz
 except ModuleNotFoundError:
-    os.system("pip3 install dateutil")
+    os.system("pip3 install python3-dateutil")
     from dateutil import tz
 try:
     from geopy.geocoders import Nominatim
