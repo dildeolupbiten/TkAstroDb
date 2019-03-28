@@ -57,7 +57,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img6](https://user-images.githubusercontent.com/29302909/55159608-83bf8880-5172-11e9-8ea8-a2fecc98fcdf.png)
 
-**7.** Users can focus on a record then by right clicking to that record they can see some options that can be done with the focused record. One of the options is deleting the record from displayed results. The deleted record will not be used in the computation later. The other option opens the [Astro-Databank](https://www.astro.com/astro-databank/Main_Page) webpage of that record.
+**7.** Users can focus on a record then by right clicking to that record they can see some options that can be done with the focused record. One of the options is deleting the record from displayed results. The deleted record will not be used in the computation later. The other option opens the [Astro-Databank](https://www.astro.com/astro-databank/Main_Page) webpage of the selected record.
 
 ![img7](https://user-images.githubusercontent.com/29302909/55159437-10b61200-5172-11e9-8bd9-bce0a526623b.png)
 
