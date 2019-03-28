@@ -672,6 +672,7 @@ def select_categories():
             checkbutton_list.append(checkbutton)
             cvar.set(False)
             checkbutton.grid(row=num, column=0, sticky="nw")
+            master.update()
         if record is False:
             tbutton.configure(command=lambda: tbutton_command(cvar_list, toplevel1, selected_categories))
         else:
