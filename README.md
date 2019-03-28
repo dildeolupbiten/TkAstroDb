@@ -83,15 +83,13 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 What users should do is simple:
 
-1. Go to Python's site-packages library folder.
-
-For example if Python3.6 or Python3.7 is installed on Program Files directory, users should go to below path:
+1. Go to Python's site-packages library folder. For example, if Python3.6 or Python3.7 is installed on Program Files directory, users should go to below path:
 
     C:\Program Files\Python36\Lib\site-packages\countryinfo
 
 2. Open the **countryinfo.py** script file.
 
-3. Go to the line 30, users should see the below codes on that line:
+3. Go to the line 30, the below codes on that line should be seen:
 
                 country_info = json.load(open(file_path))
 
