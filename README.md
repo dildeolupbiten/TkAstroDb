@@ -1,6 +1,6 @@
 # TkAstroDb
 
-TkAstroDb is a program that uses [Astro-Databank](https://www.astro.com/astro-databank/Main_Page) to conduct statistical studies in astrology. Because of the license conditions, Astrodatabank can not be shared, copied with third party users. Therefore those who are interested in using that program should contact with the webmaster of [Astrodienst](http://www.astro.com) to get a license.
+TkAstroDb is a program that uses [Astro-Databank](https://www.astro.com/astro-databank/Main_Page) to conduct statistical studies in astrology. Because of the license conditions, [Astro-Databank](https://www.astro.com/astro-databank/Main_Page)  can not be shared with third party users. Therefore those who are interested in using that program should contact with the webmaster of [Astrodienst](http://www.astro.com) to get a license.
 
 If third party users have a license, they should follow the below instructions:
 
