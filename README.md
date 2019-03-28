@@ -53,7 +53,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img5](https://user-images.githubusercontent.com/29302909/50359618-72148680-056e-11e9-94e0-17938c41d268.png)
 
-**6.** Before clicking **Display Records** button, users can click the check buttons in order to filter the records. Because some human records can be in event categories or some event records can be in human categories. But if users want to display all records, they should not click the check buttons. Then, users can click **Display Records** button. After clicked to that button, users should wait a bit. Finally the records will be displayed at treeview as follows:
+**6.** Before clicked **Display Records** button, users can click the check buttons in order to filter the records. Because some human records can be in event categories or some event records can be in human categories. But if users want to display all records, they should not click the check buttons. Then, users can click **Display Records** button. After clicked to that button, users should wait a bit. Finally the records will be displayed at treeview as follows:
 
 ![img6](https://user-images.githubusercontent.com/29302909/55159608-83bf8880-5172-11e9-8ea8-a2fecc98fcdf.png)
 
@@ -61,7 +61,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img7](https://user-images.githubusercontent.com/29302909/55159437-10b61200-5172-11e9-8bd9-bce0a526623b.png)
 
-**8.** If users click **Export** menu button, they can see **Adb Links** and **Year Frequency** options. By clicking **Adb Links** option, they can export the links of displayed records to **links.txt** file. This file will be created at **TkAstroDb** directory. By clicking the **Year Frequency** option, a windows is opened as below. Users can specify the maximum, minimum and step values. After clicked the **Apply** button, the frequency of the years of displayed records will be put in a **year-frequency.txt** file.
+**8.** If users click **Export** menu button, they can see **Adb Links**, **Latitude Frequency** and **Year Frequency** options. By clicking **Adb Links** option, they can export the links of displayed records to **links.txt** file. This file will be created at **TkAstroDb** directory. By clicking the **Latitude Frequency** option, the latitude intervals of the selected categories and the mean latitude value will be written inside **latitude-frequency.txt** file. By clicking the **Year Frequency** option, a windows is opened as below. Users can specify the maximum, minimum and step values. After clicked the **Apply** button, the frequency of the years of displayed records will be put in a **year-frequency.txt** file.
 
 ![img8](https://user-images.githubusercontent.com/29302909/51045381-80394e00-15d4-11e9-8eed-881fa66f0afb.png)
 
