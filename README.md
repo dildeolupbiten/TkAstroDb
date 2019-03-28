@@ -79,7 +79,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **12.** Users should fill all the entry fields that can be seen on the image. They can select any existing categories or they can define new categories using entry field if they want. Finally users should press the **Add** button, then the selected or defined categories will be added to the category listbox. Note that users should use decimal latitude and longitude coordinates for a place.
 
-**Note:** The encoding of Windows is **cp1252** while the encoding of Unix is **utf-8**. That's why in Windows non-ASCII characters give an **UnicodeDecodeError**. When users try to add a new record to the new database users will receive **UnicodeDecodeError** if the place that is found via latitude and longitude values, contains non-ASCII characters. This error occurs because of the codes of the [countryinfo](https://pypi.org/project/countryinfo/) library. That's why users should manually change some parts of [countryinfo](https://pypi.org/project/countryinfo/) library to avoid from this problem.
+The encoding of Windows is **cp1252** while the encoding of Unix is **utf-8**. That's why in Windows non-ASCII characters give an **UnicodeDecodeError**. When users try to add a new record to the new database users will receive **UnicodeDecodeError** if the place that is found via latitude and longitude values, contains non-ASCII characters. This error occurs because of the codes of the [countryinfo](https://pypi.org/project/countryinfo/) library. That's why users should manually change some parts of [countryinfo](https://pypi.org/project/countryinfo/) library to avoid from this problem.
 
 What users should do is simple:
 
