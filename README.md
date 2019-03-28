@@ -79,6 +79,28 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **12.** Users should fill all the entry fields that can be seen on the image. They can select any existing categories or they can define new categories using entry field if they want. Finally users should press the **Add** button, then the selected or defined categories will be added to the category listbox. Note that users should use decimal latitude and longitude coordinates for a place.
 
+**Note:** The encoding of Windows is **cp1252** while the encoding of Unix is **utf-8**. That's why in Windows non-ASCII characters give an **UnicodeDecodeError**. When users try to add a new record to the new database users will receive **UnicodeDecodeError** if the place that is found via latitude and longitude values, contains non-ASCII characters. This error occurs because of the codes of the [countryinfo](https://pypi.org/project/countryinfo/) library. That's why users should manually change some parts of [countryinfo](https://pypi.org/project/countryinfo/) library to avoid from this problem.
+
+What users should do is simple:
+
+1. Go to Python's site-packages library folder.
+
+For example if Python3.6 or Python3.7 is installed on Program Files directory, users should go to below path:
+
+    C:\Program Files\Python36\Lib\site-packages\countryinfo
+
+2. Open the **countryinfo.py** script file.
+
+3. Go to the line 30, users should see the below codes on that line:
+
+                country_info = json.load(open(file_path))
+
+4. Replace the above code with below code:
+
+                country_info = json.load(open(file_path, encoding="utf-8"))
+
+5. Save and exit the script file. Now users no longer get an **UnicodeDecodeError** because of non-ASCII characters.
+
 ![img12](https://user-images.githubusercontent.com/29302909/55161048-b7e87880-5175-11e9-8915-771bf09e8bd8.png)
 
 **13.** After added a new record to an alternative database which name is **TkAstroDb.db**, the new category that was defined by the user will be added to the category list. Then if users click the **Select** button which is near the **Categories** label, the newly defined category can be seen.
