@@ -2027,6 +2027,7 @@ def main():
             frame = tk.Frame(toplevel6, bd=1, relief="sunken")
             frame.grid(row=i, column=0, pady=4, padx=4)
             frames.append(frame)
+            master.update()
 
         def add(cat_entry, listbox):
             global record_categories
@@ -2112,6 +2113,7 @@ def main():
                 entry.bind("<Button-3>", lambda event: button_3_on_entry(event))
                 entries.append(entry)
                 label.grid(row=row1, column=col1)
+            master.update()
 
         widget(frames[0], "Name", 28, row1=0, col1=0, row2=1, col2=0)
         widget(frames[1], "Gender", 28, row1=0, col1=0, row2=1, col2=0)
@@ -2203,8 +2205,8 @@ def main():
                     msgbox.showinfo(title="Create New Record", message=f"Error: {err}")
                     master.update()
             except ValueError as err:
-                master.update()
                 msgbox.showinfo(title="Create New Record", message=f"Error: {err}")
+                master.update()
 
         add_record_button = tk.Button(master=frames[7], text="Create", command=get_record_data)
         add_record_button.grid(row=0, column=0)
