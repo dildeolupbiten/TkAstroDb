@@ -1,6 +1,6 @@
 # TkAstroDb
 
-TkAstroDb is a program that uses Astrodatabank (Adb) to conduct statistical studies in astrology. Because of the license conditions, Astrodatabank can not be shared, copied with third party users. Therefore those who are interested in using that program should contact with the webmaster of http://www.astro.com to get a license.
+TkAstroDb is a program that uses Astrodatabank (Adb) to conduct statistical studies in astrology. Because of the license conditions, Astrodatabank can not be shared, copied with third party users. Therefore those who are interested in using that program should contact with the webmaster of [Astrodienst](http://www.astro.com) to get a license.
 
 If third party users have a license, they should follow the below instructions:
 
@@ -89,7 +89,7 @@ What users should do is simple:
 
 2. Open the **countryinfo.py** script file.
 
-3. Go to the 30'th line, the below codes on that line should be seen:
+3. Go to the 30'th line, the below codes on this line should be seen:
 
                 country_info = json.load(open(file_path))
 
