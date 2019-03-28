@@ -71,19 +71,6 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **10.** If users click **Options** menu button, they can see **Orb Factor** option. And by clicking that menu button, they can define the orb factors for each astrological aspect. If users don't click this menu button, the orb factors will be defined according to their default settings. The default orb factors were defined as follow:
 
-```conjunction = 6
-semi_sextile = 2
-semi_square = 2
-sextile = 4
-quintile = 2
-square = 6
-trine = 6
-sesquiquadrate = 2
-biquintile = 2
-quincunx = 2
-opposite = 6
-```
-
 ![img10](https://user-images.githubusercontent.com/29302909/50407124-2cf88a80-07e2-11e9-92f4-d51a4f7a6697.png)
 
 **11.** If users click **Records** menu button, they can see an option which name is as **Create New Record**. And if users select that option, they will see a new window which is as follows:
