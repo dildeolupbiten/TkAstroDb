@@ -87,7 +87,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **14.** After clicked the **Apply** button and selected the Rodden Rating, the newly added record can be displayed.
 
-![img14](https://user-images.githubusercontent.com/29302909/55161360-6db3c700-5176-11e9-889a-2008f70d6e58.png)
+![img14](https://user-images.githubusercontent.com/29302909/55178782-1eca5980-5197-11e9-912b-aed6b584531f.png)
 
 **15.** If users click **Calculations** menu button, they can see options which are as follows: **Find Observed Values**, **Find Expected Values**, **Find Chi-Square Values** and **Find Effect Size Values**. If users want to find the astrological pattern distributions of any category, they should click **Find Observed Values** button. After clicked that menu button, a progress bar should be created as follows:
 
