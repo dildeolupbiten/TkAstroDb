@@ -85,7 +85,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img13](https://user-images.githubusercontent.com/29302909/55161277-2fb6a300-5176-11e9-8d0c-db32a4ac623e.png)
 
-**14.** After clicked the **Apply** button and selecting the Rodden Rating, the newly added record can be displayed.
+**14.** After clicked the **Apply** button and selected the Rodden Rating, the newly added record can be displayed.
 
 ![img14](https://user-images.githubusercontent.com/29302909/55161360-6db3c700-5176-11e9-889a-2008f70d6e58.png)
 
