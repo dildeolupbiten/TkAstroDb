@@ -160,19 +160,19 @@ y1: {sum(y1)}, Expected y1: {sum(exp_y)}")
 
 **observed_values.xlsx**
 
-![img20](https://user-images.githubusercontent.com/29302909/51140511-cc47f500-1857-11e9-9867-ae413c28c379.png)
+![img20](https://user-images.githubusercontent.com/29302909/55176661-9944aa80-5192-11e9-8891-ca4498541e8b.png)
 
 **expected_values.xlsx**
 
-![img21](https://user-images.githubusercontent.com/29302909/51140623-103afa00-1858-11e9-9a8b-c7862cfe6654.png)
+![img21](https://user-images.githubusercontent.com/29302909/55176770-d27d1a80-5192-11e9-95e9-9aee8916ccfb.png)
 
 **chi-square.xlsx**
 
-![img22](https://user-images.githubusercontent.com/29302909/51140580-f0a3d180-1857-11e9-8c4f-a81b37974b4a.png)
+![img22](https://user-images.githubusercontent.com/29302909/55176879-0c4e2100-5193-11e9-923f-dfe0c3b4a934.png)
 
 **effect-size.xlsx**
 
-![img23](https://user-images.githubusercontent.com/29302909/51140744-6445de80-1858-11e9-883a-3c68e7dbe97d.png)
+![img23](https://user-images.githubusercontent.com/29302909/55176960-369fde80-5193-11e9-979a-f7429821261d.png)
 
 ## Notes
 
