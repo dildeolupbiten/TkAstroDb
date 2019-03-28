@@ -196,7 +196,7 @@ y1: {sum(y1)}, Expected y1: {sum(exp_y)}")
 
 ## Notes
 
-**1.** The tables may not be opened by Microsoft Excel. Therefore it is recommended to use Libre Office. 
+**1.** The tables may not be opened by Microsoft Excel. Therefore it is recommended to use [Libre Office](https://www.libreoffice.org/download/download/). 
 
 **2.** If users want to put their files in a cloud system like Dropbox, it is recommended that the format of the excel files should be changed from *xlsx* to *ods* format.
 
