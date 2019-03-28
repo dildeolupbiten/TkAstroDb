@@ -73,17 +73,33 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img10](https://user-images.githubusercontent.com/29302909/50407124-2cf88a80-07e2-11e9-92f4-d51a4f7a6697.png)
 
-**11.** If users click **Calculations** menu button, they can see options which are as follows: **Find Observed Values**, **Find Expected Values**, **Find Chi-Square Values** and **Find Effect Size Values**.. If users want to find the astrological pattern distributions of any category, they should click **Find Observed Values** button. After clicked that menu button, a progress bar should be created as follows:
+**11.** If users click **Records** menu button, they can see an option which name is as **Create New Record**. And if users select that option, they will see a new window which is as follows:
 
-![img11](https://user-images.githubusercontent.com/29302909/55159732-cc774180-5172-11e9-88b8-14ad17ccd6c2.png)
+![img11](https://user-images.githubusercontent.com/29302909/55160888-5a542c00-5175-11e9-8259-4054157d93dc.png)
 
-**12.** After the computation finished, a log file (**output.log**) and an excel spreadsheet file (**observed_values.xlsx**) can be found inside nested directories like **Vocation/Occult_Fields/Astrologer/Rodden_Rating_AA/Orb_Factor_6_2_2_4_2_6_6_2_2_2_6/House_System_Placidus**. The directory names can be different according to the settings selected by the users. The spreadsheet file contains the astrological pattern distributions of displayed records.
+**12.** Users should fill all the entry fields that can be seen on the image. They can select any existing categories or they can define new categories if they want. Note that users should use decimal latitude and longitude coordinates for a place.
 
-![img12](https://user-images.githubusercontent.com/29302909/51046181-79133f80-15d6-11e9-8457-cc72a010e63f.png)
+![img12](https://user-images.githubusercontent.com/29302909/55161048-b7e87880-5175-11e9-8915-771bf09e8bd8.png)
 
-**13.** In order to calculate the expected values, the users must have two tables which include the astrological pattern distributions of two different categories. The expected values are calculated by comparing this two different categories. One category will be used as a *control group*, the other category will be used as a *research group*. While the table which is wanted to use as a *control group* should be renamed as **control_group.xlsx**, there is no need to change the name of *research group*, so it's name should be **observed_values.xlsx**. Note that users should copy the related tables to the **TkAstroDb** folder, then users can click **Calculations** menu button and they should select **Find Expected Values** option. There are two different methods to calculate the expected results.
+**13.** After added a new record to an alternative database which name is **TkAstroDb.db**, the new category that was defined by the user will be added to the category list. Then if users click the **Select** button which is near the **Categories** label, the newly defined category can be seen.
 
-**13.1. Flavia's Method:** This method is recommended to be used when the population number of the control group is small. For example this method can be used when the control group is another Adb category.
+![img13](https://user-images.githubusercontent.com/29302909/55161277-2fb6a300-5176-11e9-8d0c-db32a4ac623e.png)
+
+**14.** After clicked the **Apply** button and selecting the Rodden Rating, the newly added record can be displayed.
+
+![img14](https://user-images.githubusercontent.com/29302909/55161360-6db3c700-5176-11e9-889a-2008f70d6e58.png)
+
+**15.** If users click **Calculations** menu button, they can see options which are as follows: **Find Observed Values**, **Find Expected Values**, **Find Chi-Square Values** and **Find Effect Size Values**. If users want to find the astrological pattern distributions of any category, they should click **Find Observed Values** button. After clicked that menu button, a progress bar should be created as follows:
+
+![img15](https://user-images.githubusercontent.com/29302909/55159732-cc774180-5172-11e9-88b8-14ad17ccd6c2.png)
+
+**16.** After the computation finished, a log file (**output.log**) and an excel spreadsheet file (**observed_values.xlsx**) can be found inside nested directories like **Vocation/Occult_Fields/Astrologer/Rodden_Rating_AA/Orb_Factor_6_2_2_4_2_6_6_2_2_2_6/House_System_Placidus**. The directory names can be different according to the settings selected by the users. The spreadsheet file contains the astrological pattern distributions of displayed records.
+
+![img16](https://user-images.githubusercontent.com/29302909/51046181-79133f80-15d6-11e9-8457-cc72a010e63f.png)
+
+**17.** In order to calculate the expected values, the users must have two tables which include the astrological pattern distributions of two different categories. The expected values are calculated by comparing this two different categories. One category will be used as a *control group*, the other category will be used as a *research group*. While the table which is wanted to use as a *control group* should be renamed as **control_group.xlsx**, there is no need to change the name of *research group*, so it's name should be **observed_values.xlsx**. Note that users should copy the related tables to the **TkAstroDb** folder, then users can click **Calculations** menu button and they should select **Find Expected Values** option. There are two different methods to calculate the expected results.
+
+**17.1. Flavia's Method:** This method is recommended to be used when the population number of the control group is small. For example this method can be used when the control group is another Adb category.
     
 ```python3
 #!/usr/bin/env python3
@@ -106,7 +122,7 @@ print(f"x1: {sum(x1)}, Expected x1: {sum(exp_x)}\n\
 y1: {sum(y1)}, Expected y1: {sum(exp_y)}")
 ```
        
-**13.2. Sjoerd's Method:** This method is recommended to be used when the population number of the control group is larger.
+**17.2. Sjoerd's Method:** This method is recommended to be used when the population number of the control group is larger.
        
 ```python3
 #!/usr/bin/env python3
@@ -128,35 +144,35 @@ print(f"x1: {sum(x1)}, Expected x1: {sum(exp_x)}\n\
 y1: {sum(y1)}, Expected y1: {sum(exp_y)}")
 ```
 
-**13.3.** After the calculation finished, **control_group.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheet file will be created as **expected_values.xlsx**. And it is recommended to move **expected_values.xlsx** file to the related category folder:
+**17.3.** After the calculation finished, **control_group.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheet file will be created as **expected_values.xlsx**. And it is recommended to move **expected_values.xlsx** file to the related category folder:
 
-![img13](https://user-images.githubusercontent.com/29302909/51046081-3b161b80-15d6-11e9-81d9-936c39d982e0.png)
+![img17](https://user-images.githubusercontent.com/29302909/51046081-3b161b80-15d6-11e9-81d9-936c39d982e0.png)
 
-**14.** In order to calculate the chi-square values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to **TkAstroDb** folder. Then they should select **Calculations** menu button. After that, they should click **Find Chi-Square Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheed file will be created as **chi-square.xlsx** in **TkAstroDb** folder. It is recommended that the users cut the file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **chi-square.xlsx** file to the related folder:
+**18.** In order to calculate the chi-square values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to **TkAstroDb** folder. Then they should select **Calculations** menu button. After that, they should click **Find Chi-Square Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheed file will be created as **chi-square.xlsx** in **TkAstroDb** folder. It is recommended that the users cut the file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **chi-square.xlsx** file to the related folder:
 
-![img14](https://user-images.githubusercontent.com/29302909/51046111-48330a80-15d6-11e9-8e05-d3e21d619b61.png)
+![img18](https://user-images.githubusercontent.com/29302909/51046111-48330a80-15d6-11e9-8e05-d3e21d619b61.png)
 
-**15.** In order to calculate the effect size values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to the **TkAstroDb** directory. Then they should select **Calculations** menu button. After that, they should select **Find Effect Size Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** will be deleted and a new excel spreadsheed file will be created as **effect-size.xlsx** in **TkAstroDb** folder. It is recommended that the users cut this file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **effect-size.xlsx** file to the related folder:
+**19.** In order to calculate the effect size values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to the **TkAstroDb** directory. Then they should select **Calculations** menu button. After that, they should select **Find Effect Size Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** will be deleted and a new excel spreadsheed file will be created as **effect-size.xlsx** in **TkAstroDb** folder. It is recommended that the users cut this file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **effect-size.xlsx** file to the related folder:
 
-![img15](https://user-images.githubusercontent.com/29302909/51046129-54b76300-15d6-11e9-9c18-ac49810666cb.png)
+![img19](https://user-images.githubusercontent.com/29302909/51046129-54b76300-15d6-11e9-9c18-ac49810666cb.png)
 
 ## Spreadsheets
 
 **observed_values.xlsx**
 
-![img16](https://user-images.githubusercontent.com/29302909/51140511-cc47f500-1857-11e9-9867-ae413c28c379.png)
+![img20](https://user-images.githubusercontent.com/29302909/51140511-cc47f500-1857-11e9-9867-ae413c28c379.png)
 
 **expected_values.xlsx**
 
-![img17](https://user-images.githubusercontent.com/29302909/51140623-103afa00-1858-11e9-9a8b-c7862cfe6654.png)
+![img21](https://user-images.githubusercontent.com/29302909/51140623-103afa00-1858-11e9-9a8b-c7862cfe6654.png)
 
 **chi-square.xlsx**
 
-![img18](https://user-images.githubusercontent.com/29302909/51140580-f0a3d180-1857-11e9-8c4f-a81b37974b4a.png)
+![img22](https://user-images.githubusercontent.com/29302909/51140580-f0a3d180-1857-11e9-8c4f-a81b37974b4a.png)
 
 **effect-size.xlsx**
 
-![img19](https://user-images.githubusercontent.com/29302909/51140744-6445de80-1858-11e9-883a-3c68e7dbe97d.png)
+![img23](https://user-images.githubusercontent.com/29302909/51140744-6445de80-1858-11e9-883a-3c68e7dbe97d.png)
 
 ## Notes
 
