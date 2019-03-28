@@ -83,21 +83,21 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 What users should do is simple:
 
-1. Go to Python's site-packages library folder. For example, if Python3.6 or Python3.7 is installed on Program Files directory, users should go to below path:
+**1.** Go to Python's site-packages library folder. For example, if Python3.6 or Python3.7 is installed on Program Files directory, users should go to below path:
 
     C:\Program Files\Python36\Lib\site-packages\countryinfo
 
-2. Open the **countryinfo.py** script file.
+**2.** Open the **countryinfo.py** script file.
 
-3. Go to the line 30, the below codes on that line should be seen:
+**3.** Go to the 30'th line, the below codes on that line should be seen:
 
                 country_info = json.load(open(file_path))
 
-4. Replace the above code with below code:
+**4.** Replace the above code with below code:
 
                 country_info = json.load(open(file_path, encoding="utf-8"))
 
-5. Save and exit the script file. Now users no longer get an **UnicodeDecodeError** because of non-ASCII characters.
+**5.** Save and exit the script file. Now users no longer get an **UnicodeDecodeError** because of non-ASCII characters.
 
 ![img12](https://user-images.githubusercontent.com/29302909/55161048-b7e87880-5175-11e9-8915-771bf09e8bd8.png)
 
