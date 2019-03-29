@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.2.8"
+__version__ = "1.2.9"
 
 import os
 import sys
@@ -99,48 +99,48 @@ for _i in os.listdir(os.getcwd()):
     if _i.endswith("xml"):
         xml_file += _i
 
-tree = xml.etree.ElementTree.parse(f"{xml_file}")
-root = tree.getroot()
-
-for _i in range(1000000):
-    try:
-        user_data = []
-        for gender, roddenrating, bdata, adb_link, categories in zip(
-                root[_i + 2][1].findall("gender"),
-                root[_i + 2][1].findall("roddenrating"),
-                root[_i + 2][1].findall("bdata"),
-                root[_i + 2][2].findall("adb_link"),
-                root[_i + 2][3].findall("categories")):
-            _name = root[_i + 2][1][0].text
-            sbdate_dmy = bdata[1].text
-            sbtime = bdata[2].text
-            jd_ut = bdata[2].get("jd_ut")
-            lat = bdata[3].get("slati")
-            lon = bdata[3].get("slong")
-            place = bdata[3].text
-            country = bdata[4].text
-            category = [
-                (categories[_j].get("cat_id"), categories[_j].text)
-                for _j in range(len(categories))]
-            for cate in category:
-                if cate[0] not in category_dict.keys():
-                    category_dict[cate[0]] = cate[1]
-            user_data.append(int(root[_i + 2].get("adb_id")))
-            user_data.append(_name)
-            user_data.append(gender.text)
-            user_data.append(roddenrating.text)
-            user_data.append(sbdate_dmy)
-            user_data.append(sbtime)
-            user_data.append(jd_ut)
-            user_data.append(lat)
-            user_data.append(lon)
-            user_data.append(place)
-            user_data.append(country)
-            user_data.append(adb_link.text)
-            user_data.append(category)
-        database.append(user_data)
-    except IndexError:
-        break
+if xml_file.count("xml") == 1:
+    tree = xml.etree.ElementTree.parse(f"{xml_file}")
+    root = tree.getroot()
+    for _i in range(1000000):
+        try:
+            user_data = []
+            for gender, roddenrating, bdata, adb_link, categories in zip(
+                    root[_i + 2][1].findall("gender"),
+                    root[_i + 2][1].findall("roddenrating"),
+                    root[_i + 2][1].findall("bdata"),
+                    root[_i + 2][2].findall("adb_link"),
+                    root[_i + 2][3].findall("categories")):
+                _name = root[_i + 2][1][0].text
+                sbdate_dmy = bdata[1].text
+                sbtime = bdata[2].text
+                jd_ut = bdata[2].get("jd_ut")
+                lat = bdata[3].get("slati")
+                lon = bdata[3].get("slong")
+                place = bdata[3].text
+                country = bdata[4].text
+                category = [
+                    (categories[_j].get("cat_id"), categories[_j].text)
+                    for _j in range(len(categories))]
+                for cate in category:
+                    if cate[0] not in category_dict.keys():
+                        category_dict[cate[0]] = cate[1]
+                user_data.append(int(root[_i + 2].get("adb_id")))
+                user_data.append(_name)
+                user_data.append(gender.text)
+                user_data.append(roddenrating.text)
+                user_data.append(sbdate_dmy)
+                user_data.append(sbtime)
+                user_data.append(jd_ut)
+                user_data.append(lat)
+                user_data.append(lon)
+                user_data.append(place)
+                user_data.append(country)
+                user_data.append(adb_link.text)
+                user_data.append(category)
+            database.append(user_data)
+        except IndexError:
+            break
 
 
 def modify_database():
@@ -2217,7 +2217,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "14 March 2019"
+        update_date, _update_date = "Update Date:", "29 March 2019"
         developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
