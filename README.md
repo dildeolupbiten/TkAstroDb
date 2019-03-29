@@ -17,7 +17,7 @@ If third party users have a license, they should follow the below instructions:
              
 **Without [Astro-Databank](https://www.astro.com/astro-databank/Main_Page)**
 
-If third party users don't have a licence, they still can continue using the program with an empty [SQL](https://www.sqlite.org/index.html) database which users can add records in. If users have also Astro-Databank xml file, both databases are merged.
+If third party users don't have a licence, they still can continue using the program with an empty [SQL](https://www.sqlite.org/index.html) database which users can add records in. If users have also [Astro-Databank](https://www.astro.com/astro-databank/Main_Page) xml file, both databases are merged.
 
 **1.** Before running the program make sure that **TkAstroDb** directory tree contains at least the following:
 
