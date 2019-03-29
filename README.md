@@ -2,7 +2,7 @@
 
 TkAstroDb is a program that uses [Astro-Databank](https://www.astro.com/astro-databank/Main_Page) to conduct statistical studies in astrology. Because of the license conditions, [Astro-Databank](https://www.astro.com/astro-databank/Main_Page)  can not be shared with third party users. Therefore those who are interested in using that program should contact with the webmaster of [Astrodienst](http://www.astro.com) to get a license.
 
-**With Astro-Databank** 
+**With [Astro-Databank](https://www.astro.com/astro-databank/Main_Page)** 
 
 If third party users have a license, they should follow the below instructions:
 
@@ -15,9 +15,9 @@ If third party users have a license, they should follow the below instructions:
              |_adb_export_181128_2309.xml
              |_TkAstroDb.py
              
-**Without Astro-Databank**
+**Without [Astro-Databank](https://www.astro.com/astro-databank/Main_Page)**
 
-If third party users don't have a licence, they still can continue using the program with an empty SQL database which users can add records in. If users have also Astro-Databank xml file, both databases are merged.
+If third party users don't have a licence, they still can continue using the program with an empty [SQL](https://www.sqlite.org/index.html) database which users can add records in. If users have also Astro-Databank xml file, both databases are merged.
 
 **1.** Before running the program make sure that **TkAstroDb** directory tree contains at least the following:
 
