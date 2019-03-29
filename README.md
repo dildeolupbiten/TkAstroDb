@@ -6,7 +6,7 @@ TkAstroDb is a program that uses [Astro-Databank](https://www.astro.com/astro-da
 
 If third party users have a license, they should follow the below instructions:
 
-**1.** After got the license and downloaded the database which is in a xml file, in order to run the program, the xml file has to be put in the same directory with **TkAstroDb.py** script file.
+**1.** After got the license and downloaded the database which is in a zipped xml file from http://www.astro.com/adbexport/, in order to run the program, the xml file has to be put in the same directory with **TkAstroDb.py** script file.
 
 **2.** Before running the program make sure that **TkAstroDb** directory tree contains at least the following:
 
