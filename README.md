@@ -119,7 +119,7 @@ What users should do is simple:
 
 **17.** In order to calculate the expected values, the users must have two tables which include the astrological pattern distributions of two different categories. The expected values are calculated by comparing this two different categories. One category will be used as a *control group*, the other category will be used as a *research group*. While the table which is wanted to use as a *control group* should be renamed as **control_group.xlsx**, there is no need to change the name of *research group*, so it's name should be **observed_values.xlsx**. Note that users should copy the related tables to the **TkAstroDb** folder, then users can click **Calculations** menu button and they should select **Find Expected Values** option. There are two different methods to calculate the expected results.
 
-**17.1. Flavia's Method:** This method is recommended to be used when the population number of the control group is small. For example this method can be used when the control group is another Adb category.
+**17.1. Flavia's Method:** When one of the categories is not a sub category of another, using this method is recommended.
     
 ```python3
 #!/usr/bin/env python3
@@ -131,7 +131,7 @@ def formula(x: list, y: list):
         [sum(y) * (x[i] + y[i]) / (sum(x) + sum(y)) for i in range(12)]
 ```
        
-**17.2. Sjoerd's Method:** This method is recommended to be used when the population number of the control group is larger.
+**17.2. Sjoerd's Method:** When one of the categories is a sub category of another, using this method is recommended.
        
 ```python3
 #!/usr/bin/env python3
