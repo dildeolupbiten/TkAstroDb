@@ -139,7 +139,8 @@ def formula(x: list, y: list):
 
 
 def formula(x: list, y: list):
-    return [i * sum(x) / sum(y) for i in y], [i * sum(y) / sum(x) for i in x] 
+    return [i * sum(x) / sum(y) for i in y],\
+        [i * sum(y) / sum(x) for i in x] 
 ```
 
 **17.3.** After the calculation finished, **control_group.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheet file will be created as **expected_values.xlsx**. And it is recommended to move **expected_values.xlsx** file to the related category folder:
