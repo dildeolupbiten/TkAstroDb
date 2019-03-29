@@ -101,7 +101,7 @@ What users should do is simple:
 
 ![img12](https://user-images.githubusercontent.com/29302909/55161048-b7e87880-5175-11e9-8915-771bf09e8bd8.png)
 
-**13.** After added a new record to an alternative [SQLite database](https://www.sqlite.org/index.html) which name is **TkAstroDb.db**, the new category that was defined by the user will be added to the category list. Then if users click the **Select** button which is near the **Categories** label, the newly defined category can be seen.
+**13.** After added a new record to an alternative [SQLite](https://www.sqlite.org/index.html) database which name is **TkAstroDb.db**, the new category that was defined by the user will be added to the category list. Then if users click the **Select** button which is near the **Categories** label, the newly defined category can be seen.
 
 ![img13](https://user-images.githubusercontent.com/29302909/55161277-2fb6a300-5176-11e9-8d0c-db32a4ac623e.png)
 
