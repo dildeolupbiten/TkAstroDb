@@ -178,19 +178,19 @@ y1: {sum(y1)}, Expected y1: {sum(exp_y)}")
 
 ## Spreadsheets
 
-[observed_values.xlsx](https://www.dropbox.com/s/bxx5rtebx24xoo9/observed_values.xlsx)
+[observed_values.ods](https://www.dropbox.com/s/jtyu063qwloi8ru/observed_values.ods)
 
 ![img20](https://user-images.githubusercontent.com/29302909/55176661-9944aa80-5192-11e9-8891-ca4498541e8b.png)
 
-[expected_values.xlsx](https://www.dropbox.com/s/c2equ3ryl2emrt0/expected_values.xlsx)
+[expected_values.ods](https://www.dropbox.com/s/rkjet5vwg8pny3o/expected_values.ods)
 
 ![img21](https://user-images.githubusercontent.com/29302909/55176770-d27d1a80-5192-11e9-95e9-9aee8916ccfb.png)
 
-[chi-square.xlsx](https://www.dropbox.com/s/boyzuskdm7yp75f/chi-square.xlsx)
+[chi-square.ods](https://www.dropbox.com/s/8chuztedv16s2yi/chi-square.ods)
 
 ![img22](https://user-images.githubusercontent.com/29302909/55176879-0c4e2100-5193-11e9-923f-dfe0c3b4a934.png)
 
-[effect-size.xlsx](https://www.dropbox.com/s/ciebvsw2z84ymyj/effect-size.xlsx)
+[effect-size.ods](https://www.dropbox.com/s/8t20csz95txghex/effect-size.ods)
 
 ![img23](https://user-images.githubusercontent.com/29302909/55176960-369fde80-5193-11e9-979a-f7429821261d.png)
 
