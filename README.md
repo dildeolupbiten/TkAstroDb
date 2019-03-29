@@ -125,21 +125,10 @@ What users should do is simple:
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
        
-from random import randrange
-       
        
 def formula(x: list, y: list):
     return [sum(x) * (x[i] + y[i]) / (sum(x) + sum(y)) for i in range(12)],\
         [sum(y) * (x[i] + y[i]) / (sum(x) + sum(y)) for i in range(12)]
-        
-           
-x1 = [randrange(0, 100, 1) for i in range(12)]
-y1 = [randrange(0, 100, 1) for i in range(12)]
-
-exp_x, exp_y = formula(x=x1, y=y1) 
-
-print(f"x1: {sum(x1)}, Expected x1: {sum(exp_x)}\n\
-y1: {sum(y1)}, Expected y1: {sum(exp_y)}")
 ```
        
 **17.2. Sjoerd's Method:** This method is recommended to be used when the population number of the control group is larger.
@@ -147,21 +136,10 @@ y1: {sum(y1)}, Expected y1: {sum(exp_y)}")
 ```python3
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-       
-from random import randrange
 
-       
+
 def formula(x: list, y: list):
     return [i * sum(x) / sum(y) for i in y], [i * sum(y) / sum(x) for i in x] 
-        
-         
-x1 = [randrange(0, 100, 1) for i in range(12)]  
-y1 = [randrange(0, 100, 1) for i in range(12)]
-
-exp_x, exp_y = formula(x=x1, y=y1) 
-
-print(f"x1: {sum(x1)}, Expected x1: {sum(exp_x)}\n\
-y1: {sum(y1)}, Expected y1: {sum(exp_y)}")
 ```
 
 **17.3.** After the calculation finished, **control_group.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheet file will be created as **expected_values.xlsx**. And it is recommended to move **expected_values.xlsx** file to the related category folder:
