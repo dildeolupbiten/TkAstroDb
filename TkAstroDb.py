@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.2.9"
+__version__ = "1.3.0"
 
 import os
 import sys
@@ -9,6 +9,7 @@ import ssl
 import time
 import shutil
 import threading
+import traceback
 import webbrowser
 import tkinter as tk
 import sqlite3 as sql
@@ -84,8 +85,11 @@ except ModuleNotFoundError:
 
 connect = sql.connect("TkAstroDb.db")
 cursor = connect.cursor()
-cursor.execute("CREATE TABLE IF NOT EXISTS DATA(adb_id, name, gender, rr, date, time, "
-               "julian_date, lat, lon, place, country, adb_link, category)")
+
+col_names = "no, add_date, adb_id, name, gender, rr, date, time, " \
+            "julian_date, lat, c_lat, lon, c_lon, place, country, adb_link, category"
+
+cursor.execute(f"CREATE TABLE IF NOT EXISTS DATA({col_names})")
 
 xml_file = ""
 
@@ -145,9 +149,12 @@ if xml_file.count("xml") == 1:
 
 def modify_database():
     global category_names, _count_
+    category_names = []
     reverse_category_list = {value: key for key, value in category_dict.items()}
     for _i_ in cursor.execute("SELECT * FROM DATA"):
-        _data_ = list(_i_)
+        _data_ = list(_i_)[2:]
+        _data_.pop(7)
+        _data_.pop(8)
         new_category = []
         edit_data = _data_[:12]
         if "|" in _data_[12]:
@@ -455,6 +462,8 @@ class Chart:
 
 selected_categories, selected_ratings, displayed_results, record_categories = [], [], [], []
 
+deleted_names, modified_names, added_names = [], [], []
+
 toplevel1, toplevel2, menu, search_menu, listbox_menu = None, None, None, None, None
 
 record = False
@@ -477,15 +486,21 @@ bottom_frame.pack()
 y_scrollbar = tk.Scrollbar(master=bottom_frame, orient="vertical")
 y_scrollbar.pack(side="right", fill="y")
 
-columns = ["Adb ID", "Name", "Gender", "Rodden Rating", "Date",
-           "Hour", "Julian Date", "Latitude", "Longitude", "Place",
-           "Country", "Adb Link", "Category"]
+columns_1 = ["Adb ID", "Name", "Gender", "Rodden Rating", "Date",
+             "Hour", "Julian Date", "Latitude", "Longitude", "Place",
+             "Country", "Adb Link", "Category"]
 
-treeview = Treeview(master=bottom_frame, show="headings",
-                    columns=[f"#{_i_ + 1}" for _i_ in range(len(columns))], height=18)
-for _i_, _j_ in enumerate(columns):
-    treeview.heading(f"#{_i_ + 1}", text=_j_)
-treeview.pack()
+
+def create_treeview(_master_, columns, height=18):
+    treeview_ = Treeview(master=_master_, show="headings",
+                         columns=[f"#{_i_ + 1}" for _i_ in range(len(columns))], height=height)
+    for _i_, _j_ in enumerate(columns):
+        treeview_.heading(f"#{_i_ + 1}", text=_j_)
+    treeview_.pack()
+    return treeview_
+
+
+treeview = create_treeview(_master_=bottom_frame, columns=columns_1)
 
 entry_button_frame = tk.Frame(master=top_frame)
 entry_button_frame.grid(row=0, column=0)
@@ -633,7 +648,8 @@ def select_ratings():
 
 
 def select_categories():
-    global selected_categories, record_categories
+    global selected_categories, record_categories, category_names
+    modify_database()
     selected_categories, record_categories = [], []
     global toplevel1
     try:
@@ -665,6 +681,7 @@ def select_categories():
         check_uncheck = tk.Checkbutton(master=tframe, text="Check/Uncheck All", variable=check_all)
         check_all.set(False)
         check_uncheck.grid(row=0, column=0, sticky="nw")
+        category_names = [i for i in category_names if i not in deleted_names]
         for num, _category_ in enumerate(category_names, 1):
             cvar = tk.BooleanVar()
             cvar_list.append([cvar, _category_])
@@ -678,6 +695,7 @@ def select_categories():
         else:
             tbutton.configure(command=lambda: tbutton_command(cvar_list, toplevel1, record_categories))
         check_uncheck.configure(command=lambda: check_all_command(check_all, cvar_list, checkbutton_list))
+        modify_database()
         master.update()
 
 
@@ -799,16 +817,16 @@ def display_results():
     master.update()
 
 
-def button_3_remove():
-    selected = treeview.selection()
+def button_3_remove(_treeview):
+    selected = _treeview.selection()
     if not selected:
         pass
     else:
         for i in selected:
             for j in displayed_results:
-                if j[0] == treeview.item(i)["values"][0]:
+                if j[0] == _treeview.item(i)["values"][0]:
                     displayed_results.remove(j)
-            treeview.delete(i)
+            _treeview.delete(i)
         info_var.set(len(displayed_results))
 
 
@@ -833,7 +851,7 @@ def button_3_on_treeview(event):
         destroy(event)
     menu = tk.Menu(master=None, tearoff=False)
     menu.add_command(
-        label="Remove", command=button_3_remove)
+        label="Remove", command=lambda: button_3_remove(_treeview=treeview))
     menu.add_command(
         label="Open ADB Page", command=button_3_open_url)
     menu.post(event.x_root, event.y_root)
@@ -844,11 +862,11 @@ def select_all_tree(event):
     treeview.selection_set(children)
 
 
-def delete_all_tree(event):
-    button_3_remove()
+def delete_all_tree(event, _treeview_):
+    button_3_remove(_treeview_)
 
 
-treeview.bind("<Delete>", lambda event: delete_all_tree(event))
+treeview.bind("<Delete>", lambda event: delete_all_tree(event, treeview))
 treeview.bind("<Control-a>", lambda event: select_all_tree(event))
 treeview.bind("<Button-1>", lambda event: destroy(event))
 treeview.bind("<Button-3>", lambda event: button_3_on_treeview(event))
@@ -856,11 +874,16 @@ treeview.bind("<Button-3>", lambda event: button_3_on_treeview(event))
 display_button = tk.Button(master=top_frame, text="Display Records", command=display_results)
 display_button.grid(row=10, column=0, columnspan=4, pady=10)
 
-y_scrollbar.configure(command=treeview.yview)
-x_scrollbar = tk.Scrollbar(master=master, orient="horizontal", command=treeview.xview)
-x_scrollbar.pack(side="top", fill="x")
 
-treeview.configure(xscrollcommand=x_scrollbar.set, yscrollcommand=y_scrollbar.set)
+def x_scrollbar(y_scrl, _master_, _treeview_):
+    y_scrl.configure(command=_treeview_.yview)
+    x_scrl = tk.Scrollbar(master=_master_, orient="horizontal", command=_treeview_.xview)
+    x_scrl.pack(side="top", fill="x")
+    _treeview_.configure(xscrollcommand=x_scrl.set, yscrollcommand=y_scrl.set)
+    return x_scrl
+
+
+x_scrollbar(y_scrl=y_scrollbar, _master_=master, _treeview_=treeview)
 
 info_frame = tk.Frame(master=master)
 info_frame.pack(side="top")
@@ -1765,6 +1788,10 @@ def find_effect_size_values():
 # --------------------------------------------- main ---------------------------------------------
 
 
+add_or_edit = False
+treeviews = []
+
+
 def main():
     freq_frmt = [0, 2000, 100]
 
@@ -2015,216 +2042,398 @@ def main():
         deltat = swe.deltat(julday_)
         return {"JD": round(julday_ + deltat, 6), "TT": round(deltat * 86400, 1)}
 
-    def create_new_record():
-        toplevel6 = tk.Toplevel()
-        toplevel6.title("Create New Record")
-        toplevel6.resizable(width=False, height=False)
-        frames = []
-        entries = []
-        list_box = []
-        option_menu = []
+    def add(cat_entry, listbox, list_box):
+        global record_categories
+        for rec in record_categories:
+            if rec not in listbox.get("0", "end"):
+                listbox.insert("end", "".join(rec))
+                list_box.append("".join(rec))
+                master.update()
+        if cat_entry.get() != "":
+            if cat_entry.get() not in listbox.get("0", "end"):
+                listbox.insert("end", cat_entry.get())
+                list_box.append(cat_entry.get())
+        record_categories = []
+        cat_entry.delete("0", "end")
+
+    def cat_cmd():
+        global record
+        record = True
+        select_categories()
+        record = False
+
+    def delete(lb):
+        for item in lb.curselection()[::-1]:
+            lb.delete(item)
+
+    def button_3_on_listbox(event, lb):
+        global listbox_menu
+        if listbox_menu is not None:
+            destroy_menu(event, listbox_menu)
+        listbox_menu = tk.Menu(master=None, tearoff=False)
+        listbox_menu.add_command(
+            label="Remove", command=lambda: delete(lb))
+        listbox_menu.post(event.x_root, event.y_root)
+
+    def select_set(event):
+        event.widget.select_set("0", "end")
+
+    def delete_(event, lb):
+        delete(lb)
+
+    def widget(_entries_, _listboxes_, _option_menu_, list_box, _frame, text, width, row1, col1, row2, col2):
+        label = tk.Label(master=_frame, text=text, fg="red")
+        if text == "Gender":
+            label.grid(row=row1, column=col1, columnspan=3)
+            menu_var = tk.StringVar()
+            gender_menu = tk.OptionMenu(_frame, menu_var, "M", "F", "N/A")
+            gender_menu.grid(row=row2, column=col2)
+            _option_menu_.append(menu_var)
+        elif text == "Add Category":
+            label.grid(row=row1, column=col1, columnspan=3)
+            cat_button = tk.Button(master=_frame, text="Select", width=10, command=cat_cmd)
+            cat_button.grid(row=1, column=0, columnspan=3)
+            cat_entry = tk.Entry(master=_frame)
+            cat_entry.grid(row=2, column=0, columnspan=3)
+            cat_entry.bind("<Control-KeyRelease-a>", lambda event: select_range(event))
+            cat_entry.bind("<Button-1>", lambda event: destroy_menu(event, search_menu))
+            cat_entry.bind("<Button-3>", lambda event: button_3_on_entry(event))
+            _option_menu_.append(cat_entry)
+            lbox_frame = tk.Frame(master=_frame)
+            lbox_frame.grid(row=4, column=0, columnspan=3)
+            listbox = tk.Listbox(master=lbox_frame, width=50, selectmode="extended")
+            listbox.pack(side="left")
+            listbox.bind("<Delete>", lambda event: delete_(event, listbox))
+            listbox.bind("<Control-a>", lambda event: select_set(event))
+            listbox.bind("<Button-1>", lambda event: destroy_menu(event, listbox_menu))
+            listbox.bind("<Button-3>", lambda event: button_3_on_listbox(event, listbox))
+            lbox_y_sbar = tk.Scrollbar(master=lbox_frame, orient="vertical", command=listbox.yview)
+            lbox_y_sbar.pack(side="left", fill="y")
+            listbox.configure(yscrollcommand=lbox_y_sbar.set)
+            _add_button = tk.Button(master=_frame, text="Add", command=lambda: add(cat_entry, listbox, list_box))
+            _add_button.grid(row=3, column=0, columnspan=3)
+            _listboxes_.append(listbox)
+        elif text == "Rodden Rating":
+            label.grid(row=row1, column=col1)
+            menu_var = tk.StringVar()
+            rodden_menu = tk.OptionMenu(_frame, menu_var, "AA", "A", "B", "C", "DD", "X", "XX", "AX")
+            rodden_menu.grid(row=row2, column=col2)
+            _option_menu_.append(menu_var)
+        else:
+            entry = tk.Entry(master=_frame, width=width)
+            entry.grid(row=row2, column=col2)
+            entry.bind("<Control-KeyRelease-a>", lambda event: select_range(event))
+            entry.bind("<Button-1>", lambda event: destroy_menu(event, search_menu))
+            entry.bind("<Button-3>", lambda event: button_3_on_entry(event))
+            _entries_.append(entry)
+            label.grid(row=row1, column=col1)
+        master.update()
+
+    def widgets(entries, listboxes, option_menu, list_box, frames):
+        widget(entries, listboxes, option_menu, list_box, frames[0], "Name", 28, row1=0, col1=0, row2=1, col2=0)
+        widget(entries, listboxes, option_menu, list_box, frames[1], "Gender", 28, row1=0, col1=0, row2=1, col2=0)
+        widget(entries, listboxes, option_menu, list_box, frames[2], "Rodden Rating", 28, row1=0, col1=0, row2=1, col2=0)
+        widget(entries, listboxes, option_menu, list_box, frames[3], "Day", 2, row1=0, col1=0, row2=1, col2=0)
+        widget(entries, listboxes, option_menu, list_box, frames[3], "Month", 2, row1=0, col1=1, row2=1, col2=1)
+        widget(entries, listboxes, option_menu, list_box, frames[3], "Year", 4, row1=0, col1=2, row2=1, col2=2)
+        widget(entries, listboxes, option_menu, list_box, frames[4], "Hour", 2, row1=0, col1=0, row2=1, col2=0)
+        widget(entries, listboxes, option_menu, list_box, frames[4], "Minute", 2, row1=0, col1=1, row2=1, col2=1)
+        widget(entries, listboxes, option_menu, list_box, frames[5], "Latitude", 10, row1=0, col1=0, row2=1, col2=0)
+        widget(entries, listboxes, option_menu, list_box, frames[5], "Longitude", 10, row1=0, col1=1, row2=1, col2=1)
+        widget(entries, listboxes, option_menu, list_box, frames[6], "Add Category", 28, row1=0, col1=0, row2=1, col2=0)
+
+    def create_frames(toplevel):
         for i in range(8):
-            frame = tk.Frame(toplevel6, bd=1, relief="sunken")
+            frame = tk.Frame(toplevel, bd=1, relief="sunken")
             frame.grid(row=i, column=0, pady=4, padx=4)
-            frames.append(frame)
             master.update()
+            yield frame
 
-        def add(cat_entry, listbox):
-            global record_categories
-            for rec in record_categories:
-                if rec not in listbox.get("0", "end"):
-                    listbox.insert("end", "".join(rec))
-                    list_box.append("".join(rec))
-                    master.update()
-            if cat_entry.get() != "":
-                if cat_entry.get() not in listbox.get("0", "end"):
-                    listbox.insert("end", cat_entry.get())
-                    list_box.append(cat_entry.get())
-            record_categories = []
-            cat_entry.delete("0", "end")
-
-        def cat_cmd():
-            global record
-            record = True
-            select_categories()
-            record = False
-
-        def delete(lb):
-            for item in lb.curselection()[::-1]:
-                lb.delete(item)
-
-        def button_3_on_listbox(event, lb):
-            global listbox_menu
-            if listbox_menu is not None:
-                destroy_menu(event, listbox_menu)
-            listbox_menu = tk.Menu(master=None, tearoff=False)
-            listbox_menu.add_command(
-                label="Remove", command=lambda: delete(lb))
-            listbox_menu.post(event.x_root, event.y_root)
-
-        def select_set(event):
-            event.widget.select_set("0", "end")
-
-        def delete_(event, lb):
-            delete(lb)
-
-        def widget(_frame, text, width, row1, col1, row2, col2):
-            label = tk.Label(master=_frame, text=text, fg="red")
-            if text == "Gender":
-                label.grid(row=row1, column=col1, columnspan=3)
-                menu_var = tk.StringVar()
-                gender_menu = tk.OptionMenu(_frame, menu_var, "Male", "Female", "N/A")
-                gender_menu.grid(row=row2, column=col2)
-                option_menu.append(menu_var)
-            elif text == "Add Category":
-                label.grid(row=row1, column=col1, columnspan=3)
-                cat_button = tk.Button(master=_frame, text="Select", width=10, command=cat_cmd)
-                cat_button.grid(row=1, column=0, columnspan=3)
-                cat_entry = tk.Entry(master=_frame)
-                cat_entry.grid(row=2, column=0, columnspan=3)
-                cat_entry.bind("<Control-KeyRelease-a>", lambda event: select_range(event))
-                cat_entry.bind("<Button-1>", lambda event: destroy_menu(event, search_menu))
-                cat_entry.bind("<Button-3>", lambda event: button_3_on_entry(event))
-                entries.append(cat_entry)
-                lbox_frame = tk.Frame(master=_frame)
-                lbox_frame.grid(row=4, column=0, columnspan=3)
-                listbox = tk.Listbox(master=lbox_frame, width=50, selectmode="extended")
-                listbox.pack(side="left")
-                listbox.bind("<Delete>", lambda event: delete_(event, listbox))
-                listbox.bind("<Control-a>", lambda event: select_set(event))
-                listbox.bind("<Button-1>", lambda event: destroy_menu(event, listbox_menu))
-                listbox.bind("<Button-3>", lambda event: button_3_on_listbox(event, listbox))
-                lbox_y_sbar = tk.Scrollbar(master=lbox_frame, orient="vertical", command=listbox.yview)
-                lbox_y_sbar.pack(side="left", fill="y")
-                listbox.configure(yscrollcommand=lbox_y_sbar.set)
-                _add_button = tk.Button(master=_frame, text="Add", command=lambda: add(cat_entry, listbox))
-                _add_button.grid(row=3, column=0, columnspan=3)
-            elif text == "Rodden Rating":
-                label.grid(row=row1, column=col1)
-                menu_var = tk.StringVar()
-                rodden_menu = tk.OptionMenu(_frame, menu_var, "AA", "A", "B", "C", "DD", "X", "XX", "AX")
-                rodden_menu.grid(row=row2, column=col2)
-                option_menu.append(menu_var)
-            else:
-                entry = tk.Entry(master=_frame, width=width)
-                entry.grid(row=row2, column=col2)
-                entry.bind("<Control-KeyRelease-a>", lambda event: select_range(event))
-                entry.bind("<Button-1>", lambda event: destroy_menu(event, search_menu))
-                entry.bind("<Button-3>", lambda event: button_3_on_entry(event))
-                entries.append(entry)
-                label.grid(row=row1, column=col1)
-            master.update()
-
-        widget(frames[0], "Name", 28, row1=0, col1=0, row2=1, col2=0)
-        widget(frames[1], "Gender", 28, row1=0, col1=0, row2=1, col2=0)
-        widget(frames[2], "Rodden Rating", 28, row1=0, col1=0, row2=1, col2=0)
-        widget(frames[3], "Day", 2, row1=0, col1=0, row2=1, col2=0)
-        widget(frames[3], "Month", 2, row1=0, col1=1, row2=1, col2=1)
-        widget(frames[3], "Year", 4, row1=0, col1=2, row2=1, col2=2)
-        widget(frames[4], "Hour", 2, row1=0, col1=0, row2=1, col2=0)
-        widget(frames[4], "Minute", 2, row1=0, col1=1, row2=1, col2=1)
-        widget(frames[5], "Latitude", 10, row1=0, col1=0, row2=1, col2=0)
-        widget(frames[5], "Longitude", 10, row1=0, col1=1, row2=1, col2=1)
-        widget(frames[6], "Add Category", 28, row1=0, col1=0, row2=1, col2=0)
-
-        def get_record_data():
-            name = entries[0].get()
-            if option_menu[0].get() == "Male":
-                _gender = "M"
-            elif option_menu[0].get() == "Female":
-                _gender = "F"
-            else:
-                _gender = "N/A"
-            rr = option_menu[1].get()
-            day = entries[1].get()
-            month = entries[2].get()
-            year = entries[3].get()
-            hour = entries[4].get()
-            minute = entries[5].get()
-            _latitude_ = float(entries[6].get())
-            _longitude_ = float(entries[7].get())
+    def get_record_data(toplevel, _treeview_, entries, option_menu, listboxes, list_box, data):
+        global add_or_edit, modify_name, modified_names
+        name = entries[0].get()
+        if option_menu[0].get() == "M":
+            _gender = "M"
+        elif option_menu[0].get() == "F":
+            _gender = "F"
+        else:
+            _gender = "N/A"
+        rr = option_menu[1].get()
+        day = entries[1].get()
+        month = entries[2].get()
+        year = entries[3].get()
+        hour = entries[4].get()
+        minute = entries[5].get()
+        _latitude_ = float(entries[6].get())
+        _longitude_ = float(entries[7].get())
+        try:
+            date = dt.strptime(f"{year} {month} {day}", "%Y %m %d")
+            _country_ = ""
             try:
-                date = dt.strptime(f"{year} {month} {day}", "%Y %m %d")
-                _country_ = ""
-                try:
-                    utc_hour, utc_minute, utc_second, _place, country_ = from_local_to_utc(
-                        year, month, day, hour, minute, _latitude_, _longitude_)
-                    jd = julday(int(year), int(month), int(day), int(utc_hour), int(utc_minute), int(utc_second))["JD"]
-                    latitude, longitude = "", ""
-                    if _latitude_ < 0:
-                        _latitude_ *= -1
-                        _degree = int(_latitude_)
-                        _minute = int((_latitude_ - _degree) * 60)
-                        latitude += f"{_degree}s{_minute}"
-                    elif _latitude_ > 0:
-                        _degree = int(_latitude_)
-                        _minute = int((_latitude_ - _degree) * 60)
-                        latitude += f"{_degree}n{_minute}"
-                    if _longitude_ < 0:
-                        _longitude_ *= -1
-                        _degree = int(_longitude_)
-                        _minute = int((_longitude_ - _degree) * 60)
-                        latitude += f"{_degree}w{_minute}"
-                    elif _longitude_ > 0:
-                        _degree = int(_longitude_)
-                        _minute = int((_longitude_ - _degree) * 60)
-                        longitude += f"{_degree}e{_minute}"
-                    _country = CountryInfo()
-                    for keys, values in _country.all().items():
-                        for k, v in values.items():
-                            if k == "nativeName":
-                                if country_ in v or v in country_:
-                                    _country_ += values["name"]
-                    if not all([name, _gender, rr, list_box]):
-                        msgbox.showinfo(
-                            title="Create New Record",
-                            message=f"Fill the empty fields.")
-                        master.update()
+                utc_hour, utc_minute, utc_second, _place, country_ = from_local_to_utc(
+                    year, month, day, hour, minute, _latitude_, _longitude_)
+                jd = julday(int(year), int(month), int(day), int(utc_hour), int(utc_minute), int(utc_second))["JD"]
+                latitude, longitude = "", ""
+                if _latitude_ < 0:
+                    _latitude_ *= -1
+                    _degree = int(_latitude_)
+                    _minute = int((_latitude_ - _degree) * 60)
+                    latitude += f"{_degree}s{_minute}"
+                elif _latitude_ > 0:
+                    _degree = int(_latitude_)
+                    _minute = int((_latitude_ - _degree) * 60)
+                    latitude += f"{_degree}n{_minute}"
+                if _longitude_ < 0:
+                    _longitude_ *= -1
+                    _degree = int(_longitude_)
+                    _minute = int((_longitude_ - _degree) * 60)
+                    latitude += f"{_degree}w{_minute}"
+                elif _longitude_ > 0:
+                    _degree = int(_longitude_)
+                    _minute = int((_longitude_ - _degree) * 60)
+                    longitude += f"{_degree}e{_minute}"
+                _country = CountryInfo()
+                for keys, values in _country.all().items():
+                    for k, v in values.items():
+                        if k == "nativeName":
+                            if country_ in v or v in country_:
+                                _country_ += values["name"]
+                if not all([name, _gender, rr, list_box]):
+                    msgbox.showinfo(
+                        title="Create New Record",
+                        message=f"Fill the empty fields.")
+                    master.update()
+                else:
+                    now = dt.now()
+                    now_frmt = now.strftime("%d %B %Y %H:%M")
+                    select_from_data = [list(_) for _ in cursor.execute("SELECT * FROM DATA")]
+                    if add_or_edit is True:
+                        no = data[0]
                     else:
-                        if len(list_box) > 1:
-                            _record_data = [
-                                "-", name, _gender, rr, date.strftime("%d %B %Y"), f"{hour}:{minute}",
-                                jd, latitude, longitude, _place, _country_, "-", "|".join(list_box)]
+                        no = len(select_from_data) + 1
+                    lb = listboxes[0].get("0", "end")
+                    if len(list_box) > 1:
+                        _record_data = [
+                            no, now_frmt, "-", name, _gender, rr, date.strftime("%d %B %Y"), f"{hour}:{minute}",
+                            jd, latitude, _latitude_, longitude, _longitude_,
+                            _place, _country_, "-", "|".join(lb)]
+                    else:
+                        _record_data = [
+                            no, now_frmt, "-", name, _gender, rr, date.strftime("%d %B %Y"), f"{hour}:{minute}",
+                            jd, latitude, _latitude_, longitude, _longitude_,
+                            _place, _country_, "-", "".join(lb)]
+                    toplevel.destroy()
+                    master.update()
+                    if _record_data not in select_from_data:
+                        if add_or_edit is True:
+                            names = col_names.split(", ")
+                            focused = _treeview_.focus()
+                            _treeview_.delete(focused)
+                            for j, k in enumerate(names):
+                                if j < 3:
+                                    pass
+                                else:
+                                    cursor.execute(f"UPDATE DATA SET {names[j]} = ? WHERE no = ?",
+                                                   (_record_data[j], no))
+                            modify = _record_data[:10] + [_record_data[11]] + _record_data[13:]
+                            for i in cursor.execute("SELECT * FROM DATA"):
+                                if modify[0] == i[0]:
+                                    modify[1] = i[1]
+                            try:
+                                _treeview_.insert("", no - 1, values=modify)
+                            except:
+                                pass
+                            if "|" in _record_data[-1]:
+                                for i in _record_data[-1].split("|"):
+                                    modified_names.append(i)
+                                    if i in deleted_names:
+                                        deleted_names.remove(i)
+                            else:
+                                modified_names.append(_record_data[-1])
+                                if _record_data[-1] in deleted_names:
+                                    deleted_names.remove(_record_data[-1])
                         else:
-                            _record_data = [
-                                "-", name, _gender, rr, date.strftime("%d %B %Y"), f"{hour}:{minute}",
-                                jd, latitude, longitude, _place, _country_, "-", "".join(list_box)]
-                        toplevel6.destroy()
-                        master.update()
-                        select_from_data = [list(_) for _ in cursor.execute("SELECT * FROM DATA")]
-                        if _record_data not in select_from_data:
                             cursor.execute(
                                 f"INSERT INTO DATA VALUES({', '.join('?' * len(_record_data))})", _record_data)
-                            connect.commit()
-                            modify_database()
+                            modify = _record_data
+                            modify.pop(10)
+                            modify.pop(11)
+                            try:
+                                _treeview_.insert("", no - 1, values=modify)
+                            except:
+                                pass
+                        if "|" in _record_data[-1]:
+                            for i in _record_data[-1].split("|"):
+                                added_names.append(i)
+                                if i in deleted_names:
+                                    deleted_names.remove(i)
                         else:
-                            msg = "This record is also stored in the database."
-                            msgbox.showinfo(title="Create New Record", message=f"Error: {msg}")
-                            master.update()
-                except BaseException as err:
-                    msgbox.showinfo(title="Create New Record", message=f"Error: {err}")
-                    master.update()
-            except ValueError as err:
-                msgbox.showinfo(title="Create New Record", message=f"Error: {err}")
+                            added_names.append(_record_data[-1])
+                            if _record_data[-1] in deleted_names:
+                                deleted_names.remove(_record_data[-1])
+                        modify_name = modify[-1]
+                        category_names.append(modify_name)
+                        connect.commit()
+                        modify_database()
+                    else:
+                        msg = "This record is also stored in the database."
+                        msgbox.showinfo(title="Create New Record", message=f"Error: {msg}")
+                        master.update()
+            except BaseException:
+                traceback.print_exc(file=sys.stdout)
                 master.update()
+        except ValueError:
+            traceback.print_exc(file=sys.stdout)
+            master.update()
 
-        add_record_button = tk.Button(master=frames[7], text="Create", command=get_record_data)
+    def record_panel(text):
+        toplevel = tk.Toplevel()
+        toplevel.title(text)
+        toplevel.resizable(width=False, height=False)
+        frames = [i for i in create_frames(toplevel)]
+        entries = []
+        listboxes = []
+        list_box = []
+        option_menu = []
+        widgets(entries, listboxes, option_menu, list_box, frames)
+        return toplevel, frames, entries, listboxes, list_box, option_menu
+
+    def add_record():
+        global add_or_edit
+        add_or_edit = False
+        toplevel, frames, entries, listboxes, list_box, option_menu = record_panel(text="Add Record")
+        if len(treeviews) != 0:
+            add_record_button = tk.Button(master=frames[7], text="Apply",
+                                          command=lambda: get_record_data(
+                                              toplevel, treeviews[0], entries, option_menu, listboxes,
+                                              list_box, data=None))
+        else:
+            add_record_button = tk.Button(master=frames[7], text="Apply",
+                                          command=lambda: get_record_data(
+                                              toplevel, None, entries, option_menu, listboxes, list_box, data=None))
         add_record_button.grid(row=0, column=0)
 
-    def about():
+    def edit_record(_treeview_):
+        global add_or_edit
+        add_or_edit = True
+        focused = _treeview_.focus()
+        if not focused:
+            pass
+        else:
+            toplevel, frames, entries, listboxes, list_box, option_menu = record_panel(text="Edit Record")
+            data = _treeview_.item(focused)["values"]
+            entries[0].insert("end", data[3])
+            date = dt.strptime(f"{data[6]} {data[7]}", "%d %B %Y %H:%M")
+            date_frmt = date.strftime("%d %m %Y %H %M")
+            for i, j in enumerate(cursor.execute("SELECT * FROM DATA")):
+                if data[0] == j[0]:
+                    entries[6].insert("end", j[10])
+                    entries[7].insert("end", j[12])
+                    master.update()
+            for i, j in enumerate(date_frmt.split(" ")):
+                entries[i + 1].insert("end", j)
+                master.update()
+            if "|" in data[-1]:
+                for i in data[-1].split("|"):
+                    listboxes[0].insert("end", i)
+                    list_box.append(i)
+                    master.update()
+                    deleted_names.append(i)
+            else:
+                listboxes[0].insert("end", data[-1])
+                list_box.append(data[-1])
+                deleted_names.append(data[-1])
+                master.update()
+            option_menu[0].set(data[4])
+            option_menu[1].set(data[5])
+            master.update()
+            add_record_button = tk.Button(master=frames[7], text="Apply",
+                                          command=lambda: get_record_data(
+                                              toplevel, _treeview_, entries, option_menu, listboxes, list_box, data))
+            add_record_button.grid(row=0, column=0)
+
+    def delete_record(_treeview_):
+        global category_names
+        focused = _treeview_.focus()
+        no = _treeview_.item(focused)["values"][0]
+        cat = _treeview_.item(focused)["values"][-1]
+        modify_database()
+        cursor.execute("DELETE FROM DATA WHERE no = ?", (no,))
+        connect.commit()
+        for i in _treeview_.get_children():
+            _treeview_.delete(i)
+        content = [i for i in cursor.execute("SELECT * FROM DATA")]
+        for i, j in enumerate(content):
+            cursor.execute("UPDATE DATA SET no = ? WHERE no = ?",
+                           (i + 1, j[0]))
+            connect.commit()
+            modify = [k for k in j]
+            modify[0] = i + 1
+            modify.pop(10)
+            modify.pop(11)
+            _treeview_.insert("", i, values=modify)
+            master.update()
+        modify_database()
+        if "|" in cat:
+            for i in cat.split("|"):
+                category_names.remove(i)
+                deleted_names.append(i)
+                if i in added_names:
+                    added_names.remove(i)
+                if i in modified_names:
+                    modified_names.remove(i)
+        else:
+            category_names.remove(cat)
+            deleted_names.append(cat)
+            if cat in added_names:
+                added_names.remove(cat)
+            if cat in modified_names:
+                modified_names.remove(cat)
+
+    def button_3_on_treeview_(event, _treeview_):
+        global menu
+        if menu is not None:
+            destroy(event)
+        menu = tk.Menu(master=None, tearoff=False)
+        menu.add_command(
+            label="Edit", command=lambda: edit_record(_treeview_))
+        menu.add_command(
+            label="Delete", command=lambda: delete_record(_treeview_))
+        menu.post(event.x_root, event.y_root)
+
+    def edit_and_delete():
+        master.update()
         toplevel7 = tk.Toplevel()
-        toplevel7.title("About TkAstroDb")
+        toplevel7.title("Edit Records")
+        columns_2 = ["No", "Add Date"] + columns_1
+        y_scrollbar_2 = tk.Scrollbar(master=toplevel7, orient="vertical")
+        y_scrollbar_2.pack(side="right", fill="y")
+        _treeview_ = create_treeview(_master_=toplevel7, columns=columns_2, height=33)
+        if _treeview_ not in treeviews:
+            treeviews.append(_treeview_)
+        x_scrollbar(y_scrl=y_scrollbar_2, _master_=toplevel7, _treeview_=_treeview_)
+        for i, j in enumerate(cursor.execute("SELECT * FROM DATA")):
+            modify = [col for col in j]
+            modify.pop(10)
+            modify.pop(11)
+            _treeview_.insert("", i, values=modify)
+            master.update()
+        _treeview_.bind("<Button-3>", lambda event: button_3_on_treeview_(event, _treeview_))
+
+    def about():
+        toplevel8 = tk.Toplevel()
+        toplevel8.title("About TkAstroDb")
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "29 March 2019"
+        update_date, _update_date = "Update Date:", "31 March 2019"
         developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
         github, _github = "GitHub:", "https://github.com/dildeolupbiten/TkAstroDb"
-        tframe1 = tk.Frame(master=toplevel7, bd="2", relief="groove")
+        tframe1 = tk.Frame(master=toplevel8, bd="2", relief="groove")
         tframe1.pack(fill="both")
-        tframe2 = tk.Frame(master=toplevel7)
+        tframe2 = tk.Frame(master=toplevel8)
         tframe2.pack(fill="both")
         tlabel_title = tk.Label(master=tframe1, text=name, font="Arial 25")
         tlabel_title.pack()
@@ -2303,7 +2512,8 @@ def main():
     options_menu.add_command(label="House System", command=create_hsys_checkbuttons)
     options_menu.add_command(label="Orb Factor", command=choose_orb_factor)
 
-    records_menu.add_command(label="Create New Record", command=create_new_record)
+    records_menu.add_command(label="Add New Record", command=add_record)
+    records_menu.add_command(label="Edit & Delete Records", command=edit_and_delete)
 
     help_menu.add_command(label="About", command=about)
     help_menu.add_command(label="Check for Updates", command=update)
