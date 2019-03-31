@@ -121,13 +121,13 @@ What users should do is simple:
 
 ![img14](https://user-images.githubusercontent.com/29302909/55178782-1eca5980-5197-11e9-912b-aed6b584531f.png)
 
-**15.** If users click **Edit & Delete Records**, they will see a new window which is as below. Users can see all the records in the [SQL](https://www.sqlite.org/index.html) database.
+**15.** If users click **Edit & Delete Records**, they will see a new window which is as below. Users can see all the records in the [SQL](https://www.sqlite.org/index.html) database. If users correctly typed the record name to the search entry which is under Search A Record By Name label, the information of the found record will be displayed in a record window. 
 
-![img15](https://user-images.githubusercontent.com/29302909/55292426-9bf20a80-53f3-11e9-80b1-e182b4ca2a47.png)
+![img15](https://user-images.githubusercontent.com/29302909/55294306-39a40480-5409-11e9-948e-33945cd46e48.png)
 
 **16.** If users right click after selected a record, a right click menu will occur as can be seen on following image.
 
-![img16](https://user-images.githubusercontent.com/29302909/55292461-fc814780-53f3-11e9-8349-5d80665601f9.png)
+![img16](https://user-images.githubusercontent.com/29302909/55294294-15482800-5409-11e9-828b-c8790014c061.png)
 
 **17.** If users select **Edit** option, a panel will be formed which contains the information of the selected record. After required changes have been done, users should click  **Apply** button to finish the editing process.
 
