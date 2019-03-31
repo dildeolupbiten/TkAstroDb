@@ -531,19 +531,20 @@ def add_command(_record_):
     search_entry.delete("0", "end")
 
 
-def search_func(event):
+def search_func(event, _search_entry):
     master.update()
     save_record = ""
     count = 0
     for _record_ in database:
-        if search_entry.get() == _record_[1]:
+        if _search_entry.get() == _record_[1]:
+            print("yes")
             index = database.index(_record_)
             count += 1
             found_record.configure(text=f"Record Found = {count}")
             add_button.grid(row=1, column=1, padx=5, pady=5)
             add_button.configure(command=lambda: add_command(_record_=database[index]))
             save_record += database[index][1]
-    if save_record != search_entry.get() or save_record == search_entry.get() == "":
+    if save_record != _search_entry.get() or save_record == _search_entry.get() == "":
         found_record.configure(text="")
         add_button.grid_forget()
 
@@ -578,7 +579,7 @@ def select_range(event):
 search_entry.bind("<Control-KeyRelease-a>", lambda event: select_range(event))
 search_entry.bind("<Button-1>", lambda event: destroy_menu(event, search_menu))
 search_entry.bind("<Button-3>", lambda event: button_3_on_entry(event))
-search_entry.bind("<KeyRelease>", search_func)
+search_entry.bind("<KeyRelease>", lambda event: search_func(event, search_entry))
 
 category_label = tk.Label(master=entry_button_frame, text="Categories:", fg="red")
 category_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
@@ -1789,7 +1790,9 @@ def find_effect_size_values():
 
 
 add_or_edit = False
+edit_or_search = False
 treeviews = []
+items = []
 
 
 def main():
@@ -2150,7 +2153,7 @@ def main():
             yield frame
 
     def get_record_data(toplevel, _treeview_, entries, option_menu, listboxes, list_box, data):
-        global add_or_edit, modify_name, modified_names
+        global add_or_edit, edit_or_search, modify_name, modified_names
         name = entries[0].get()
         if option_menu[0].get() == "M":
             _gender = "M"
@@ -2227,8 +2230,11 @@ def main():
                     if _record_data not in select_from_data:
                         if add_or_edit is True:
                             names = col_names.split(", ")
-                            focused = _treeview_.focus()
-                            _treeview_.delete(focused)
+                            if edit_or_search is False:
+                                focused = _treeview_.focus()
+                                _treeview_.delete(focused)
+                            else:
+                                _treeview_.delete(items[0])
                             for j, k in enumerate(names):
                                 if j < 3:
                                     pass
@@ -2313,6 +2319,37 @@ def main():
                                               toplevel, None, entries, option_menu, listboxes, list_box, data=None))
         add_record_button.grid(row=0, column=0)
 
+    def create_panel(entries, data, listboxes, list_box, option_menu, frames, toplevel, _treeview_):
+        entries[0].insert("end", data[3])
+        date = dt.strptime(f"{data[6]} {data[7]}", "%d %B %Y %H:%M")
+        date_frmt = date.strftime("%d %m %Y %H %M")
+        for i, j in enumerate(cursor.execute("SELECT * FROM DATA")):
+            if data[0] == j[0]:
+                entries[6].insert("end", j[10])
+                entries[7].insert("end", j[12])
+                master.update()
+        for i, j in enumerate(date_frmt.split(" ")):
+            entries[i + 1].insert("end", j)
+            master.update()
+        if "|" in data[-1]:
+            for i in data[-1].split("|"):
+                listboxes[0].insert("end", i)
+                list_box.append(i)
+                master.update()
+                deleted_names.append(i)
+        else:
+            listboxes[0].insert("end", data[-1])
+            list_box.append(data[-1])
+            deleted_names.append(data[-1])
+            master.update()
+        option_menu[0].set(data[4])
+        option_menu[1].set(data[5])
+        master.update()
+        add_record_button = tk.Button(master=frames[7], text="Apply",
+                                      command=lambda: get_record_data(
+                                          toplevel, _treeview_, entries, option_menu, listboxes, list_box, data))
+        add_record_button.grid(row=0, column=0)
+
     def edit_record(_treeview_):
         global add_or_edit
         add_or_edit = True
@@ -2322,35 +2359,7 @@ def main():
         else:
             toplevel, frames, entries, listboxes, list_box, option_menu = record_panel(text="Edit Record")
             data = _treeview_.item(focused)["values"]
-            entries[0].insert("end", data[3])
-            date = dt.strptime(f"{data[6]} {data[7]}", "%d %B %Y %H:%M")
-            date_frmt = date.strftime("%d %m %Y %H %M")
-            for i, j in enumerate(cursor.execute("SELECT * FROM DATA")):
-                if data[0] == j[0]:
-                    entries[6].insert("end", j[10])
-                    entries[7].insert("end", j[12])
-                    master.update()
-            for i, j in enumerate(date_frmt.split(" ")):
-                entries[i + 1].insert("end", j)
-                master.update()
-            if "|" in data[-1]:
-                for i in data[-1].split("|"):
-                    listboxes[0].insert("end", i)
-                    list_box.append(i)
-                    master.update()
-                    deleted_names.append(i)
-            else:
-                listboxes[0].insert("end", data[-1])
-                list_box.append(data[-1])
-                deleted_names.append(data[-1])
-                master.update()
-            option_menu[0].set(data[4])
-            option_menu[1].set(data[5])
-            master.update()
-            add_record_button = tk.Button(master=frames[7], text="Apply",
-                                          command=lambda: get_record_data(
-                                              toplevel, _treeview_, entries, option_menu, listboxes, list_box, data))
-            add_record_button.grid(row=0, column=0)
+            create_panel(entries, data, listboxes, list_box, option_menu, frames, toplevel, _treeview_)
 
     def delete_record(_treeview_):
         global category_names
@@ -2401,14 +2410,38 @@ def main():
             label="Delete", command=lambda: delete_record(_treeview_))
         menu.post(event.x_root, event.y_root)
 
+    def search_record(event, search_entry_, _treeview_):
+        global edit_or_search
+        modify_database()
+        master.update()
+        for _record_ in database:
+            if search_entry_.get() == _record_[1]:
+                for item in _treeview_.get_children():
+                    if _treeview_.item(item)["values"][3] == _record_[1]:
+                        toplevel, frames, entries, listboxes, list_box, option_menu = record_panel(text="Edit Record")
+                        data = _treeview_.item(item)["values"]
+                        items.append(item)
+                        edit_or_search = True
+                        create_panel(entries, data, listboxes, list_box, option_menu, frames, toplevel, _treeview_)
+                        break
+                break
+
     def edit_and_delete():
+        global add_or_edit
+        add_or_edit = True
         master.update()
         toplevel7 = tk.Toplevel()
         toplevel7.title("Edit Records")
+        toplevel7.geometry("800x600")
+        toplevel7.resizable(width=False, height=False)
+        search_label_ = tk.Label(master=toplevel7, text="Search A Record By Name", fg="red")
+        search_label_.pack()
+        search_entry_ = tk.Entry(master=toplevel7)
+        search_entry_.pack()
         columns_2 = ["No", "Add Date"] + columns_1
         y_scrollbar_2 = tk.Scrollbar(master=toplevel7, orient="vertical")
         y_scrollbar_2.pack(side="right", fill="y")
-        _treeview_ = create_treeview(_master_=toplevel7, columns=columns_2, height=33)
+        _treeview_ = create_treeview(_master_=toplevel7, columns=columns_2, height=26)
         if _treeview_ not in treeviews:
             treeviews.append(_treeview_)
         x_scrollbar(y_scrl=y_scrollbar_2, _master_=toplevel7, _treeview_=_treeview_)
@@ -2419,6 +2452,8 @@ def main():
             _treeview_.insert("", i, values=modify)
             master.update()
         _treeview_.bind("<Button-3>", lambda event: button_3_on_treeview_(event, _treeview_))
+        search_entry_.bind("<KeyRelease>", lambda event: search_record(event, search_entry_, _treeview_))
+        master.update()
 
     def about():
         toplevel8 = tk.Toplevel()
