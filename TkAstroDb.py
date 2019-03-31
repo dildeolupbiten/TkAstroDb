@@ -2452,6 +2452,7 @@ def main():
             _treeview_.insert("", i, values=modify)
             master.update()
         _treeview_.bind("<Button-3>", lambda event: button_3_on_treeview_(event, _treeview_))
+        _treeview_.bind("<Button-1>", lambda event: destroy(event))
         search_entry_.bind("<KeyRelease>", lambda event: search_record(event, search_entry_, _treeview_))
         master.update()
 
