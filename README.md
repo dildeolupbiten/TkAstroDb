@@ -125,7 +125,7 @@ What users should do is simple:
 
 ![img15](https://user-images.githubusercontent.com/29302909/55292426-9bf20a80-53f3-11e9-80b1-e182b4ca2a47.png)
 
-**16.** If users right click after selected a record, a right click menu will be occur as can be seen on following image.
+**16.** If users right click after selected a record, a right click menu will occur as can be seen on following image.
 
 ![img16](https://user-images.githubusercontent.com/29302909/55292461-fc814780-53f3-11e9-8349-5d80665601f9.png)
 
