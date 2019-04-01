@@ -2249,10 +2249,14 @@ def main():
                             if "|" in _record_data[-1]:
                                 for i in _record_data[-1].split("|"):
                                     modified_names.append(i)
+                                    if i not in category_names:
+                                        category_names.append(i)
                                     if i in deleted_names:
                                         deleted_names.remove(i)
                             else:
                                 modified_names.append(_record_data[-1])
+                                if _record_data[-1] not in category_names:                             
+                                    category_names.append(_record_data[-1])
                                 if _record_data[-1] in deleted_names:
                                     deleted_names.remove(_record_data[-1])
                         else:
@@ -2268,14 +2272,17 @@ def main():
                         if "|" in _record_data[-1]:
                             for i in _record_data[-1].split("|"):
                                 added_names.append(i)
+                                if i not in category_names:
+                                    category_names.append(i)
                                 if i in deleted_names:
                                     deleted_names.remove(i)
                         else:
                             added_names.append(_record_data[-1])
+                            category_names.append(_record_data[-1])
                             if _record_data[-1] in deleted_names:
                                 deleted_names.remove(_record_data[-1])
                         modify_name = modify[-1]
-                        category_names.append(modify_name)
+                        #category_names.append(modify_name)
                         connect.commit()
                     else:
                         msg = "This record is also stored in the database."
