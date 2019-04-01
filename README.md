@@ -89,7 +89,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img11](https://user-images.githubusercontent.com/29302909/55292823-eb3a3a00-53f7-11e9-8051-ffab3d7ce8ce.png)
 
-**12.** Users should fill all the entry fields that can be seen on the image. They can select any existing categories or they can define new categories using entry field if they want. Finally users should press the **Add** button, then the selected or defined categories will be added to the category listbox. Note that users should use decimal latitude and longitude coordinates for a place.
+**12.** Users should fill all the entry fields that can be seen on the image. They can select any existing categories or they can define new categories using entry field if they want. Finally users should press the **Apply** button, then the selected or defined categories will be added to the category listbox. Note that users should use decimal latitude and longitude coordinates for a place.
 
 ![img12](https://user-images.githubusercontent.com/29302909/55292729-f93b8b00-53f6-11e9-9c81-1b69f6f2789f.png)
 
