@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 
 import os
 import sys
@@ -537,7 +537,6 @@ def search_func(event, _search_entry):
     count = 0
     for _record_ in database:
         if _search_entry.get() == _record_[1]:
-            print("yes")
             index = database.index(_record_)
             count += 1
             found_record.configure(text=f"Record Found = {count}")
@@ -650,7 +649,6 @@ def select_ratings():
 
 def select_categories():
     global selected_categories, record_categories, category_names
-    modify_database()
     selected_categories, record_categories = [], []
     global toplevel1
     try:
@@ -696,7 +694,6 @@ def select_categories():
         else:
             tbutton.configure(command=lambda: tbutton_command(cvar_list, toplevel1, record_categories))
         check_uncheck.configure(command=lambda: check_all_command(check_all, cvar_list, checkbutton_list))
-        modify_database()
         master.update()
 
 
@@ -2280,7 +2277,6 @@ def main():
                         modify_name = modify[-1]
                         category_names.append(modify_name)
                         connect.commit()
-                        modify_database()
                     else:
                         msg = "This record is also stored in the database."
                         msgbox.showinfo(title="Create New Record", message=f"Error: {msg}")
@@ -2366,7 +2362,6 @@ def main():
         focused = _treeview_.focus()
         no = _treeview_.item(focused)["values"][0]
         cat = _treeview_.item(focused)["values"][-1]
-        modify_database()
         cursor.execute("DELETE FROM DATA WHERE no = ?", (no,))
         connect.commit()
         for i in _treeview_.get_children():
@@ -2382,7 +2377,6 @@ def main():
             modify.pop(11)
             _treeview_.insert("", i, values=modify)
             master.update()
-        modify_database()
         if "|" in cat:
             for i in cat.split("|"):
                 category_names.remove(i)
@@ -2412,7 +2406,6 @@ def main():
 
     def search_record(event, search_entry_, _treeview_):
         global edit_or_search
-        modify_database()
         master.update()
         for _record_ in database:
             if search_entry_.get() == _record_[1]:
@@ -2462,7 +2455,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "31 March 2019"
+        update_date, _update_date = "Update Date:", "01 April 2019"
         developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
