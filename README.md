@@ -119,7 +119,7 @@ What users should do is simple:
 
 **14.** After clicked the **Apply** button and selected the Rodden Rating, the newly added record can be displayed.
 
-![img14](https://user-images.githubusercontent.com/29302909/55178782-1eca5980-5197-11e9-912b-aed6b584531f.png)
+![img14](https://user-images.githubusercontent.com/29302909/55326449-7404b480-5490-11e9-8b4b-4146dd5decb2.png)
 
 **15.** If users click **Edit & Delete Records**, they will see a new window which is as below. Users can see all the records in the [SQL](https://www.sqlite.org/index.html) database. If users correctly typed the record name to the search entry which is under **Search A Record By Name** label, the information of the found record will be displayed in a record window. 
 
