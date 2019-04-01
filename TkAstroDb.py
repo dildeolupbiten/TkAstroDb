@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 
 import os
 import sys
@@ -145,11 +145,10 @@ if xml_file.count("xml") == 1:
             database.append(user_data)
         except IndexError:
             break
-
-
-def modify_database():
-    global category_names, _count_
-    category_names = []
+            
+            
+def sql_database():
+    global _count_
     reverse_category_list = {value: key for key, value in category_dict.items()}
     for _i_ in cursor.execute("SELECT * FROM DATA"):
         _data_ = list(_i_)[2:]
@@ -177,6 +176,11 @@ def modify_database():
                 _count_ += 1
         edit_data.append(new_category)
         database.append(edit_data)
+        
+        
+def merge_xml_and_sql():
+    global category_names
+    category_names = []
     for _i_ in range(5000):
         _records_ = []
         category_groups = {}
@@ -196,6 +200,11 @@ def modify_database():
                 category_names.append(category_name)
             all_categories.append(category_groups)
     category_names = sorted(category_names)
+
+
+def modify_database():
+    sql_database()
+    merge_xml_and_sql()
 
 
 modify_database()
@@ -649,6 +658,7 @@ def select_ratings():
 
 def select_categories():
     global selected_categories, record_categories, category_names
+    sql_database()
     selected_categories, record_categories = [], []
     global toplevel1
     try:
@@ -1626,16 +1636,18 @@ def find_observed_values():
             log.flush()
             for records in displayed_results:
                 julian_date = float(records[6])
-                longitude = records[8]
-                if "e" in longitude:
-                    longitude = float(longitude.replace("e", "."))
-                elif "w" in longitude:
-                    longitude = -1 * float(longitude.replace("w", "."))
                 latitude = records[7]
-                if "n" in latitude:
-                    latitude = float(latitude.replace("n", "."))
-                elif "s" in latitude:
-                    latitude = -1 * float(latitude.replace("s", "."))
+                longitude = records[8]
+                if type(longitude) != float:
+                    if "e" in longitude:
+                        longitude = float(longitude.replace("e", "."))
+                    elif "w" in longitude:
+                        longitude = -1 * float(longitude.replace("w", "."))
+                if type(latitude) != float:
+                    if "n" in latitude:
+                        latitude = float(latitude.replace("n", "."))
+                    elif "s" in latitude:
+                        latitude = -1 * float(latitude.replace("s", "."))
                 try:
                     chart = Chart(julian_date, longitude, latitude)
                     write_datas_to_excel(chart.get_chart_data())
@@ -2282,7 +2294,6 @@ def main():
                             if _record_data[-1] in deleted_names:
                                 deleted_names.remove(_record_data[-1])
                         modify_name = modify[-1]
-                        #category_names.append(modify_name)
                         connect.commit()
                     else:
                         msg = "This record is also stored in the database."
@@ -2462,7 +2473,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "01 April 2019"
+        update_date, _update_date = "Update Date:", "02 April 2019"
         developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
