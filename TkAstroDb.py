@@ -2341,7 +2341,6 @@ def main():
             create_panel(entries, data, listboxes, list_box, option_menu, frames, toplevel, _treeview_)
 
     def delete_record(_treeview_):
-        global category_names
         focused = _treeview_.focus()
         no = _treeview_.item(focused)["values"][0]
         cat = _treeview_.item(focused)["values"][-1]
