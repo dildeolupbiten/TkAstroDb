@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.3.2"
+__version__ = "1.3.1"
 
 import os
 import sys
@@ -147,7 +147,7 @@ if xml_file.count("xml") == 1:
             break
             
             
-def sql_database():
+def merge_databases():
     global _count_
     reverse_category_list = {value: key for key, value in category_dict.items()}
     for _i_ in cursor.execute("SELECT * FROM DATA"):
@@ -178,7 +178,7 @@ def sql_database():
         database.append(edit_data)
         
         
-def merge_xml_and_sql():
+def group_categories():
     global category_names
     category_names = []
     for _i_ in range(5000):
@@ -202,12 +202,8 @@ def merge_xml_and_sql():
     category_names = sorted(category_names)
 
 
-def modify_database():
-    sql_database()
-    merge_xml_and_sql()
-
-
-modify_database()
+merge_databases()
+group_categories()
 
 
 # --------------------------------------------- swisseph ---------------------------------------------
@@ -471,8 +467,6 @@ class Chart:
 
 selected_categories, selected_ratings, displayed_results, record_categories = [], [], [], []
 
-deleted_names, modified_names, added_names = [], [], []
-
 toplevel1, toplevel2, menu, search_menu, listbox_menu = None, None, None, None, None
 
 record = False
@@ -658,7 +652,6 @@ def select_ratings():
 
 def select_categories():
     global selected_categories, record_categories, category_names
-    sql_database()
     selected_categories, record_categories = [], []
     global toplevel1
     try:
@@ -690,7 +683,6 @@ def select_categories():
         check_uncheck = tk.Checkbutton(master=tframe, text="Check/Uncheck All", variable=check_all)
         check_all.set(False)
         check_uncheck.grid(row=0, column=0, sticky="nw")
-        category_names = [i for i in category_names if i not in deleted_names]
         for num, _category_ in enumerate(category_names, 1):
             cvar = tk.BooleanVar()
             cvar_list.append([cvar, _category_])
@@ -2162,7 +2154,7 @@ def main():
             yield frame
 
     def get_record_data(toplevel, _treeview_, entries, option_menu, listboxes, list_box, data):
-        global add_or_edit, edit_or_search, modify_name, modified_names
+        global add_or_edit, edit_or_search, modify_name
         name = entries[0].get()
         if option_menu[0].get() == "M":
             _gender = "M"
@@ -2258,19 +2250,6 @@ def main():
                                 _treeview_.insert("", no - 1, values=modify)
                             except:
                                 pass
-                            if "|" in _record_data[-1]:
-                                for i in _record_data[-1].split("|"):
-                                    modified_names.append(i)
-                                    if i not in category_names:
-                                        category_names.append(i)
-                                    if i in deleted_names:
-                                        deleted_names.remove(i)
-                            else:
-                                modified_names.append(_record_data[-1])
-                                if _record_data[-1] not in category_names:                             
-                                    category_names.append(_record_data[-1])
-                                if _record_data[-1] in deleted_names:
-                                    deleted_names.remove(_record_data[-1])
                         else:
                             cursor.execute(
                                 f"INSERT INTO DATA VALUES({', '.join('?' * len(_record_data))})", _record_data)
@@ -2281,18 +2260,6 @@ def main():
                                 _treeview_.insert("", no - 1, values=modify)
                             except:
                                 pass
-                        if "|" in _record_data[-1]:
-                            for i in _record_data[-1].split("|"):
-                                added_names.append(i)
-                                if i not in category_names:
-                                    category_names.append(i)
-                                if i in deleted_names:
-                                    deleted_names.remove(i)
-                        else:
-                            added_names.append(_record_data[-1])
-                            category_names.append(_record_data[-1])
-                            if _record_data[-1] in deleted_names:
-                                deleted_names.remove(_record_data[-1])
                         modify_name = modify[-1]
                         connect.commit()
                     else:
@@ -2350,11 +2317,9 @@ def main():
                 listboxes[0].insert("end", i)
                 list_box.append(i)
                 master.update()
-                deleted_names.append(i)
         else:
             listboxes[0].insert("end", data[-1])
             list_box.append(data[-1])
-            deleted_names.append(data[-1])
             master.update()
         option_menu[0].set(data[4])
         option_menu[1].set(data[5])
@@ -2395,21 +2360,6 @@ def main():
             modify.pop(11)
             _treeview_.insert("", i, values=modify)
             master.update()
-        if "|" in cat:
-            for i in cat.split("|"):
-                category_names.remove(i)
-                deleted_names.append(i)
-                if i in added_names:
-                    added_names.remove(i)
-                if i in modified_names:
-                    modified_names.remove(i)
-        else:
-            category_names.remove(cat)
-            deleted_names.append(cat)
-            if cat in added_names:
-                added_names.remove(cat)
-            if cat in modified_names:
-                modified_names.remove(cat)
 
     def button_3_on_treeview_(event, _treeview_):
         global menu
@@ -2473,7 +2423,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "02 April 2019"
+        update_date, _update_date = "Update Date:", "01 April 2019"
         developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
