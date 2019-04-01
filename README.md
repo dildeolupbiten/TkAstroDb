@@ -113,7 +113,7 @@ What users should do is simple:
 
 5. Save and exit the script file. Now users no longer get an [UnicodeDecodeError](https://wiki.python.org/moin/UnicodeDecodeError) because of non-ASCII characters.
 
-**13.** After added new records to an alternative [SQL](https://www.sqlite.org/index.html) database which name is **TkAstroDb.db**, users should restart the main program to make the added records active. After activated the records if users click the **Select** button which is near the **Categories** label, the newly defined category can be seen.
+**13.** After added new records to an alternative [SQL](https://www.sqlite.org/index.html) database which name is **TkAstroDb.db**, users should restart the main program to make the added records active. After activated the records if users click the **Select** button which is near the **Categories** label, the newly defined category and can be seen.
 
 ![img13](https://user-images.githubusercontent.com/29302909/55161277-2fb6a300-5176-11e9-8d0c-db32a4ac623e.png)
 
@@ -121,7 +121,7 @@ What users should do is simple:
 
 ![img14](https://user-images.githubusercontent.com/29302909/55326449-7404b480-5490-11e9-8b4b-4146dd5decb2.png)
 
-**15.** If users click **Edit & Delete Records**, they will see a new window which is as below. Users can see all the records in the [SQL](https://www.sqlite.org/index.html) database. If users correctly typed the record name to the search entry which is under **Search A Record By Name** label, the information of the found record will be displayed in a record window. 
+**15.** If users click **Edit & Delete Records**, they will see a new window which is as below. Users can see all the records of the [SQL](https://www.sqlite.org/index.html) database. If users correctly typed the record name to the search entry which is under **Search A Record By Name** label, the information of the found record will be displayed in a record window. 
 
 ![img15](https://user-images.githubusercontent.com/29302909/55294306-39a40480-5409-11e9-948e-33945cd46e48.png)
 
