@@ -117,7 +117,7 @@ What users should do is simple:
 
 ![img13](https://user-images.githubusercontent.com/29302909/55161277-2fb6a300-5176-11e9-8d0c-db32a4ac623e.png)
 
-**14.** After clicked the **Apply** button and selected the Rodden Rating, the newly added record can be displayed.
+**14.** After clicked the **Apply** button and selected the **Rodden Rating**, the newly added record can be displayed.
 
 ![img14](https://user-images.githubusercontent.com/29302909/55326449-7404b480-5490-11e9-8b4b-4146dd5decb2.png)
 
