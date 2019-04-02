@@ -2726,15 +2726,15 @@ def main():
                         connect.commit()
                     else:
                         msg = "This record is also stored in the database."
-                        msgbox.showinfo(title="Create New Record", 
+                        msgbox.showinfo(title="Add New Record", 
                                         message=f"Error: {msg}")
                         master.update()
             except BaseException as err:
-                msgbox.showinfo(title="Create New Record", 
+                msgbox.showinfo(title="Add New Record", 
                                 message=f"Error: {err}")
                 master.update()
         except ValueError as err:
-            msgbox.showinfo(title="Create New Record", 
+            msgbox.showinfo(title="Add New Record", 
                             message=f"Error: {err}")
             master.update()
 
