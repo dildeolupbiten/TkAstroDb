@@ -9,7 +9,6 @@ import ssl
 import time
 import shutil
 import threading
-import traceback
 import webbrowser
 import tkinter as tk
 import sqlite3 as sql
@@ -2730,11 +2729,13 @@ def main():
                         msgbox.showinfo(title="Create New Record", 
                                         message=f"Error: {msg}")
                         master.update()
-            except BaseException:
-                traceback.print_exc(file=sys.stdout)
+            except BaseException as err:
+                msgbox.showinfo(title="Create New Record", 
+                                message=f"Error: {err}")
                 master.update()
-        except ValueError:
-            traceback.print_exc(file=sys.stdout)
+        except ValueError as err:
+            msgbox.showinfo(title="Create New Record", 
+                            message=f"Error: {err}")
             master.update()
 
     def record_panel(text):
