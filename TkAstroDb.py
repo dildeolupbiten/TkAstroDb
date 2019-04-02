@@ -2422,7 +2422,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "01 April 2019"
+        update_date, _update_date = "Update Date:", "02 April 2019"
         developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
