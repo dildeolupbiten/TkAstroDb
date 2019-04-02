@@ -152,8 +152,8 @@ def merge_databases():
     reverse_category_list = {value: key for key, value in category_dict.items()}
     for _i_ in cursor.execute("SELECT * FROM DATA"):
         _data_ = list(_i_)[2:]
-        _data_.pop(7)
         _data_.pop(8)
+        _data_.pop(9)
         new_category = []
         edit_data = _data_[:12]
         if "|" in _data_[12]:
