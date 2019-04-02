@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 
 import os
 import sys
@@ -23,7 +23,7 @@ from datetime import datetime as dt
 try:
     from dateutil import tz
 except ModuleNotFoundError:
-    os.system("pip3 install python3-dateutil")
+    os.system("pip3 install python-dateutil")
     from dateutil import tz
 try:
     from geopy.geocoders import Nominatim
