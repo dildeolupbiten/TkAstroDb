@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.3.2"
+__version__ = "1.3.3"
 
 import os
 import sys
@@ -65,29 +65,35 @@ except ModuleNotFoundError:
         path = os.path.join(os.getcwd(), "Eph", "Whl")
         if sys.version_info.minor == 6:
             if platform.architecture()[0] == "64bit":
-                new_path = os.path.join(path, "pyswisseph-2.5.1.post0-cp36-cp36m-win_amd64.whl")
+                new_path = os.path.join(
+                    path,
+                    "pyswisseph-2.5.1.post0-cp36-cp36m-win_amd64.whl")
                 os.system(f"pip3 install {new_path}")
             elif platform.architecture()[0] == "32bit":
-                new_path = os.path.join(path, "pyswisseph-2.5.1.post0-cp36-cp36m-win32.whl")
+                new_path = os.path.join(
+                    path, "pyswisseph-2.5.1.post0-cp36-cp36m-win32.whl")
                 os.system(f"pip3 install {new_path}")
         elif sys.version_info.minor == 7:
             if platform.architecture()[0] == "64bit":
-                new_path = os.path.join(path, "pyswisseph-2.5.1.post0-cp37-cp37m-win_amd64.whl")
+                new_path = os.path.join(
+                    path, "pyswisseph-2.5.1.post0-cp37-cp37m-win_amd64.whl")
                 os.system(f"pip3 install {new_path}")
             elif platform.architecture()[0] == "32bit":
-                new_path = os.path.join(path, "pyswisseph-2.5.1.post0-cp37-cp37m-win32.whl")
+                new_path = os.path.join(
+                    path, "pyswisseph-2.5.1.post0-cp37-cp37m-win32.whl")
                 os.system(f"pip3 install {new_path}")
     import swisseph as swe
 
 
-# --------------------------------------------- sqlite3 & xml -----------------------------------
+# -----------------------------sqlite3 & xml------------------------------------
 
 
 connect = sql.connect("TkAstroDb.db")
 cursor = connect.cursor()
 
 col_names = "no, add_date, adb_id, name, gender, rr, date, time, " \
-            "julian_date, lat, c_lat, lon, c_lon, place, country, adb_link, category"
+            "julian_date, lat, c_lat, lon, c_lon, place, country, " \
+            "adb_link, category"
 
 cursor.execute(f"CREATE TABLE IF NOT EXISTS DATA({col_names})")
 
@@ -149,7 +155,9 @@ if xml_file.count("xml") == 1:
             
 def merge_databases():
     global _count_
-    reverse_category_list = {value: key for key, value in category_dict.items()}
+    reverse_category_list = {
+        value: key for key, value in category_dict.items()
+    }
     for _i_ in cursor.execute("SELECT * FROM DATA"):
         _data_ = list(_i_)[2:]
         _data_.pop(8)
@@ -160,19 +168,27 @@ def merge_databases():
             edit_category = _data_[12].split("|")
             for _cat_ in edit_category:
                 if _cat_ in category_dict.values():
-                    new_category.append((reverse_category_list[_cat_], _cat_))
+                    new_category.append(
+                        (reverse_category_list[_cat_], _cat_)
+                    )
                 else:
                     new_category.append((str(4014 + _count_), _cat_))
                     category_dict[str(4014 + _count_)] = _cat_
                     _count_ += 1
-                    reverse_category_list = {value: key for key, value in category_dict.items()}
+                    reverse_category_list = {
+                        value: key for key, value in category_dict.items()
+                    }
         else:
             if _data_[12] in category_dict.values():
-                new_category.append((reverse_category_list[_data_[12]], _data_[12]))
+                new_category.append(
+                    (reverse_category_list[_data_[12]], _data_[12])
+                )
             else:
                 new_category.append((str(4014 + _count_), _data_[12]))
                 category_dict[str(4014 + _count_)] = _data_[12]
-                reverse_category_list = {value: key for key, value in category_dict.items()}
+                reverse_category_list = {
+                    value: key for key, value in category_dict.items()
+                }
                 _count_ += 1
         edit_data.append(new_category)
         database.append(edit_data)
@@ -206,7 +222,7 @@ merge_databases()
 group_categories()
 
 
-# --------------------------------------------- swisseph ---------------------------------------------
+# --------------------------------swisseph--------------------------------------
 
 
 swe.set_ephe_path(os.path.join(os.getcwd(), "Eph"))
@@ -333,7 +349,8 @@ class Chart:
         asc = 0
         angle = []
         for i, j in enumerate(swe.houses(
-                self.julian_date, self.latitude, self.longitude, bytes(hsys.encode("utf-8")))[0]):
+                self.julian_date, self.latitude, self.longitude,
+                bytes(hsys.encode("utf-8")))[0]):
             if i == 0:
                 asc += j
             angle.append(j)
@@ -389,45 +406,72 @@ class Chart:
         for i, j in enumerate(self.MODIFY_PLANET_INFO_FORMAT):
             for k, m in enumerate(self.NEW_HOUSE_DEGREES):
                 try:
-                    if self.NEW_HOUSE_DEGREES[k][1] - self.NEW_HOUSE_DEGREES[k + 1][1] > 180 \
+                    if self.NEW_HOUSE_DEGREES[k][1] - \
+                            self.NEW_HOUSE_DEGREES[k + 1][1] > 180 \
                             and j[1] < self.NEW_HOUSE_DEGREES[k + 1][1]:
-                        next_house_degree = self.NEW_HOUSE_DEGREES[k + 1][1] + 360
+                        next_house_degree = self.NEW_HOUSE_DEGREES[k + 1][1] \
+                            + 360
                         new_planet_degree = j[1] + 360
-                        if self.NEW_HOUSE_DEGREES[k][1] < new_planet_degree < next_house_degree:
-                            self.PLANET_SIGN_HOUSE.append([j[0], j[2], self.HOUSE_SIGN[k][0]])
-                    elif self.NEW_HOUSE_DEGREES[k][1] - self.NEW_HOUSE_DEGREES[k + 1][1] > 180 \
+                        if self.NEW_HOUSE_DEGREES[k][1] < \
+                                new_planet_degree < next_house_degree:
+                            self.PLANET_SIGN_HOUSE.append(
+                                [j[0], j[2], self.HOUSE_SIGN[k][0]]
+                            )
+                    elif self.NEW_HOUSE_DEGREES[k][1] - \
+                            self.NEW_HOUSE_DEGREES[k + 1][1] > 180 \
                             and j[1] > self.NEW_HOUSE_DEGREES[k][1]:
-                        next_house_degree = self.NEW_HOUSE_DEGREES[k + 1][1] + 360
-                        if self.NEW_HOUSE_DEGREES[k][1] < j[1] < next_house_degree:
-                            self.PLANET_SIGN_HOUSE.append([j[0], j[2], self.HOUSE_SIGN[k][0]])
-                    if self.NEW_HOUSE_DEGREES[k][1] < j[1] < self.NEW_HOUSE_DEGREES[k + 1][1]:
-                        self.PLANET_SIGN_HOUSE.append([j[0], j[2], self.HOUSE_SIGN[k][0]])
+                        next_house_degree = self.NEW_HOUSE_DEGREES[k + 1][1] \
+                            + 360
+                        if self.NEW_HOUSE_DEGREES[k][1] < j[1] < \
+                                next_house_degree:
+                            self.PLANET_SIGN_HOUSE.append(
+                                [j[0], j[2], self.HOUSE_SIGN[k][0]]
+                            )
+                    if self.NEW_HOUSE_DEGREES[k][1] < j[1] < \
+                            self.NEW_HOUSE_DEGREES[k + 1][1]:
+                        self.PLANET_SIGN_HOUSE.append(
+                            [j[0], j[2], self.HOUSE_SIGN[k][0]]
+                        )
                 except IndexError:
-                    if self.NEW_HOUSE_DEGREES[k][1] - self.NEW_HOUSE_DEGREES[0][1] > 180 \
+                    if self.NEW_HOUSE_DEGREES[k][1] - \
+                            self.NEW_HOUSE_DEGREES[0][1] > 180 \
                             and j[1] < self.NEW_HOUSE_DEGREES[0][1]:
                         next_house_degree = self.NEW_HOUSE_DEGREES[0][1] + 360
                         new_planet_degree = j[1] + 360
-                        if self.NEW_HOUSE_DEGREES[k][1] < new_planet_degree < next_house_degree:
-                            self.PLANET_SIGN_HOUSE.append([j[0], j[2], self.HOUSE_SIGN[k][0]])
-                    elif self.NEW_HOUSE_DEGREES[k][1] - self.NEW_HOUSE_DEGREES[0][1] > 180 \
+                        if self.NEW_HOUSE_DEGREES[k][1] < \
+                                new_planet_degree < next_house_degree:
+                            self.PLANET_SIGN_HOUSE.append(
+                                [j[0], j[2], self.HOUSE_SIGN[k][0]]
+                            )
+                    elif self.NEW_HOUSE_DEGREES[k][1] - \
+                            self.NEW_HOUSE_DEGREES[0][1] > 180 \
                             and j[1] > self.NEW_HOUSE_DEGREES[k][1]:
                         next_house_degree = self.NEW_HOUSE_DEGREES[0][1] + 360
-                        if self.NEW_HOUSE_DEGREES[k][1] < j[1] < next_house_degree:
-                            self.PLANET_SIGN_HOUSE.append([j[0], j[2], self.HOUSE_SIGN[k][0]])
-                    if self.NEW_HOUSE_DEGREES[k][1] < j[1] < self.NEW_HOUSE_DEGREES[0][1]:
-                        self.PLANET_SIGN_HOUSE.append([j[0], j[2], self.HOUSE_SIGN[k][0]])
+                        if self.NEW_HOUSE_DEGREES[k][1] < j[1] < \
+                                next_house_degree:
+                            self.PLANET_SIGN_HOUSE.append(
+                                [j[0], j[2], self.HOUSE_SIGN[k][0]]
+                            )
+                    if self.NEW_HOUSE_DEGREES[k][1] < j[1] < \
+                            self.NEW_HOUSE_DEGREES[0][1]:
+                        self.PLANET_SIGN_HOUSE.append(
+                            [j[0], j[2], self.HOUSE_SIGN[k][0]]
+                        )
 
-    def select_rulership(self, ruler_list, rulership, ruler_type, ruler_sign, i, m):
+    def select_rulership(self, ruler_list, rulership, ruler_type, 
+                         ruler_sign, i, m):
         ruler_list.append([f"Lord {i + 1}", f"House {m[2]}"])
         for n, o in enumerate(signs):
             if rulership[o] == ruler_type:
                 if [f"{i + 1}", o] in self.HOUSE_SIGN:
                     if n % 2 == 0:
                         ruler_sign[o].append(
-                            [f"Lord {i + 1} is {ruler_type} (+)", f"House {m[2]}"])
+                            [f"Lord {i + 1} is {ruler_type} (+)",
+                             f"House {m[2]}"])
                     else:
                         ruler_sign[o].append(
-                            [f"Lord {i + 1} is {ruler_type} (-)", f"House {m[2]}"])
+                            [f"Lord {i + 1} is {ruler_type} (-)", 
+                             f"House {m[2]}"])
 
     @staticmethod
     def set_lords(ruler_sign):
@@ -441,7 +485,8 @@ class Chart:
 
     def get_chart_data(self):
         traditional_ruler, modern_ruler = [], []
-        trad_ruler_sign, mode_ruler_sign = {i: [] for i in signs}, {i: [] for i in signs}
+        trad_ruler_sign = {i: [] for i in signs}
+        mode_ruler_sign = {i: [] for i in signs}
         for i, j in enumerate(self.house_cusps()[0]):
             traditional = traditional_rulership[self.house_cusps()[0][i][2]]
             modern = modern_rulership[self.house_cusps()[0][i][2]]
@@ -450,24 +495,29 @@ class Chart:
                     self.select_rulership(ruler_list=traditional_ruler,
                                           rulership=traditional_rulership,
                                           ruler_type=traditional,
-                                          ruler_sign=trad_ruler_sign, i=i, m=m)
+                                          ruler_sign=trad_ruler_sign, 
+                                          i=i, m=m)
                 if modern == m[0]:
                     self.select_rulership(ruler_list=modern_ruler,
                                           rulership=modern_rulership,
                                           ruler_type=modern,
-                                          ruler_sign=mode_ruler_sign, i=i, m=m)
+                                          ruler_sign=mode_ruler_sign, 
+                                          i=i, m=m)
         trad_lords = self.set_lords(ruler_sign=trad_ruler_sign)
         mode_lords = self.set_lords(ruler_sign=mode_ruler_sign)
-        return self.PLANET_SIGN_HOUSE, self.HOUSE_SIGN, self.PLANET_DEGREES, traditional_ruler, modern_ruler, \
-            trad_ruler_sign, mode_ruler_sign, trad_lords, mode_lords
+        return self.PLANET_SIGN_HOUSE, self.HOUSE_SIGN, self.PLANET_DEGREES, \
+            traditional_ruler, modern_ruler, trad_ruler_sign, \
+            mode_ruler_sign, trad_lords, mode_lords
 
 
-# --------------------------------------------- tkinter ---------------------------------------------
+# ---------------------------------tkinter--------------------------------------
 
 
-selected_categories, selected_ratings, displayed_results, record_categories = [], [], [], []
+selected_categories, selected_ratings, displayed_results, \
+    record_categories = [], [], [], []
 
-toplevel1, toplevel2, menu, search_menu, listbox_menu = None, None, None, None, None
+toplevel1, toplevel2, menu, search_menu, listbox_menu = None, None, None, \
+    None, None
 
 record = False
 
@@ -495,8 +545,12 @@ columns_1 = ["Adb ID", "Name", "Gender", "Rodden Rating", "Date",
 
 
 def create_treeview(_master_, columns, height=18):
-    treeview_ = Treeview(master=_master_, show="headings",
-                         columns=[f"#{_i_ + 1}" for _i_ in range(len(columns))], height=height)
+    treeview_ = Treeview(
+        master=_master_,
+        show="headings",
+        columns=[f"#{_i_ + 1}" for _i_ in range(len(columns))],
+        height=height
+    )
     for _i_, _j_ in enumerate(columns):
         treeview_.heading(f"#{_i_ + 1}", text=_j_)
     treeview_.pack()
@@ -508,7 +562,8 @@ treeview = create_treeview(_master_=bottom_frame, columns=columns_1)
 entry_button_frame = tk.Frame(master=top_frame)
 entry_button_frame.grid(row=0, column=0)
 
-search_label = tk.Label(master=entry_button_frame, text="Search A Record By Name: ", fg="red")
+search_label = tk.Label(master=entry_button_frame, 
+                        text="Search A Record By Name: ", fg="red")
 search_label.grid(row=0, column=0, padx=5, sticky="w", pady=5)
 
 search_entry = tk.Entry(master=entry_button_frame)
@@ -544,9 +599,11 @@ def search_func(event, _search_entry):
             count += 1
             found_record.configure(text=f"Record Found = {count}")
             add_button.grid(row=1, column=1, padx=5, pady=5)
-            add_button.configure(command=lambda: add_command(_record_=database[index]))
+            add_button.configure(
+                command=lambda: add_command(_record_=database[index]))
             save_record += database[index][1]
-    if save_record != _search_entry.get() or save_record == _search_entry.get() == "":
+    if save_record != _search_entry.get() or \
+            save_record == _search_entry.get() == "":
         found_record.configure(text="")
         add_button.grid_forget()
 
@@ -562,15 +619,20 @@ def button_3_on_entry(event):
         destroy_menu(event, search_menu)
     search_menu = tk.Menu(master=None, tearoff=False)
     search_menu.add_command(
-        label="Copy", command=lambda: master.focus_get().event_generate('<<Copy>>'))
+        label="Copy", 
+        command=lambda: master.focus_get().event_generate('<<Copy>>'))
     search_menu.add_command(
-        label="Cut", command=lambda: master.focus_get().event_generate('<<Cut>>'))
+        label="Cut", 
+        command=lambda: master.focus_get().event_generate('<<Cut>>'))
     search_menu.add_command(
-        label="Paste", command=lambda: master.focus_get().event_generate('<<Paste>>'))
+        label="Paste", 
+        command=lambda: master.focus_get().event_generate('<<Paste>>'))
     search_menu.add_command(
-        label="Remove", command=lambda: master.focus_get().event_generate('<<Clear>>'))
+        label="Remove", 
+        command=lambda: master.focus_get().event_generate('<<Clear>>'))
     search_menu.add_command(
-        label="Select All", command=lambda: master.focus_get().event_generate('<<SelectAll>>'))
+        label="Select All", 
+        command=lambda: master.focus_get().event_generate('<<SelectAll>>'))
     search_menu.post(event.x_root, event.y_root)
 
 
@@ -578,15 +640,25 @@ def select_range(event):
     event.widget.select_range("0", "end")
 
 
-search_entry.bind("<Control-KeyRelease-a>", lambda event: select_range(event))
-search_entry.bind("<Button-1>", lambda event: destroy_menu(event, search_menu))
-search_entry.bind("<Button-3>", lambda event: button_3_on_entry(event))
-search_entry.bind("<KeyRelease>", lambda event: search_func(event, search_entry))
+search_entry.bind(
+    "<Control-KeyRelease-a>", 
+    lambda event: select_range(event))
+search_entry.bind(
+    "<Button-1>", 
+    lambda event: destroy_menu(event, search_menu))
+search_entry.bind(
+    "<Button-3>", 
+    lambda event: button_3_on_entry(event))
+search_entry.bind(
+    "<KeyRelease>", 
+    lambda event: search_func(event, search_entry))
 
-category_label = tk.Label(master=entry_button_frame, text="Categories:", fg="red")
+category_label = tk.Label(master=entry_button_frame, 
+                          text="Categories:", fg="red")
 category_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
 
-rrating_label = tk.Label(master=entry_button_frame, text="Rodden Rating:", fg="red")
+rrating_label = tk.Label(master=entry_button_frame, 
+                         text="Rodden Rating:", fg="red")
 rrating_label.grid(row=3, column=0, padx=5, pady=5, sticky="w")
 
 
@@ -635,19 +707,29 @@ def select_ratings():
         cvar_list = []
         checkbutton_list = []
         check_all = tk.BooleanVar()
-        check_uncheck = tk.Checkbutton(master=rating_frame, text="Check/Uncheck All", variable=check_all)
+        check_uncheck = tk.Checkbutton(master=rating_frame, 
+                                       text="Check/Uncheck All", 
+                                       variable=check_all)
         check_all.set(False)
         check_uncheck.grid(row=0, column=0, sticky="nw")
-        for num, c in enumerate(["AA", "A", "B", "C", "DD", "X", "XX", "AX"], 1):
+        for num, c in enumerate(
+                ["AA", "A", "B", "C", "DD", "X", "XX", "AX"], 1):
             _rating_ = c
             cvar = tk.BooleanVar()
             cvar_list.append([cvar, _rating_])
-            checkbutton = tk.Checkbutton(master=rating_frame, text=_rating_, variable=cvar)
+            checkbutton = tk.Checkbutton(master=rating_frame, 
+                                         text=_rating_, variable=cvar)
             checkbutton_list.append(checkbutton)
             cvar.set(False)
             checkbutton.grid(row=num, column=0, sticky="nw")
-        tbutton.configure(command=lambda: tbutton_command(cvar_list, toplevel2, selected_ratings))
-        check_uncheck.configure(command=lambda: check_all_command(check_all, cvar_list, checkbutton_list))
+        tbutton.configure(
+            command=lambda: tbutton_command(cvar_list, 
+                                            toplevel2, 
+                                            selected_ratings))
+        check_uncheck.configure(
+            command=lambda: check_all_command(check_all, 
+                                              cvar_list, 
+                                              checkbutton_list))
 
 
 def select_categories():
@@ -669,47 +751,68 @@ def select_categories():
         button_frame.pack(side="bottom")
         tcanvas = tk.Canvas(master=canvas_frame)
         tframe = tk.Frame(master=tcanvas)
-        tscrollbar = tk.Scrollbar(master=canvas_frame, orient="vertical", command=tcanvas.yview)
+        tscrollbar = tk.Scrollbar(master=canvas_frame, 
+                                  orient="vertical", 
+                                  command=tcanvas.yview)
         tcanvas.configure(yscrollcommand=tscrollbar.set)
         tscrollbar.pack(side="right", fill="y")
         tcanvas.pack()
         tcanvas.create_window((4, 4), window=tframe, anchor="nw")
-        tframe.bind("<Configure>", lambda event: on_frame_configure(event, tcanvas))
+        tframe.bind(
+            "<Configure>", 
+            lambda event: on_frame_configure(event, tcanvas))
         tbutton = tk.Button(master=button_frame, text="Apply")
         tbutton.pack()
         cvar_list = []
         checkbutton_list = []
         check_all = tk.BooleanVar()
-        check_uncheck = tk.Checkbutton(master=tframe, text="Check/Uncheck All", variable=check_all)
+        check_uncheck = tk.Checkbutton(master=tframe, 
+                                       text="Check/Uncheck All", 
+                                       variable=check_all)
         check_all.set(False)
         check_uncheck.grid(row=0, column=0, sticky="nw")
         for num, _category_ in enumerate(category_names, 1):
             cvar = tk.BooleanVar()
             cvar_list.append([cvar, _category_])
-            checkbutton = tk.Checkbutton(master=tframe, text=_category_, variable=cvar)
+            checkbutton = tk.Checkbutton(master=tframe, 
+                                         text=_category_, 
+                                         variable=cvar)
             checkbutton_list.append(checkbutton)
             cvar.set(False)
             checkbutton.grid(row=num, column=0, sticky="nw")
             master.update()
         if record is False:
-            tbutton.configure(command=lambda: tbutton_command(cvar_list, toplevel1, selected_categories))
+            tbutton.configure(
+                command=lambda: tbutton_command(cvar_list, 
+                                                toplevel1, 
+                                                selected_categories))
         else:
-            tbutton.configure(command=lambda: tbutton_command(cvar_list, toplevel1, record_categories))
-        check_uncheck.configure(command=lambda: check_all_command(check_all, cvar_list, checkbutton_list))
+            tbutton.configure(
+                command=lambda: tbutton_command(cvar_list, 
+                                                toplevel1, 
+                                                record_categories))
+        check_uncheck.configure(
+            command=lambda: check_all_command(check_all, 
+                                              cvar_list, 
+                                              checkbutton_list))
         master.update()
 
 
-category_button = tk.Button(master=entry_button_frame, text="Select", command=select_categories)
+category_button = tk.Button(master=entry_button_frame, text="Select", 
+                            command=select_categories)
 category_button.grid(row=2, column=1, padx=5, pady=5)
 
-rating_button = tk.Button(master=entry_button_frame, text="Select", command=select_ratings)
+rating_button = tk.Button(master=entry_button_frame, text="Select", 
+                          command=select_ratings)
 rating_button.grid(row=3, column=1, padx=5, pady=5)
 
 
 def create_checkbutton():
     check_frame = tk.Frame(master=top_frame)
     check_frame.grid(row=0, column=2)
-    for i, j in enumerate(("event", "human", "male", "female", "North Hemisphere", "South Hemisphere")):
+    for i, j in enumerate(
+            ("event", "human", "male", "female", "North Hemisphere", 
+             "South Hemisphere")):
         _var_ = tk.StringVar()
         _var_.set(value="0")
         _checkbutton_ = tk.Checkbutton(
@@ -721,9 +824,12 @@ def create_checkbutton():
         yield _checkbutton_
 
 
-var_checkbutton_1, display_checkbutton_1, var_checkbutton_2, display_checkbutton_2, \
-    var_checkbutton_3, display_checkbutton_3, var_checkbutton_4, display_checkbutton_4, \
-    var_checkbutton_5, display_checkbutton_5, var_checkbutton_6, display_checkbutton_6 = create_checkbutton()
+var_checkbutton_1, display_checkbutton_1, \
+    var_checkbutton_2, display_checkbutton_2, \
+    var_checkbutton_3, display_checkbutton_3, \
+    var_checkbutton_4, display_checkbutton_4, \
+    var_checkbutton_5, display_checkbutton_5, \
+    var_checkbutton_6, display_checkbutton_6 = create_checkbutton()
 
 
 def insert_to_treeview(control_items, item):
@@ -781,39 +887,47 @@ def display_results():
     for c in all_categories:
         _category_ = list(c.keys())[0][1]
         if _category_ in selected_categories:
-            items = list(c.values())[0]
-            for item in items:
+            items_ = list(c.values())[0]
+            for item in items_:
                 if item[3] in selected_ratings:
                     if item in control_items:
                         pass
                     else:
-                        if var_checkbutton_1.get() == "0" and var_checkbutton_2.get() == "0":
+                        if var_checkbutton_1.get() == "0" and \
+                                var_checkbutton_2.get() == "0":
                             if item[0] == 3546 or item[0] == 68092:
                                 pass
                             else:
                                 male_female_check(control_items, item)
-                        elif var_checkbutton_1.get() == "1" and var_checkbutton_2.get() == "0":
+                        elif var_checkbutton_1.get() == "1" and \
+                                var_checkbutton_2.get() == "0":
                             if item[2] == "N/A":
                                 pass
                             elif item[0] == 3546:
                                 pass
                             else:
                                 male_female_check(control_items, item)
-                        elif var_checkbutton_1.get() == "0" and var_checkbutton_2.get() == "1":
+                        elif var_checkbutton_1.get() == "0" and \
+                                var_checkbutton_2.get() == "1":
                             if item[2] != "N/A" or item[0] == 68092:
                                 pass
                             else:
                                 south_north_check(control_items, item)
-                        elif var_checkbutton_1.get() == "1" and var_checkbutton_2.get() == "1":
+                        elif var_checkbutton_1.get() == "1" and \
+                                var_checkbutton_2.get() == "1":
                             pass
     info_var.set(len(displayed_results))
     master.update()
     if len(displayed_results) == 0:
-        msgbox.showinfo(title="Display Records", message="No record is inserted.")
+        msgbox.showinfo(title="Display Records", 
+                        message="No record is inserted.")
     elif len(displayed_results) == 1:
-        msgbox.showinfo(title="Display Records", message="1 record is inserted.")
+        msgbox.showinfo(title="Display Records", 
+                        message="1 record is inserted.")
     else:
-        msgbox.showinfo(title="Display Records", message=f"{len(displayed_results)} records are inserted.")
+        msgbox.showinfo(title="Display Records", 
+                        message=f"{len(displayed_results)} "
+                                "records are inserted.")
     master.update()
 
 
@@ -871,15 +985,18 @@ treeview.bind("<Control-a>", lambda event: select_all_tree(event))
 treeview.bind("<Button-1>", lambda event: destroy(event))
 treeview.bind("<Button-3>", lambda event: button_3_on_treeview(event))
 
-display_button = tk.Button(master=top_frame, text="Display Records", command=display_results)
+display_button = tk.Button(master=top_frame, text="Display Records", 
+                           command=display_results)
 display_button.grid(row=10, column=0, columnspan=4, pady=10)
 
 
 def x_scrollbar(y_scrl, _master_, _treeview_):
     y_scrl.configure(command=_treeview_.yview)
-    x_scrl = tk.Scrollbar(master=_master_, orient="horizontal", command=_treeview_.xview)
+    x_scrl = tk.Scrollbar(master=_master_, orient="horizontal", 
+                          command=_treeview_.xview)
     x_scrl.pack(side="top", fill="x")
-    _treeview_.configure(xscrollcommand=x_scrl.set, yscrollcommand=y_scrl.set)
+    _treeview_.configure(xscrollcommand=x_scrl.set, 
+                         yscrollcommand=y_scrl.set)
     return x_scrl
 
 
@@ -895,7 +1012,7 @@ info = tk.Label(master=info_frame, textvariable=info_var)
 info.grid(row=0, column=1)
 
 
-# --------------------------------------------- xlrd/xlwt ---------------------------------------------
+# --------------------------------xlrd/xlwt-------------------------------------
 
 
 conjunction = 6
@@ -953,7 +1070,8 @@ def get_excel_datas(sheet):
                 for col in range(sheet.ncols):
                     if col < 13:
                         datas.append(([row, col], sheet.cell_value(row, col)))
-                    elif (col == 13 and 216 < row < 398) or (col == 13 and 429 < row < 789):
+                    elif (col == 13 and 216 < row < 398) or \
+                            (col == 13 and 429 < row < 789):
                         datas.append(([row, col], sheet.cell_value(row, col)))
         elif selection == "chi-square" or selection == "effect-size":
             if row == 1:
@@ -972,8 +1090,8 @@ def get_excel_datas(sheet):
                     if "/" in i:
                         r3 = i
             elif row == 0 or row == 4 or row == 5 \
-                    or row in [i for i in range(230, 396, 15)] or row == 411 \
-                    or row == 427 \
+                    or row in [i for i in range(230, 396, 15)] \
+                    or row == 411 or row == 427 \
                     or row in [i for i in range(443, 609, 15)] \
                     or row in [i for i in range(624, 790, 15)]:
                 pass
@@ -981,7 +1099,8 @@ def get_excel_datas(sheet):
                 for col in range(sheet.ncols):
                     if col < 13:
                         datas.append(([row, col], sheet.cell_value(row, col)))
-                    elif (col == 13 and 216 < row < 398) or (col == 13 and 429 < row < 789):
+                    elif (col == 13 and 216 < row < 398) or \
+                            (col == 13 and 429 < row < 789):
                         datas.append(([row, col], sheet.cell_value(row, col)))
         elif selection == "observed":
             if row in [i for i in range(6)] \
@@ -994,7 +1113,8 @@ def get_excel_datas(sheet):
                 for col in range(sheet.ncols):
                     if col < 13:
                         datas.append(([row, col], sheet.cell_value(row, col)))
-                    elif (col == 13 and 216 < row < 398) or (col == 13 and 429 < row < 789):
+                    elif (col == 13 and 216 < row < 398) or \
+                            (col == 13 and 429 < row < 789):
                         datas.append(([row, col], sheet.cell_value(row, col)))
     return datas
 
@@ -1006,15 +1126,17 @@ def write_total_horz(sheet, num=7, col=13):
             sheet.write(
                 v + 1, col,
                 xlwt.Formula(
-                    f"SUM(B{v + 2};C{v + 2};D{v + 2};E{v + 2};F{v + 2};G{v + 2};H{v + 2};\
-                    I{v + 2};J{v + 2};K{v + 2};L{v + 2};M{v + 2})"),
+                    f"SUM(B{v + 2};C{v + 2};D{v + 2};E{v + 2};F{v + 2};\
+                    G{v + 2};H{v + 2};I{v + 2};J{v + 2};K{v + 2};L{v + 2};\
+                    M{v + 2})"),
                 style=style)
         elif col == 14:
             sheet.write(
                 v + 1, col,
                 xlwt.Formula(
-                    f"SUM(C{v + 2};D{v + 2};E{v + 2};F{v + 2};G{v + 2};H{v + 2};I{v + 2};\
-                    J{v + 2};K{v + 2};L{v + 2};M{v + 2};N{v + 2})"),
+                    f"SUM(C{v + 2};D{v + 2};E{v + 2};F{v + 2};G{v + 2};\
+                    H{v + 2};I{v + 2};J{v + 2};K{v + 2};L{v + 2};M{v + 2};\
+                    N{v + 2})"),
                 style=style)
 
 
@@ -1024,16 +1146,18 @@ def write_total_vert(sheet, num=7, col=1):
             sheet.write(
                 num + 11, __ + col,
                 xlwt.Formula(
-                    f"SUM({_}{num};{_}{num + 1};{_}{num + 2};{_}{num + 3};{_}{num + 4};{_}{num + 5};\
-                            {_}{num + 6};{_}{num + 7};{_}{num + 8};{_}{num + 9};{_}{num + 10};{_}{num + 11})"),
+                    f"SUM({_}{num};{_}{num + 1};{_}{num + 2};{_}{num + 3};\
+                    {_}{num + 4};{_}{num + 5};{_}{num + 6};{_}{num + 7};\
+                    {_}{num + 8};{_}{num + 9};{_}{num + 10};{_}{num + 11})"),
                 style=style)
     elif col == 2:
         for __, _ in enumerate("CDEFGHIJKLMNO"):
             sheet.write(
                 num + 11, __ + col,
                 xlwt.Formula(
-                    f"SUM({_}{num};{_}{num + 1};{_}{num + 2};{_}{num + 3};{_}{num + 4};{_}{num + 5};\
-                            {_}{num + 6};{_}{num + 7};{_}{num + 8};{_}{num + 9};{_}{num + 10};{_}{num + 11})"),
+                    f"SUM({_}{num};{_}{num + 1};{_}{num + 2};{_}{num + 3};\
+                    {_}{num + 4};{_}{num + 5};{_}{num + 6};{_}{num + 7};\
+                    {_}{num + 8};{_}{num + 9};{_}{num + 10};{_}{num + 11})"),
                 style=style)
 
 
@@ -1055,7 +1179,8 @@ def modify_category_names():
 
 def write_title(sheet, row, var_checkbutton, label):
     style.font = _font_(bold=True)
-    sheet.write_merge(r1=row, r2=row, c1=0, c2=1, label=f"{label}:", style=style)
+    sheet.write_merge(r1=row, r2=row, c1=0, c2=1, label=f"{label}:", 
+                      style=style)
     style.font = _font_(bold=False)
     if var_checkbutton.get() == "0":
         sheet.write(row, 2, label="True", style=style)
@@ -1065,77 +1190,110 @@ def write_title(sheet, row, var_checkbutton, label):
 
 def write_title_of_total(sheet):
     try:
-        record_name = f"{displayed_results[0][1].replace(' ', '_', displayed_results[0][1].count(' '))}"
+        dis_res = displayed_results[0][1]
+        record_name = f"{dis_res.replace(' ', '_', dis_res.count(' '))}"
     except IndexError:
         record_name = ""
     style.alignment = xlwt.Alignment()
-
     style.font = _font_(bold=True)
-    sheet.write_merge(r1=0, r2=0, c1=3, c2=4, label="Adb Version:", style=style)
+    sheet.write_merge(r1=0, r2=0, c1=3, c2=4, label="Adb Version:", 
+                      style=style)
     style.font = _font_(bold=False)
-    sheet.write_merge(r1=0, r2=0, c1=5, c2=13, label=f"{xml_file.replace('.xml', '')}", style=style)
-
-    write_title(sheet, row=0, var_checkbutton=var_checkbutton_1, label="Event")
-    write_title(sheet, row=1, var_checkbutton=var_checkbutton_2, label="Human")
-    write_title(sheet, row=2, var_checkbutton=var_checkbutton_3, label="Male")
-    write_title(sheet, row=3, var_checkbutton=var_checkbutton_4, label="Female")
-    write_title(sheet, row=4, var_checkbutton=var_checkbutton_5, label="North Hemisphere")
-    write_title(sheet, row=5, var_checkbutton=var_checkbutton_6, label="South Hemisphere")
-
+    sheet.write_merge(r1=0, r2=0, c1=5, c2=13, 
+                      label=f"{xml_file.replace('.xml', '')}", 
+                      style=style)
+    write_title(sheet, row=0, var_checkbutton=var_checkbutton_1, 
+                label="Event")
+    write_title(sheet, row=1, var_checkbutton=var_checkbutton_2, 
+                label="Human")
+    write_title(sheet, row=2, var_checkbutton=var_checkbutton_3, 
+                label="Male")
+    write_title(sheet, row=3, var_checkbutton=var_checkbutton_4, 
+                label="Female")
+    write_title(sheet, row=4, var_checkbutton=var_checkbutton_5, 
+                label="North Hemisphere")
+    write_title(sheet, row=5, var_checkbutton=var_checkbutton_6, 
+                label="South Hemisphere")
     style.font = _font_(bold=True)
     if selection == "observed":
-        sheet.write_merge(r1=1, r2=1, c1=3, c2=4, label="House System:", style=style)
+        sheet.write_merge(r1=1, r2=1, c1=3, c2=4, 
+                          label="House System:", style=style)
         style.font = _font_(bold=False)
-        sheet.write_merge(r1=1, r2=1, c1=5, c2=13, label=f"{house_systems[hsys]}", style=style)
+        sheet.write_merge(r1=1, r2=1, c1=5, c2=13, 
+                          label=f"{house_systems[hsys]}", style=style)
         style.font = _font_(bold=True)
         if len(displayed_results) == 1:
-            sheet.write_merge(r1=2, r2=2, c1=3, c2=4, label="Rodden Rating:", style=style)
+            sheet.write_merge(r1=2, r2=2, c1=3, c2=4, 
+                              label="Rodden Rating:", style=style)
             style.font = _font_(bold=False)
-            sheet.write_merge(r1=2, r2=2, c1=5, c2=13, label=f"{displayed_results[0][3]}", style=style)
+            sheet.write_merge(r1=2, r2=2, c1=5, c2=13, 
+                              label=f"{displayed_results[0][3]}", 
+                              style=style)
         else:
-            sheet.write_merge(r1=2, r2=2, c1=3, c2=4, label="Rodden Rating:", style=style)
+            sheet.write_merge(r1=2, r2=2, c1=3, c2=4, 
+                              label="Rodden Rating:", style=style)
             style.font = _font_(bold=False)
-            sheet.write_merge(r1=2, r2=2, c1=5, c2=13, label=f"{'+'.join(selected_ratings)}", style=style)
+            sheet.write_merge(r1=2, r2=2, c1=5, c2=13, 
+                              label=f"{'+'.join(selected_ratings)}", 
+                              style=style)
         style.font = _font_(bold=True)
         if len(selected_categories) == 1:
             if len(displayed_results) == 1:
-                sheet.write_merge(r1=3, r2=3, c1=3, c2=4, label="Category:", style=style)
+                sheet.write_merge(r1=3, r2=3, c1=3, c2=4, 
+                                  label="Category:", style=style)
                 style.font = _font_(bold=False)
-                sheet.write_merge(r1=3, r2=3, c1=5, c2=13, label=f"{record_name}", style=style)
+                sheet.write_merge(r1=3, r2=3, c1=5, c2=13, 
+                                  label=f"{record_name}", style=style)
             else:
-                sheet.write_merge(r1=3, r2=3, c1=3, c2=4, label="Category:", style=style)
+                sheet.write_merge(r1=3, r2=3, c1=3, c2=4, 
+                                  label="Category:", style=style)
                 style.font = _font_(bold=False)
-                sheet.write_merge(r1=3, r2=3, c1=5, c2=13,
-                                  label=f"{'/'.join(modify_category_names())}", style=style)
+                sheet.write_merge(
+                    r1=3, r2=3, c1=5, c2=13,
+                    label=f"{'/'.join(modify_category_names())}",
+                    style=style)
         else:
-            sheet.write_merge(r1=3, r2=3, c1=3, c2=4, label="Category:", style=style)
+            sheet.write_merge(r1=3, r2=3, c1=3, c2=4, 
+                              label="Category:", style=style)
             style.font = _font_(bold=False)
-            sheet.write_merge(r1=3, r2=3, c1=5, c2=13, label="Control_Group", style=style)
+            sheet.write_merge(r1=3, r2=3, c1=5, c2=13, 
+                              label="Control_Group", style=style)
     elif selection == "expected_values":
-        sheet.write_merge(r1=1, r2=1, c1=3, c2=4, label="House System:", style=style)
+        sheet.write_merge(r1=1, r2=1, c1=3, c2=4, 
+                          label="House System:", style=style)
         style.font = _font_(bold=False)
-        sheet.write_merge(r1=1, r2=1, c1=5, c2=13, label=f"{r1[:-3]}", style=style)
+        sheet.write_merge(r1=1, r2=1, c1=5, c2=13, 
+                          label=f"{r1[:-3]}", style=style)
         style.font = _font_(bold=True)
-        sheet.write_merge(r1=2, r2=2, c1=3, c2=4, label="Rodden Rating:", style=style)
+        sheet.write_merge(r1=2, r2=2, c1=3, c2=4, 
+                          label="Rodden Rating:", style=style)
         style.font = _font_(bold=False)
-        sheet.write_merge(r1=2, r2=2, c1=5, c2=13, label=f"{r2[:-3]}", style=style)
+        sheet.write_merge(r1=2, r2=2, c1=5, c2=13, 
+                          label=f"{r2[:-3]}", style=style)
         style.font = _font_(bold=True)
-        sheet.write_merge(r1=3, r2=3, c1=3, c2=4, label="Category:", style=style)
+        sheet.write_merge(r1=3, r2=3, c1=3, c2=4, 
+                          label="Category:", style=style)
         style.font = _font_(bold=False)
-        sheet.write_merge(r1=3, r2=3, c1=5, c2=13, label=f"{r3[:-3]}", style=style)
+        sheet.write_merge(r1=3, r2=3, c1=5, c2=13, 
+                          label=f"{r3[:-3]}", style=style)
     elif selection == "chi-square" or selection == "effect-size":
-        sheet.write_merge(r1=1, r2=1, c1=3, c2=4, label="House System:", style=style)
+        sheet.write_merge(r1=1, r2=1, c1=3, c2=4, 
+                          label="House System:", style=style)
         style.font = _font_(bold=False)
-        sheet.write_merge(r1=1, r2=1, c1=5, c2=13, label=f"{r1}", style=style)
+        sheet.write_merge(r1=1, r2=1, c1=5, c2=13, 
+                          label=f"{r1}", style=style)
         style.font = _font_(bold=True)
-        sheet.write_merge(r1=2, r2=2, c1=3, c2=4, label="Rodden Rating:", style=style)
+        sheet.write_merge(r1=2, r2=2, c1=3, c2=4, 
+                          label="Rodden Rating:", style=style)
         style.font = _font_(bold=False)
-        sheet.write_merge(r1=2, r2=2, c1=5, c2=13, label=f"{r2}", style=style)
+        sheet.write_merge(r1=2, r2=2, c1=5, c2=13, 
+                          label=f"{r2}", style=style)
         style.font = _font_(bold=True)
-        sheet.write_merge(r1=3, r2=3, c1=3, c2=4, label="Category:", style=style)
+        sheet.write_merge(r1=3, r2=3, c1=3, c2=4, 
+                          label="Category:", style=style)
         style.font = _font_(bold=False)
-        sheet.write_merge(r1=3, r2=3, c1=5, c2=13, label=f"{r3}", style=style)
-
+        sheet.write_merge(r1=3, r2=3, c1=5, c2=13, 
+                          label=f"{r3}", style=style)
     style.alignment = alignment
     style.font = _font_(bold=True)
     sheet.write(7, 13, "Total", style=style)
@@ -1152,9 +1310,24 @@ def write_title_of_total(sheet):
             sheet.write(217 + (i * 15), 14, "Total", style=style)
             sheet.write(430 + (i * 15), 14, "Total", style=style)
             sheet.write(611 + (i * 15), 14, "Total", style=style)
-            sheet.write_merge(r1=230 + (i * 15), r2=230 + (i * 15), c1=0, c2=1, label="Total", style=style)
-            sheet.write_merge(r1=443 + (i * 15), r2=443 + (i * 15), c1=0, c2=1, label="Total", style=style)
-            sheet.write_merge(r1=624 + (i * 15), r2=624 + (i * 15), c1=0, c2=1, label="Total", style=style)
+            sheet.write_merge(r1=230 + (i * 15), 
+                              r2=230 + (i * 15), 
+                              c1=0, 
+                              c2=1, 
+                              label="Total", 
+                              style=style)
+            sheet.write_merge(r1=443 + (i * 15), 
+                              r2=443 + (i * 15), 
+                              c1=0, 
+                              c2=1, 
+                              label="Total", 
+                              style=style)
+            sheet.write_merge(r1=624 + (i * 15), 
+                              r2=624 + (i * 15), 
+                              c1=0, 
+                              c2=1, 
+                              label="Total", 
+                              style=style)
     style.font = _font_(bold=False)
 
 
@@ -1189,21 +1362,29 @@ def special_cells(new_sheet, i):
     style.font = _font_(bold=True)
     if "Orb" in i[1]:
         style.alignment = xlwt.Alignment()
-        new_sheet.write_merge(r1=i[0][0], r2=i[0][0], c1=i[0][1], c2=i[0][1] + 2,
-                              label=i[1], style=style)
+        new_sheet.write_merge(r1=i[0][0], 
+                              r2=i[0][0], 
+                              c1=i[0][1], 
+                              c2=i[0][1] + 2,
+                              label=i[1], 
+                              style=style)
         style.alignment = alignment
     elif i[1] == "Traditional House Rulership":
         new_sheet.write_merge(r1=397, r2=397, c1=0, c2=13,
-                              label="Traditional House Rulership", style=style)
+                              label="Traditional House Rulership", 
+                              style=style)
     elif i[1] == "Modern House Rulership":
         new_sheet.write_merge(r1=413, r2=413, c1=0, c2=13,
-                              label="Modern House Rulership", style=style)
+                              label="Modern House Rulership", 
+                              style=style)
     elif i[1] == "Detailed Traditional House Rulership":
         new_sheet.write_merge(r1=429, r2=429, c1=0, c2=13,
-                              label="Detailed Traditional House Rulership", style=style)
+                              label="Detailed Traditional House Rulership", 
+                              style=style)
     elif i[1] == "Detailed Modern House Rulership":
         new_sheet.write_merge(r1=610, r2=610, c1=0, c2=13,
-                              label="Detailed Modern House Rulership", style=style)
+                              label="Detailed Modern House Rulership", 
+                              style=style)
     elif i[0][0] in [i for i in range(218, 394, 15)] and i[0][1] == 0:
         new_sheet.write_merge(r1=i[0][0], r2=i[0][0] + 11, c1=0, c2=0,
                               label=i[1], style=style)
@@ -1263,12 +1444,14 @@ def extract_aspects(planet, value, num=11):
         _planets_[f"{planet}"].append(value)
 
 
-def search_aspect(planet_pos, sheet, row: int, aspect: int, orb: int, name: str):
+def search_aspect(planet_pos, sheet, row: int, aspect: int, 
+                  orb: int, name: str):
     _row = row
     n_ = 1
     name_frmt = f"{name}: Orb Factor: +- {orb}"
     style.alignment = xlwt.Alignment()
-    sheet.write_merge(r1=_row - 2, r2=_row - 2, c1=0, c2=2, label=name_frmt, style=style)
+    sheet.write_merge(r1=_row - 2, r2=_row - 2, c1=0, c2=2, 
+                      label=name_frmt, style=style)
     style.alignment = alignment
     for i, j in enumerate(planet_pos):
         style.font = _font_(bold=True)
@@ -1321,8 +1504,9 @@ def search_aspect(planet_pos, sheet, row: int, aspect: int, orb: int, name: str)
 def sum_aspects(planet):
     for i, j in enumerate(planet):
         planet[i] = np.array(j)
-    new_list = list(planet[0] + planet[1] + planet[2] + planet[3] + planet[4] + planet[5] + planet[6] +
-                    planet[7] + planet[8] + planet[9] + planet[10])
+    new_list = list(planet[0] + planet[1] + planet[2] + planet[3] + 
+                    planet[4] + planet[5] + planet[6] + planet[7] + 
+                    planet[8] + planet[9] + planet[10])
     return [float(i) for i in new_list]
 
 
@@ -1339,12 +1523,20 @@ def detailed_traditional(sheet, row, label, rulership):
     for i in range(12):
         item2 = 0
         sheet.write_merge(
-            r1=row + 2 + item0 + item2, r2=row + 2 + item0 + item2 + 11, c1=0, c2=0,
-            label=f"Lord {item1 + 1}\nis", style=style)
+            r1=row + 2 + item0 + item2, 
+            r2=row + 2 + item0 + item2 + 11, 
+            c1=0, 
+            c2=0,
+            label=f"Lord {item1 + 1}\nis", 
+            style=style)
         for lord in lords:
             sheet.write_merge(
-                r1=row + 1 + item0, r2=row + 1 + item0, c1=item2 + 2, c2=item2 + 2,
-                label=f"House {item2 + 1}", style=style)
+                r1=row + 1 + item0, 
+                r2=row + 1 + item0, 
+                c1=item2 + 2, 
+                c2=item2 + 2,
+                label=f"House {item2 + 1}", 
+                style=style)
             sheet.write(
                 row + 2 + item0 + item2, 1,
                 label=lord, style=style)
@@ -1429,19 +1621,31 @@ def write_datas_to_excel(get_datas):
             else:
                 sheet.write(i + 36, k + 1, 0, style=style)
     style.font = _font_(bold=True)
-    search_aspect(planet_pos, sheet, row=51, aspect=0, orb=conjunction, name="Conjunction")
-    search_aspect(planet_pos, sheet, row=65, aspect=30, orb=semi_sextile, name="Semi-Sextile")
-    search_aspect(planet_pos, sheet, row=79, aspect=45, orb=semi_square, name="Semi-Square")
-    search_aspect(planet_pos, sheet, row=93, aspect=60, orb=sextile, name="Sextile")
-    search_aspect(planet_pos, sheet, row=107, aspect=72, orb=quintile, name="Quintile")
-    search_aspect(planet_pos, sheet, row=121, aspect=90, orb=square, name="Square")
-    search_aspect(planet_pos, sheet, row=135, aspect=120, orb=trine, name="Trine")
-    search_aspect(planet_pos, sheet, row=149, aspect=135, orb=sesquiquadrate, name="Sesquiquadrate")
-    search_aspect(planet_pos, sheet, row=163, aspect=144, orb=biquintile, name="BiQuintile")
-    search_aspect(planet_pos, sheet, row=177, aspect=150, orb=quincunx, name="Quincunx")
-    search_aspect(planet_pos, sheet, row=191, aspect=180, orb=opposite, name="Opposite")
+    search_aspect(planet_pos, sheet, row=51, aspect=0, 
+                  orb=conjunction, name="Conjunction")
+    search_aspect(planet_pos, sheet, row=65, aspect=30, 
+                  orb=semi_sextile, name="Semi-Sextile")
+    search_aspect(planet_pos, sheet, row=79, aspect=45, 
+                  orb=semi_square, name="Semi-Square")
+    search_aspect(planet_pos, sheet, row=93, aspect=60, 
+                  orb=sextile, name="Sextile")
+    search_aspect(planet_pos, sheet, row=107, aspect=72, 
+                  orb=quintile, name="Quintile")
+    search_aspect(planet_pos, sheet, row=121, aspect=90, 
+                  orb=square, name="Square")
+    search_aspect(planet_pos, sheet, row=135, aspect=120, 
+                  orb=trine, name="Trine")
+    search_aspect(planet_pos, sheet, row=149, aspect=135, 
+                  orb=sesquiquadrate, name="Sesquiquadrate")
+    search_aspect(planet_pos, sheet, row=163, aspect=144, 
+                  orb=biquintile, name="BiQuintile")
+    search_aspect(planet_pos, sheet, row=177, aspect=150, 
+                  orb=quincunx, name="Quincunx")
+    search_aspect(planet_pos, sheet, row=191, aspect=180, 
+                  orb=opposite, name="Opposite")
     style.alignment = xlwt.Alignment()
-    sheet.write_merge(r1=203, r2=203, c1=0, c2=2, label="All Aspects", style=style)
+    sheet.write_merge(r1=203, r2=203, c1=0, c2=2, 
+                      label="All Aspects", style=style)
     style.alignment = alignment
     for i, j in enumerate(planets):
         sheet.write(204 + i, i, j, style=style)
@@ -1490,12 +1694,15 @@ def write_datas_to_excel(get_datas):
         for j, k in enumerate(i):
             for num, sign in enumerate(signs):
                 if sign in k:
-                    sheet.write(217 + count + (j + 1), num + 2, 1, style=style)
+                    sheet.write(217 + count + (j + 1), num + 2, 1, 
+                                style=style)
                 else:
-                    sheet.write(217 + count + (j + 1), num + 2, 0, style=style)
+                    sheet.write(217 + count + (j + 1), num + 2, 0, 
+                                style=style)
         count += 15
     style.font = _font_(bold=True)
-    sheet.write_merge(r1=397, r2=397, c1=0, c2=13, label="Traditional House Rulership", style=style)
+    sheet.write_merge(r1=397, r2=397, c1=0, c2=13, 
+                      label="Traditional House Rulership", style=style)
     for i, j in enumerate(traditional_ruler):
         style.font = _font_(bold=True)
         sheet.write(398, i + 1, f"House {i + 1}", style=style)
@@ -1507,7 +1714,8 @@ def write_datas_to_excel(get_datas):
             else:
                 sheet.write(399 + i, k + 1, 0, style=style)
     style.font = _font_(bold=True)
-    sheet.write_merge(r1=413, r2=413, c1=0, c2=13, label="Modern House Rulership", style=style)
+    sheet.write_merge(r1=413, r2=413, c1=0, c2=13, 
+                      label="Modern House Rulership", style=style)
     for i, j in enumerate(modern_ruler):
         style.font = _font_(bold=True)
         sheet.write(414, i + 1, f"House {i + 1}", style=style)
@@ -1519,13 +1727,17 @@ def write_datas_to_excel(get_datas):
             else:
                 sheet.write(415 + i, k + 1, 0, style=style)
     style.font = _font_(bold=True)
-    detailed_traditional(sheet, row=429, label="Detailed Traditional House Rulership",
+    detailed_traditional(sheet, row=429, 
+                         label="Detailed Traditional House Rulership",
                          rulership=traditional_rulership.items())
-    detailed_traditional(sheet, row=610, label="Detailed Modern House Rulership",
+    detailed_traditional(sheet, row=610, 
+                         label="Detailed Modern House Rulership",
                          rulership=modern_rulership.items())
     style.font = _font_(bold=False)
-    detailed_values(sheet, lords=trad_lords, rulership=traditional_rulership, _row1=431, _row2=443)
-    detailed_values(sheet, lords=mode_lords, rulership=modern_rulership, _row1=612, _row2=624)
+    detailed_values(sheet, lords=trad_lords, 
+                    rulership=traditional_rulership, _row1=431, _row2=443)
+    detailed_values(sheet, lords=mode_lords, 
+                    rulership=modern_rulership, _row1=612, _row2=624)
     count = 0
     for i in os.listdir(os.getcwd()):
         if i.startswith("table"):
@@ -1551,45 +1763,91 @@ def check_dir_names(cat, dir1, orb_factor, criteria):
     if var_checkbutton_5.get() == "0" and var_checkbutton_6.get() == "0":
         return change_dir(cat, dir1, orb_factor, sub_dir=f"{criteria}")
     elif var_checkbutton_5.get() == "0" and var_checkbutton_6.get() == "1":
-        return change_dir(cat, dir1, orb_factor, sub_dir=os.path.join(f"{criteria}", "North"))
+        return change_dir(cat, 
+                          dir1, 
+                          orb_factor, 
+                          sub_dir=os.path.join(f"{criteria}", "North"))
     elif var_checkbutton_5.get() == "1" and var_checkbutton_6.get() == "0":
-        return change_dir(cat, dir1, orb_factor, sub_dir=os.path.join(f"{criteria}", "South"))
+        return change_dir(cat, 
+                          dir1, 
+                          orb_factor, 
+                          sub_dir=os.path.join(f"{criteria}", "South"))
 
 
 def dir_names(cat, dir1, orb_factor):
     if len(displayed_results) == 1:
-        return os.path.join(*cat, dir1, f"ORB_{'_'.join(orb_factor)}", f"{house_systems[hsys]}")
-    if var_checkbutton_1.get() == "0" and var_checkbutton_2.get() == "1":
-        return check_dir_names(cat, dir1, orb_factor, criteria="Event")
-    elif var_checkbutton_1.get() == "1" and var_checkbutton_2.get() == "0":
-        if var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "1":
-            return check_dir_names(cat, dir1, orb_factor, criteria="Male")
-        elif var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "0":
-            return check_dir_names(cat, dir1, orb_factor, criteria="Female")
-        elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "0":
-            return check_dir_names(cat, dir1, orb_factor, criteria="Human")
-    elif var_checkbutton_1.get() == "0" and var_checkbutton_2.get() == "0":
-        if var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "1":
-            return check_dir_names(cat, dir1, orb_factor, criteria="Male+Event")
-        elif var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "0":
-            return check_dir_names(cat, dir1, orb_factor, criteria="Female+Event")
-        elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "0":
-            return check_dir_names(cat, dir1, orb_factor, criteria="Human+Event")
-        elif var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "1":
-            return check_dir_names(cat, dir1, orb_factor, criteria="Event")
+        return os.path.join(*cat, 
+                            dir1, 
+                            f"ORB_{'_'.join(orb_factor)}", 
+                            f"{house_systems[hsys]}")
+    if var_checkbutton_1.get() == "0" and \
+            var_checkbutton_2.get() == "1":
+        return check_dir_names(cat, 
+                               dir1, 
+                               orb_factor, 
+                               criteria="Event")
+    elif var_checkbutton_1.get() == "1" and \
+            var_checkbutton_2.get() == "0":
+        if var_checkbutton_3.get() == "0" and \
+                var_checkbutton_4.get() == "1":
+            return check_dir_names(cat, 
+                                   dir1, 
+                                   orb_factor, 
+                                   criteria="Male")
+        elif var_checkbutton_3.get() == "1" and \
+                var_checkbutton_4.get() == "0":
+            return check_dir_names(cat, 
+                                   dir1, 
+                                   orb_factor, 
+                                   criteria="Female")
+        elif var_checkbutton_3.get() == "0" and \
+                var_checkbutton_4.get() == "0":
+            return check_dir_names(cat, 
+                                   dir1, 
+                                   orb_factor, 
+                                   criteria="Human")
+    elif var_checkbutton_1.get() == "0" and \
+            var_checkbutton_2.get() == "0":
+        if var_checkbutton_3.get() == "0" and \
+                var_checkbutton_4.get() == "1":
+            return check_dir_names(cat, 
+                                   dir1, 
+                                   orb_factor, 
+                                   criteria="Male+Event")
+        elif var_checkbutton_3.get() == "1" and \
+                var_checkbutton_4.get() == "0":
+            return check_dir_names(cat, 
+                                   dir1, 
+                                   orb_factor, 
+                                   criteria="Female+Event")
+        elif var_checkbutton_3.get() == "0" and \
+                var_checkbutton_4.get() == "0":
+            return check_dir_names(cat, 
+                                   dir1, 
+                                   orb_factor, 
+                                   criteria="Human+Event")
+        elif var_checkbutton_3.get() == "1" and \
+                var_checkbutton_4.get() == "1":
+            return check_dir_names(cat, 
+                                   dir1, 
+                                   orb_factor, 
+                                   criteria="Event")
 
 
 def find_observed_values():
     global selection, dir2
     selection = "observed"
     if len(displayed_results) == 0:
-        msgbox.showinfo(title="Find Observed Values", message=f"{len(displayed_results)} records selected.")
+        msgbox.showinfo(
+            title="Find Observed Values", 
+            message=f"{len(displayed_results)} records selected.")
     else:
         __size__ = len(displayed_results)
         __received__ = 0
         __now__ = time.time()
         pframe = tk.Frame(master=master)
-        pbar = Progressbar(master=pframe, orient="horizontal", length=200, mode="determinate")
+        pbar = Progressbar(master=pframe, orient="horizontal", length=200, 
+                           mode="determinate")
         pstring = tk.StringVar()
         plabel = tk.Label(master=pframe, textvariable=pstring)
         pframe.pack()
@@ -1610,15 +1868,20 @@ def find_observed_values():
             log.write(f"Orb Factor: {'_'.join(orb_factor)}\n")
             if len(selected_categories) == 1:
                 if len(displayed_results) == 1:
-                    log.write(f"Category: \
-{displayed_results[0][1].replace(' ', '_', displayed_results[0][1].count(' '))}\n\n")
+                    dis_res = displayed_results[0][1]
+                    cnt = dis_res.count(' ')
+                    dis_res = dis_res.replace(' ', '_', cnt)
+                    log.write(f"Category: {dis_res}\n\n")
                 else:
-                    log.write(f"Category: {'/'.join(modify_category_names())}\n\n")
+                    mod_cat_names = '/'.join(modify_category_names())
+                    log.write(f"Category: {mod_cat_names}\n\n")
             elif len(selected_categories) > 1:
                 log.write(f"Category: Control_Group\n\n")
-                criterias = ["Event", "Human", "Male", "Female", "North Hemisphere", "South Hemisphere"]
-                checkbuttons = [var_checkbutton_1, var_checkbutton_2, var_checkbutton_3,
-                                var_checkbutton_4, var_checkbutton_5, var_checkbutton_6]
+                criterias = ["Event", "Human", "Male", "Female", 
+                             "North Hemisphere", "South Hemisphere"]
+                checkbuttons = [var_checkbutton_1, var_checkbutton_2, 
+                                var_checkbutton_3, var_checkbutton_4, 
+                                var_checkbutton_5, var_checkbutton_6]
                 for i in range(6):
                     if checkbuttons[i].get() == "0":
                         log.write(f"{criterias[i]}: True\n")
@@ -1644,7 +1907,8 @@ def find_observed_values():
                     chart = Chart(julian_date, longitude, latitude)
                     write_datas_to_excel(chart.get_chart_data())
                 except BaseException as err:
-                    log.write(f"|{str(dt.now())[:-7]}| Error Type: {err}\n{' ' * 22}Record: {records}\n\n")
+                    log.write(f"|{str(dt.now())[:-7]}| Error Type: {err}\n"
+                              f"{' ' * 22}Record: {records}\n\n")
                     log.flush()
                 __received__ += 1
                 if __received__ != __size__:
@@ -1652,8 +1916,10 @@ def find_observed_values():
                     pbar["maximum"] = __size__
                     pstring.set("{} %, {} minutes remaining.".format(
                         int(100 * __received__ / __size__),
-                        round((int(__size__ / (__received__ / (time.time() - __now__))) - int(
-                            time.time() - __now__)) / 60)))
+                        round(
+                            (int(__size__ /
+                                 (__received__ / (time.time() - __now__)))
+                             - int(time.time() - __now__)) / 60)))
                 else:
                     pframe.destroy()
                     pbar.destroy()
@@ -1663,7 +1929,10 @@ def find_observed_values():
                         dir1 = f"RR_{'+'.join(selected_ratings)}"
                         if len(selected_categories) == 1:
                             if len(displayed_results) == 1:
-                                cat = [displayed_results[0][1].replace(" ", "_", displayed_results[0][1].count(" "))]
+                                dis_res = displayed_results[0][1]
+                                cnt = dis_res.count(" ")
+                                dis_res = dis_res.replace(" ", "_", cnt)
+                                cat = [dis_res]
                                 dir1 = f"RR_{displayed_results[0][3]}"
                             else:
                                 cat = modify_category_names()
@@ -1673,18 +1942,26 @@ def find_observed_values():
                             dir2 = dir_names(cat, dir1, orb_factor)
                         try:
                             os.makedirs(dir2)
-                            shutil.move(src=os.path.join(os.getcwd(), "observed_values.xlsx"),
-                                        dst=os.path.join(os.getcwd(), dir2, "observed_values.xlsx"))
+                            shutil.move(
+                                src=os.path.join(os.getcwd(),
+                                                 "observed_values.xlsx"),
+                                dst=os.path.join(os.getcwd(),
+                                                 dir2,
+                                                 "observed_values.xlsx"))
                         except FileExistsError as err:
-                            log.write(f"|{str(dt.now())[:-7]}| Error Type: {err}\n\n")
+                            log.write(
+                                f"|{str(dt.now())[:-7]}| "
+                                f"Error Type: {err}\n\n")
                             log.flush()
                     except FileNotFoundError:
                         pass
                     master.update()
                     log.write(f"|{str(dt.now())[:-7]}| Process finished.")
-                    shutil.move(src=os.path.join(os.getcwd(), "output.log"),
-                                dst=os.path.join(os.getcwd(), dir2, "output.log"))
-                    msgbox.showinfo(title="Find Observed Values", message="Process finished successfully.")
+                    shutil.move(
+                        src=os.path.join(os.getcwd(), "output.log"),
+                        dst=os.path.join(os.getcwd(), dir2, "output.log"))
+                    msgbox.showinfo(title="Find Observed Values",
+                                    message="Process finished successfully.")
 
 
 def sum_of_row(table):
@@ -1706,12 +1983,14 @@ def calculate(file_name_1, file_name_2, table_name, msg_title):
         read_file_1 = xlrd.open_workbook(file_name_1)
     except FileNotFoundError:
         msgbox.showinfo(title=f"Find {msg_title} Values",
-                        message=f"No such file or directory: '{file_name_1}.xlsx'")
+                        message=f"No such file or directory: "
+                                f"'{file_name_1}.xlsx'")
     try:
         read_file_2 = xlrd.open_workbook(file_name_2)
     except FileNotFoundError:
         msgbox.showinfo(title=f"Find {msg_title} Values",
-                        message=f"No such file or directory: '{file_name_2}.xlsx'")
+                        message=f"No such file or directory: "
+                                f"'{file_name_2}.xlsx'")
     if read_file_1 is not None and read_file_2 is not None:
         sheet_1 = read_file_1.sheet_by_name("Sheet1")
         sheet_2 = read_file_2.sheet_by_name("Sheet1")
@@ -1732,17 +2011,27 @@ def calculate(file_name_1, file_name_2, table_name, msg_title):
                                 if selection == "expected_values":
                                     if method is False:
                                         # Sjoerd's method
-                                        new_sheet.write(*i[0], i[1] * ratio, style=style)
+                                        new_sheet.write(
+                                            *i[0],
+                                            i[1] * ratio,
+                                            style=style)
                                     elif method is True:
                                         # Flavia's method
                                         new_sheet.write(
                                             *i[0],
-                                            sum_of_row(data_2) * (i[1] + j[1]) / sum_of_all,
+                                            sum_of_row(data_2) *
+                                            (i[1] + j[1]) / sum_of_all,
                                             style=style)
                                 elif selection == "chi-square":
-                                    new_sheet.write(*i[0], (i[1] - j[1]) ** 2 / j[1], style=style)
+                                    new_sheet.write(
+                                        *i[0], 
+                                        (i[1] - j[1]) ** 2 / j[1], 
+                                        style=style)
                                 elif selection == "effect-size":
-                                    new_sheet.write(*i[0], i[1] / j[1], style=style)
+                                    new_sheet.write(
+                                        *i[0],
+                                        i[1] / j[1],
+                                        style=style)
                             except ZeroDivisionError:
                                 new_sheet.write(*i[0], 0, style=style)
                         else:
@@ -1757,7 +2046,8 @@ def calculate(file_name_1, file_name_2, table_name, msg_title):
                         control_list.append(j[0])
         save_file(new_file, new_sheet, table_name, file_name_1, file_name_2)
         master.update()
-        msgbox.showinfo(title=f"Find {msg_title} Values", message="Process finished successfully.")
+        msgbox.showinfo(title=f"Find {msg_title} Values", 
+                        message="Process finished successfully.")
 
 
 def find_expected_values():
@@ -1787,7 +2077,7 @@ def find_effect_size_values():
     )
 
 
-# --------------------------------------------- main ---------------------------------------------
+# ----------------------------------main ---------------------------------------
 
 
 add_or_edit = False
@@ -1827,7 +2117,8 @@ def main():
 
     def change_orb_factors(parent, orb_entries):
         global conjunction, semi_sextile, semi_square, sextile
-        global quintile, square, trine, sesquiquadrate, biquintile, quincunx, opposite
+        global quintile, square, trine, sesquiquadrate, biquintile
+        global quincunx, opposite
         conjunction = int(orb_entries[0].get())
         semi_sextile = int(orb_entries[1].get())
         semi_square = int(orb_entries[2].get())
@@ -1845,10 +2136,12 @@ def main():
         toplevel3 = tk.Toplevel()
         toplevel3.title("Orb Factor")
         toplevel3.resizable(width=False, height=False)
-        aspects = ["Conjunction", "Semi-Sextile", "Semi-Square", "Sextile", "Quintile",
-                   "Square", "Trine", "Sesquiquadrate", "BiQuintile", "Quincunx", "Opposite"]
-        default_orbs = [conjunction, semi_sextile, semi_square, sextile, quintile,
-                        square, trine, sesquiquadrate, biquintile, quincunx, opposite]
+        aspects = ["Conjunction", "Semi-Sextile", "Semi-Square", 
+                   "Sextile", "Quintile", "Square", "Trine", 
+                   "Sesquiquadrate", "BiQuintile", "Quincunx", "Opposite"]
+        default_orbs = [conjunction, semi_sextile, semi_square, sextile, 
+                        quintile, square, trine, sesquiquadrate, biquintile, 
+                        quincunx, opposite]
         orb_entries = []
         for i, j in enumerate(aspects):
             aspect_label = tk.Label(master=toplevel3, text=f"{j}")
@@ -1859,8 +2152,11 @@ def main():
             orb_entry.grid(row=i, column=2)
             orb_entry.insert(0, default_orbs[i])
             orb_entries.append(orb_entry)
-        apply_button = tk.Button(master=toplevel3, text="Apply",
-                                 command=lambda: change_orb_factors(parent=toplevel3, orb_entries=orb_entries))
+        apply_button = tk.Button(
+            master=toplevel3, 
+            text="Apply",
+            command=lambda: change_orb_factors(parent=toplevel3, 
+                                               orb_entries=orb_entries))
         apply_button.grid(row=11, column=0, columnspan=3)
 
     def change_hsys(parent, checkbuttons, _house_systems_):
@@ -1911,19 +2207,33 @@ def main():
             _checkbutton_.grid(row=i, column=0, sticky="w")
             checkbuttons[j] = [_checkbutton_, _var_]
         checkbuttons["Placidus"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, _house_systems_, "Placidus"))
+            command=lambda: check_uncheck(checkbuttons, 
+                                          _house_systems_, 
+                                          "Placidus"))
         checkbuttons["Koch"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, _house_systems_, "Koch"))
+            command=lambda: check_uncheck(checkbuttons, 
+                                          _house_systems_, 
+                                          "Koch"))
         checkbuttons["Porphyrius"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, _house_systems_, "Porphyrius"))
+            command=lambda: check_uncheck(checkbuttons, 
+                                          _house_systems_, 
+                                          "Porphyrius"))
         checkbuttons["Regiomontanus"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, _house_systems_, "Regiomontanus"))
+            command=lambda: check_uncheck(checkbuttons, 
+                                          _house_systems_, 
+                                          "Regiomontanus"))
         checkbuttons["Campanus"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, _house_systems_, "Campanus"))
+            command=lambda: check_uncheck(checkbuttons, 
+                                          _house_systems_, 
+                                          "Campanus"))
         checkbuttons["Equal"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, _house_systems_, "Equal"))
+            command=lambda: check_uncheck(checkbuttons, 
+                                          _house_systems_, 
+                                          "Equal"))
         checkbuttons["Whole Signs"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, _house_systems_, "Whole Signs"))
+            command=lambda: check_uncheck(checkbuttons, 
+                                          _house_systems_, 
+                                          "Whole Signs"))
         apply_button = tk.Button(master=button_frame, text="Apply",
                                  command=lambda: change_hsys(
                                      parent=toplevel4,
@@ -1935,11 +2245,17 @@ def main():
         with open("links.txt", "w", encoding="utf-8") as f:
             for i, j in enumerate(displayed_results):
                 f.write(f"{i + 1}. {j[12]}\n")
-        msgbox.showinfo(title="Export Links", message=f"{len(displayed_results)} links were exported.")
+        msgbox.showinfo(
+            title="Export Links", 
+            message=f"{len(displayed_results)} links were exported.")
 
     def export_lat_frequency():
-        latitude_freq_north = {f"{i}\u00b0 - {i + 1}\u00b0": [] for i in range(90)}
-        latitude_freq_south = {f"{-i}\u00b0 - {-i - 1}\u00b0": [] for i in range(90)}
+        latitude_freq_north = {
+            f"{i}\u00b0 - {i + 1}\u00b0": [] for i in range(90)
+        }
+        latitude_freq_south = {
+            f"{-i}\u00b0 - {-i - 1}\u00b0": [] for i in range(90)
+        }
         latitudes = []
         for item in displayed_results:
             latitude = item[7]
@@ -1953,33 +2269,49 @@ def main():
         for i in latitudes:
             for j in range(90):
                 if j <= i < j + 1:
-                    latitude_freq_north[f"{j}\u00b0 - {j + 1}\u00b0"].append(i)
+                    latitude_freq_north[
+                        f"{j}\u00b0 - {j + 1}\u00b0"].append(i)
                 elif -j - 1 <= i < -j:
-                    latitude_freq_south[f"{-j}\u00b0 - {-j - 1}\u00b0"].append(i)
+                    latitude_freq_south[
+                        f"{-j}\u00b0 - {-j - 1}\u00b0"].append(i)
         edit_latitude_freq_north = {
-            keys: len(values) for keys, values in latitude_freq_north.items() if len(values) != 0}
+            keys: len(values)
+            for keys, values in latitude_freq_north.items()
+            if len(values) != 0
+        }
         edit_latitude_freq_south = {
-            keys: len(values) for keys, values in latitude_freq_south.items() if len(values) != 0}
-        with open("latitude-frequency.txt", "w", encoding="utf-8") as f:
+            keys: len(values)
+            for keys, values in latitude_freq_south.items()
+            if len(values) != 0
+        }
+        with open("latitude-frequency.txt", "w",
+                  encoding="utf-8") as f:
             f.write("Latitude Intervals\n\n")
             for i, j in edit_latitude_freq_south.items():
                 f.write(f"{i} = {j}\n")
             for i, j in edit_latitude_freq_north.items():
                 f.write(f"{i} = {j}\n")
-            f.write(f"\nMean Latitude = {dd_to_dms(sum(latitudes) / len(latitudes))}\n")
+            f.write(f"\nMean Latitude = "
+                    f"{dd_to_dms(sum(latitudes) / len(latitudes))}\n")
             f.write(f"\nTotal = {len(displayed_results)}")
-            msgbox.showinfo(title="Export Latitude Frequency",
-                            message=f"{len(displayed_results)} records were exported.")
+            msgbox.showinfo(
+                title="Export Latitude Frequency",
+                message=f"{len(displayed_results)} "
+                        f"records were exported.")
 
     def year_frequency_command(parent, date_entries, years):
         min_, max_, step_ = date_entries[:]
-        min_, max_, step_ = int(min_.get()), int(max_.get()), int(step_.get())
+        min_, max_, step_ = int(min_.get()), int(max_.get()), \
+            int(step_.get())
         freq_frmt[0], freq_frmt[1], freq_frmt[2] = min_, max_, step_
         with open("year-frequency.txt", "w", encoding="utf-8") as f:
             year_dict = dict()
             count = 0
             for i in range(min_, max_, step_):
-                year_dict[(min_ + (count * step_), min_ + (count * step_) + step_)] = []
+                year_dict[
+                    (min_ + (count * step_),
+                     min_ + (count * step_) + step_)
+                ] = []
                 count += 1
             for i in years:
                 for keys, values in year_dict.items():
@@ -1989,8 +2321,10 @@ def main():
                 f.write(f"{keys} = {len(values)}\n")
             f.write(f"Total = {len(displayed_results)}")
             parent.destroy()
-            msgbox.showinfo(title="Export Year Frequency",
-                            message=f"{len(displayed_results)} records were exported.")
+            msgbox.showinfo(
+                title="Export Year Frequency",
+                message=f"{len(displayed_results)} "
+                        f"records were exported.")
 
     def export_year_frequency():
         toplevel5 = tk.Toplevel()
@@ -2002,7 +2336,8 @@ def main():
         date_entries = []
         years = [int(i[4].split(" ")[2]) for i in displayed_results]
         if len(years) != 0:
-            freq_frmt[0], freq_frmt[1], freq_frmt[2] = min(years), max(years), 100
+            freq_frmt[0], freq_frmt[1], freq_frmt[2] = \
+                min(years), max(years), 100
         for i, j in enumerate(("Minimum", "Maximum", "Step")):
             date_label = tk.Label(master=t5frame, text=j)
             date_label.grid(row=i, column=0, sticky="w")
@@ -2010,22 +2345,30 @@ def main():
             date_entry.grid(row=i, column=1, sticky="w")
             date_entry.insert("1", f"{freq_frmt[i]}")
             date_entries.append(date_entry)
-        apply_button = tk.Button(master=t5frame, text="Apply",
-                                 command=lambda: year_frequency_command(
-                                     parent=toplevel5, date_entries=date_entries, years=years))
+        apply_button = tk.Button(
+            master=t5frame,
+            text="Apply",
+            command=lambda: year_frequency_command(
+                parent=toplevel5,
+                date_entries=date_entries,
+                years=years)
+        )
         apply_button.grid(row=3, column=0, columnspan=3)
 
     def callback(event, url):
         webbrowser.open_new(url)
 
-    def from_local_to_utc(year, month, day, hour, minute, _lat, _lon):
+    def from_local_to_utc(year, month, day, hour, minute,
+                          _lat, _lon):
         nominatim = Nominatim()
         location = nominatim.reverse([_lat, _lon])[0]
         tzw = tzwhere.tzwhere()
         timezone = tzw.tzNameAt(_lat, _lon)
         local_zone = tz.gettz(timezone)
         utc_zone = tz.gettz("UTC")
-        global_time = dt.strptime(f"{year}-{month}-{day} {hour}:{minute}:00", "%Y-%m-%d %H:%M:%S")
+        global_time = dt.strptime(
+            f"{year}-{month}-{day} {hour}:{minute}:00",
+            "%Y-%m-%d %H:%M:%S")
         local_time = global_time.replace(tzinfo=local_zone)
         utc_time = local_time.astimezone(utc_zone)
         if location.split(", ")[0].isnumeric():
@@ -2044,7 +2387,10 @@ def main():
             swe.GREG_CAL
         )
         deltat = swe.deltat(julday_)
-        return {"JD": round(julday_ + deltat, 6), "TT": round(deltat * 86400, 1)}
+        return {
+            "JD": round(julday_ + deltat, 6),
+            "TT": round(deltat * 86400, 1)
+        }
 
     def add(cat_entry, listbox, list_box):
         global record_categories
@@ -2085,66 +2431,171 @@ def main():
     def delete_(event, lb):
         delete(lb)
 
-    def widget(_entries_, _listboxes_, _option_menu_, list_box, _frame, text, width, row1, col1, row2, col2):
+    def widget(_entries_, _listboxes_, _option_menu_, list_box,
+               _frame, text, width, row1, col1, row2, col2):
         label = tk.Label(master=_frame, text=text, fg="red")
         if text == "Gender":
             label.grid(row=row1, column=col1, columnspan=3)
             menu_var = tk.StringVar()
-            gender_menu = tk.OptionMenu(_frame, menu_var, "M", "F", "N/A")
+            gender_menu = tk.OptionMenu(_frame,
+                                        menu_var, "M", "F", "N/A")
             gender_menu.grid(row=row2, column=col2)
             _option_menu_.append(menu_var)
         elif text == "Add Category":
             label.grid(row=row1, column=col1, columnspan=3)
-            cat_button = tk.Button(master=_frame, text="Select", width=10, command=cat_cmd)
+            cat_button = tk.Button(master=_frame, text="Select",
+                                   width=10, command=cat_cmd)
             cat_button.grid(row=1, column=0, columnspan=3)
             cat_entry = tk.Entry(master=_frame)
             cat_entry.grid(row=2, column=0, columnspan=3)
-            cat_entry.bind("<Control-KeyRelease-a>", lambda event: select_range(event))
-            cat_entry.bind("<Button-1>", lambda event: destroy_menu(event, search_menu))
-            cat_entry.bind("<Button-3>", lambda event: button_3_on_entry(event))
+            cat_entry.bind(
+                "<Control-KeyRelease-a>",
+                lambda event: select_range(event))
+            cat_entry.bind(
+                "<Button-1>",
+                lambda event: destroy_menu(event, search_menu))
+            cat_entry.bind(
+                "<Button-3>",
+                lambda event: button_3_on_entry(event))
             _option_menu_.append(cat_entry)
             lbox_frame = tk.Frame(master=_frame)
             lbox_frame.grid(row=4, column=0, columnspan=3)
-            listbox = tk.Listbox(master=lbox_frame, width=50, selectmode="extended")
+            listbox = tk.Listbox(master=lbox_frame, width=50,
+                                 selectmode="extended")
             listbox.pack(side="left")
-            listbox.bind("<Delete>", lambda event: delete_(event, listbox))
-            listbox.bind("<Control-a>", lambda event: select_set(event))
-            listbox.bind("<Button-1>", lambda event: destroy_menu(event, listbox_menu))
-            listbox.bind("<Button-3>", lambda event: button_3_on_listbox(event, listbox))
-            lbox_y_sbar = tk.Scrollbar(master=lbox_frame, orient="vertical", command=listbox.yview)
+            listbox.bind(
+                "<Delete>",
+                lambda event: delete_(event, listbox))
+            listbox.bind(
+                "<Control-a>",
+                lambda event: select_set(event))
+            listbox.bind(
+                "<Button-1>",
+                lambda event: destroy_menu(event, listbox_menu))
+            listbox.bind(
+                "<Button-3>",
+                lambda event: button_3_on_listbox(event, listbox))
+            lbox_y_sbar = tk.Scrollbar(master=lbox_frame,
+                                       orient="vertical",
+                                       command=listbox.yview)
             lbox_y_sbar.pack(side="left", fill="y")
             listbox.configure(yscrollcommand=lbox_y_sbar.set)
-            _add_button = tk.Button(master=_frame, text="Add", command=lambda: add(cat_entry, listbox, list_box))
+            _add_button = tk.Button(
+                master=_frame,
+                text="Add",
+                command=lambda: add(cat_entry, listbox, list_box))
             _add_button.grid(row=3, column=0, columnspan=3)
             _listboxes_.append(listbox)
         elif text == "Rodden Rating":
             label.grid(row=row1, column=col1)
             menu_var = tk.StringVar()
-            rodden_menu = tk.OptionMenu(_frame, menu_var, "AA", "A", "B", "C", "DD", "X", "XX", "AX")
+            rodden_menu = tk.OptionMenu(
+                _frame,
+                menu_var,
+                "AA",
+                "A",
+                "B",
+                "C",
+                "DD",
+                "X",
+                "XX",
+                "AX")
             rodden_menu.grid(row=row2, column=col2)
             _option_menu_.append(menu_var)
         else:
             entry = tk.Entry(master=_frame, width=width)
             entry.grid(row=row2, column=col2)
-            entry.bind("<Control-KeyRelease-a>", lambda event: select_range(event))
-            entry.bind("<Button-1>", lambda event: destroy_menu(event, search_menu))
-            entry.bind("<Button-3>", lambda event: button_3_on_entry(event))
+            entry.bind(
+                "<Control-KeyRelease-a>",
+                lambda event: select_range(event))
+            entry.bind(
+                "<Button-1>",
+                lambda event: destroy_menu(event, search_menu))
+            entry.bind(
+                "<Button-3>",
+                lambda event: button_3_on_entry(event))
             _entries_.append(entry)
             label.grid(row=row1, column=col1)
         master.update()
 
     def widgets(entries, listboxes, option_menu, list_box, frames):
-        widget(entries, listboxes, option_menu, list_box, frames[0], "Name", 28, row1=0, col1=0, row2=1, col2=0)
-        widget(entries, listboxes, option_menu, list_box, frames[1], "Gender", 28, row1=0, col1=0, row2=1, col2=0)
-        widget(entries, listboxes, option_menu, list_box, frames[2], "Rodden Rating", 28, row1=0, col1=0, row2=1, col2=0)
-        widget(entries, listboxes, option_menu, list_box, frames[3], "Day", 2, row1=0, col1=0, row2=1, col2=0)
-        widget(entries, listboxes, option_menu, list_box, frames[3], "Month", 2, row1=0, col1=1, row2=1, col2=1)
-        widget(entries, listboxes, option_menu, list_box, frames[3], "Year", 4, row1=0, col1=2, row2=1, col2=2)
-        widget(entries, listboxes, option_menu, list_box, frames[4], "Hour", 2, row1=0, col1=0, row2=1, col2=0)
-        widget(entries, listboxes, option_menu, list_box, frames[4], "Minute", 2, row1=0, col1=1, row2=1, col2=1)
-        widget(entries, listboxes, option_menu, list_box, frames[5], "Latitude", 10, row1=0, col1=0, row2=1, col2=0)
-        widget(entries, listboxes, option_menu, list_box, frames[5], "Longitude", 10, row1=0, col1=1, row2=1, col2=1)
-        widget(entries, listboxes, option_menu, list_box, frames[6], "Add Category", 28, row1=0, col1=0, row2=1, col2=0)
+        widget(
+            entries,
+            listboxes,
+            option_menu,
+            list_box,
+            frames[0],
+            "Name", 28, row1=0, col1=0, row2=1, col2=0)
+        widget(
+            entries,
+            listboxes,
+            option_menu,
+            list_box,
+            frames[1],
+            "Gender", 28, row1=0, col1=0, row2=1, col2=0)
+        widget(
+            entries,
+            listboxes,
+            option_menu,
+            list_box,
+            frames[2],
+            "Rodden Rating", 28, row1=0, col1=0, row2=1, col2=0)
+        widget(
+            entries,
+            listboxes,
+            option_menu,
+            list_box,
+            frames[3],
+            "Day", 2, row1=0, col1=0, row2=1, col2=0)
+        widget(
+            entries,
+            listboxes,
+            option_menu,
+            list_box,
+            frames[3],
+            "Month", 2, row1=0, col1=1, row2=1, col2=1)
+        widget(
+            entries,
+            listboxes,
+            option_menu,
+            list_box,
+            frames[3],
+            "Year", 4, row1=0, col1=2, row2=1, col2=2)
+        widget(
+            entries,
+            listboxes,
+            option_menu,
+            list_box,
+            frames[4],
+            "Hour", 2, row1=0, col1=0, row2=1, col2=0)
+        widget(
+            entries,
+            listboxes,
+            option_menu,
+            list_box,
+            frames[4],
+            "Minute", 2, row1=0, col1=1, row2=1, col2=1)
+        widget(
+            entries,
+            listboxes,
+            option_menu,
+            list_box,
+            frames[5],
+            "Latitude", 10, row1=0, col1=0, row2=1, col2=0)
+        widget(
+            entries,
+            listboxes,
+            option_menu,
+            list_box,
+            frames[5],
+            "Longitude", 10, row1=0, col1=1, row2=1, col2=1)
+        widget(
+            entries,
+            listboxes,
+            option_menu,
+            list_box,
+            frames[6],
+            "Add Category", 28, row1=0, col1=0, row2=1, col2=0)
 
     def create_frames(toplevel):
         for i in range(8):
@@ -2153,7 +2604,8 @@ def main():
             master.update()
             yield frame
 
-    def get_record_data(toplevel, _treeview_, entries, option_menu, listboxes, list_box, data):
+    def get_record_data(toplevel, _treeview_, entries, option_menu, 
+                        listboxes, list_box, data):
         global add_or_edit, edit_or_search, modify_name
         name = entries[0].get()
         if option_menu[0].get() == "M":
@@ -2174,9 +2626,11 @@ def main():
             date = dt.strptime(f"{year} {month} {day}", "%Y %m %d")
             _country_ = ""
             try:
-                utc_hour, utc_minute, utc_second, _place, country_ = from_local_to_utc(
-                    year, month, day, hour, minute, _latitude_, _longitude_)
-                jd = julday(int(year), int(month), int(day), int(utc_hour), int(utc_minute), int(utc_second))["JD"]
+                utc_hour, utc_minute, utc_second, _place, country_ = \
+                    from_local_to_utc(year, month, day, hour, minute, 
+                                      _latitude_, _longitude_)
+                jd = julday(int(year), int(month), int(day), int(utc_hour), 
+                            int(utc_minute), int(utc_second))["JD"]
                 latitude, longitude = "", ""
                 if _latitude_ < 0:
                     _latitude_ *= -1
@@ -2210,7 +2664,9 @@ def main():
                 else:
                     now = dt.now()
                     now_frmt = now.strftime("%d %B %Y %H:%M")
-                    select_from_data = [list(_) for _ in cursor.execute("SELECT * FROM DATA")]
+                    select_from_data = [
+                        list(_) for _ in cursor.execute("SELECT * FROM DATA")
+                    ]
                     if add_or_edit is True:
                         no = data[0]
                     else:
@@ -2218,12 +2674,14 @@ def main():
                     lb = listboxes[0].get("0", "end")
                     if len(list_box) > 1:
                         _record_data = [
-                            no, now_frmt, "-", name, _gender, rr, date.strftime("%d %B %Y"), f"{hour}:{minute}",
+                            no, now_frmt, "-", name, _gender, rr, 
+                            date.strftime("%d %B %Y"), f"{hour}:{minute}",
                             jd, latitude, _latitude_, longitude, _longitude_,
                             _place, _country_, "-", "|".join(lb)]
                     else:
                         _record_data = [
-                            no, now_frmt, "-", name, _gender, rr, date.strftime("%d %B %Y"), f"{hour}:{minute}",
+                            no, now_frmt, "-", name, _gender, rr, 
+                            date.strftime("%d %B %Y"), f"{hour}:{minute}",
                             jd, latitude, _latitude_, longitude, _longitude_,
                             _place, _country_, "-", "".join(lb)]
                     toplevel.destroy()
@@ -2240,9 +2698,12 @@ def main():
                                 if j < 3:
                                     pass
                                 else:
-                                    cursor.execute(f"UPDATE DATA SET {names[j]} = ? WHERE no = ?",
-                                                   (_record_data[j], no))
-                            modify = _record_data[:10] + [_record_data[11]] + _record_data[13:]
+                                    cursor.execute(
+                                        f"UPDATE DATA SET {names[j]} = ? "
+                                        f"WHERE no = ?",
+                                        (_record_data[j], no))
+                            modify = _record_data[:10] + \
+                                [_record_data[11]] + _record_data[13:]
                             for i in cursor.execute("SELECT * FROM DATA"):
                                 if modify[0] == i[0]:
                                     modify[1] = i[1]
@@ -2252,7 +2713,9 @@ def main():
                                 pass
                         else:
                             cursor.execute(
-                                f"INSERT INTO DATA VALUES({', '.join('?' * len(_record_data))})", _record_data)
+                                f"INSERT INTO DATA VALUES("
+                                f"{', '.join('?' * len(_record_data))})",
+                                _record_data)
                             modify = _record_data
                             modify.pop(10)
                             modify.pop(11)
@@ -2264,7 +2727,8 @@ def main():
                         connect.commit()
                     else:
                         msg = "This record is also stored in the database."
-                        msgbox.showinfo(title="Create New Record", message=f"Error: {msg}")
+                        msgbox.showinfo(title="Create New Record", 
+                                        message=f"Error: {msg}")
                         master.update()
             except BaseException:
                 traceback.print_exc(file=sys.stdout)
@@ -2288,19 +2752,34 @@ def main():
     def add_record():
         global add_or_edit
         add_or_edit = False
-        toplevel, frames, entries, listboxes, list_box, option_menu = record_panel(text="Add Record")
+        toplevel, frames, entries, listboxes, list_box, option_menu = \
+            record_panel(text="Add Record")
         if len(treeviews) != 0:
-            add_record_button = tk.Button(master=frames[7], text="Apply",
-                                          command=lambda: get_record_data(
-                                              toplevel, treeviews[0], entries, option_menu, listboxes,
-                                              list_box, data=None))
+            add_record_button = tk.Button(
+                master=frames[7], 
+                text="Apply",
+                command=lambda: get_record_data(toplevel, 
+                                                treeviews[0], 
+                                                entries, 
+                                                option_menu, 
+                                                listboxes,
+                                                list_box, 
+                                                data=None))
         else:
-            add_record_button = tk.Button(master=frames[7], text="Apply",
-                                          command=lambda: get_record_data(
-                                              toplevel, None, entries, option_menu, listboxes, list_box, data=None))
+            add_record_button = tk.Button(
+                master=frames[7], 
+                text="Apply",
+                command=lambda: get_record_data(toplevel, 
+                                                None, 
+                                                entries, 
+                                                option_menu, 
+                                                listboxes, 
+                                                list_box, 
+                                                data=None))
         add_record_button.grid(row=0, column=0)
 
-    def create_panel(entries, data, listboxes, list_box, option_menu, frames, toplevel, _treeview_):
+    def create_panel(entries, data, listboxes, list_box, 
+                     option_menu, frames, toplevel, _treeview_):
         entries[0].insert("end", data[3])
         date = dt.strptime(f"{data[6]} {data[7]}", "%d %B %Y %H:%M")
         date_frmt = date.strftime("%d %m %Y %H %M")
@@ -2324,9 +2803,17 @@ def main():
         option_menu[0].set(data[4])
         option_menu[1].set(data[5])
         master.update()
-        add_record_button = tk.Button(master=frames[7], text="Apply",
-                                      command=lambda: get_record_data(
-                                          toplevel, _treeview_, entries, option_menu, listboxes, list_box, data))
+        add_record_button = tk.Button(
+            master=frames[7], 
+            text="Apply",
+            command=lambda: get_record_data(
+                toplevel,
+                _treeview_,
+                entries,
+                option_menu,
+                listboxes,
+                list_box,
+                data))
         add_record_button.grid(row=0, column=0)
 
     def edit_record(_treeview_):
@@ -2336,14 +2823,15 @@ def main():
         if not focused:
             pass
         else:
-            toplevel, frames, entries, listboxes, list_box, option_menu = record_panel(text="Edit Record")
+            toplevel, frames, entries, listboxes, list_box, option_menu = \
+                record_panel(text="Edit Record")
             data = _treeview_.item(focused)["values"]
-            create_panel(entries, data, listboxes, list_box, option_menu, frames, toplevel, _treeview_)
+            create_panel(entries, data, listboxes, list_box, option_menu, 
+                         frames, toplevel, _treeview_)
 
     def delete_record(_treeview_):
         focused = _treeview_.focus()
         no = _treeview_.item(focused)["values"][0]
-        cat = _treeview_.item(focused)["values"][-1]
         cursor.execute("DELETE FROM DATA WHERE no = ?", (no,))
         connect.commit()
         for i in _treeview_.get_children():
@@ -2378,11 +2866,13 @@ def main():
             if search_entry_.get() == _record_[1]:
                 for item in _treeview_.get_children():
                     if _treeview_.item(item)["values"][3] == _record_[1]:
-                        toplevel, frames, entries, listboxes, list_box, option_menu = record_panel(text="Edit Record")
+                        toplevel, frames, entries, listboxes, list_box, \
+                            option_menu = record_panel(text="Edit Record")
                         data = _treeview_.item(item)["values"]
                         items.append(item)
                         edit_or_search = True
-                        create_panel(entries, data, listboxes, list_box, option_menu, frames, toplevel, _treeview_)
+                        create_panel(entries, data, listboxes, list_box, 
+                                     option_menu, frames, toplevel, _treeview_)
                         break
                 break
 
@@ -2394,26 +2884,35 @@ def main():
         toplevel7.title("Edit Records")
         toplevel7.geometry("800x600")
         toplevel7.resizable(width=False, height=False)
-        search_label_ = tk.Label(master=toplevel7, text="Search A Record By Name", fg="red")
+        search_label_ = tk.Label(master=toplevel7, 
+                                 text="Search A Record By Name", fg="red")
         search_label_.pack()
         search_entry_ = tk.Entry(master=toplevel7)
         search_entry_.pack()
         columns_2 = ["No", "Add Date"] + columns_1
         y_scrollbar_2 = tk.Scrollbar(master=toplevel7, orient="vertical")
         y_scrollbar_2.pack(side="right", fill="y")
-        _treeview_ = create_treeview(_master_=toplevel7, columns=columns_2, height=26)
+        _treeview_ = create_treeview(_master_=toplevel7, columns=columns_2, 
+                                     height=26)
         if _treeview_ not in treeviews:
             treeviews.append(_treeview_)
-        x_scrollbar(y_scrl=y_scrollbar_2, _master_=toplevel7, _treeview_=_treeview_)
+        x_scrollbar(y_scrl=y_scrollbar_2, _master_=toplevel7, 
+                    _treeview_=_treeview_)
         for i, j in enumerate(cursor.execute("SELECT * FROM DATA")):
             modify = [col for col in j]
             modify.pop(10)
             modify.pop(11)
             _treeview_.insert("", i, values=modify)
             master.update()
-        _treeview_.bind("<Button-3>", lambda event: button_3_on_treeview_(event, _treeview_))
-        _treeview_.bind("<Button-1>", lambda event: destroy(event))
-        search_entry_.bind("<KeyRelease>", lambda event: search_record(event, search_entry_, _treeview_))
+        _treeview_.bind(
+            "<Button-3>", 
+            lambda event: button_3_on_treeview_(event, _treeview_))
+        _treeview_.bind(
+            "<Button-1>", 
+            lambda event: destroy(event))
+        search_entry_.bind(
+            "<KeyRelease>", 
+            lambda event: search_record(event, search_entry_, _treeview_))
         master.update()
 
     def about():
@@ -2423,43 +2922,63 @@ def main():
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
         update_date, _update_date = "Update Date:", "02 April 2019"
-        developed_by, _developed_by = "Developed By:", "Tanberk Celalettin Kutlu"
-        thanks_to, _thanks_to = "Special Thanks To:", "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
+        developed_by, _developed_by = "Developed By:", \
+            "Tanberk Celalettin Kutlu"
+        thanks_to, _thanks_to = "Special Thanks To:", \
+            "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
         contact, _contact = "Contact:", "tckutlu@gmail.com"
-        github, _github = "GitHub:", "https://github.com/dildeolupbiten/TkAstroDb"
+        github, _github = "GitHub:", \
+            "https://github.com/dildeolupbiten/TkAstroDb"
         tframe1 = tk.Frame(master=toplevel8, bd="2", relief="groove")
         tframe1.pack(fill="both")
         tframe2 = tk.Frame(master=toplevel8)
         tframe2.pack(fill="both")
         tlabel_title = tk.Label(master=tframe1, text=name, font="Arial 25")
         tlabel_title.pack()
-        for i, j in enumerate((version, build_date, update_date, developed_by, thanks_to, contact, github)):
-            tlabel_info_1 = tk.Label(master=tframe2, text=j, font="Arial 12", fg="red")
+        for i, j in enumerate((version, build_date, update_date, 
+                               developed_by, thanks_to, contact, github)):
+            tlabel_info_1 = tk.Label(master=tframe2, text=j, 
+                                     font="Arial 12", fg="red")
             tlabel_info_1.grid(row=i, column=0, sticky="w")
-        for i, j in enumerate((_version, _build_date, _update_date, _developed_by, _thanks_to, _contact, _github)):
+        for i, j in enumerate((_version, _build_date, _update_date, 
+                               _developed_by, _thanks_to, _contact, _github)):
             if j == _github:
-                tlabel_info_2 = tk.Label(master=tframe2, text=j, font="Arial 12", fg="blue", cursor="hand2")
+                tlabel_info_2 = tk.Label(master=tframe2, text=j, 
+                                         font="Arial 12", fg="blue", 
+                                         cursor="hand2")
                 url1 = "https://github.com/dildeolupbiten/TkAstroDb"
-                tlabel_info_2.bind("<Button-1>", lambda event: callback(event, url1))
+                tlabel_info_2.bind(
+                    "<Button-1>", 
+                    lambda event: callback(event, url1))
             elif j == _contact:
-                tlabel_info_2 = tk.Label(master=tframe2, text=j, font="Arial 12", fg="blue", cursor="hand2")
+                tlabel_info_2 = tk.Label(master=tframe2, text=j, 
+                                         font="Arial 12", fg="blue", 
+                                         cursor="hand2")
                 url2 = "mailto://tckutlu@gmail.com"
-                tlabel_info_2.bind("<Button-1>", lambda event: callback(event, url2))
+                tlabel_info_2.bind(
+                    "<Button-1>", 
+                    lambda event: callback(event, url2))
             else:
-                tlabel_info_2 = tk.Label(master=tframe2, text=j, font="Arial 12")
+                tlabel_info_2 = tk.Label(master=tframe2, text=j, 
+                                         font="Arial 12")
             tlabel_info_2.grid(row=i, column=1, sticky="w")
 
     def update():
-        url_1 = "https://raw.githubusercontent.com/dildeolupbiten/TkAstroDb/master/TkAstroDb.py"
-        url_2 = "https://raw.githubusercontent.com/dildeolupbiten/TkAstroDb/master/README.md"
-        data_1 = urllib.urlopen(url=url_1, context=ssl.SSLContext(ssl.PROTOCOL_SSLv23))
-        data_2 = urllib.urlopen(url=url_2, context=ssl.SSLContext(ssl.PROTOCOL_SSLv23))
+        url_1 = "https://raw.githubusercontent.com/dildeolupbiten/"\
+                "TkAstroDb/master/TkAstroDb.py"
+        url_2 = "https://raw.githubusercontent.com/dildeolupbiten/"\
+                "TkAstroDb/master/README.md"
+        data_1 = urllib.urlopen(url=url_1, 
+                                context=ssl.SSLContext(ssl.PROTOCOL_SSLv23))
+        data_2 = urllib.urlopen(url=url_2, 
+                                context=ssl.SSLContext(ssl.PROTOCOL_SSLv23))
         with open("TkAstroDb.py", "r", encoding="utf-8") as f:
             var_1 = [i.decode("utf-8") for i in data_1]
             var_2 = [i.decode("utf-8") for i in data_2]
             var_3 = [i for i in f]
             if var_1 == var_3:
-                msgbox.showinfo(title="Update", message="Program is up-to-date.")
+                msgbox.showinfo(title="Update", 
+                                message="Program is up-to-date.")
             else:
                 with open("README.md", "w", encoding="utf-8") as g:
                     for i in var_2:
@@ -2469,7 +2988,8 @@ def main():
                     for i in var_1:
                         h.write(i)
                         h.flush()
-                    msgbox.showinfo(title="Update", message="Program is updated.")
+                    msgbox.showinfo(title="Update", 
+                                    message="Program is updated.")
                     if os.name == "posix":
                         import signal
                         os.kill(os.getpid(), signal.SIGKILL)
@@ -2493,26 +3013,41 @@ def main():
 
     method_menu = tk.Menu(master=calculations_menu, tearoff=False)
 
-    calculations_menu.add_command(label="Find Observed Values", command=func1)
-    calculations_menu.add_cascade(label="Find Expected Values", menu=method_menu)
-    calculations_menu.add_command(label="Find Chi-Square Values", command=func3)
-    calculations_menu.add_command(label="Find Effect Size Values", command=func4)
+    calculations_menu.add_command(label="Find Observed Values", 
+                                  command=func1)
+    calculations_menu.add_cascade(label="Find Expected Values", 
+                                  menu=method_menu)
+    calculations_menu.add_command(label="Find Chi-Square Values", 
+                                  command=func3)
+    calculations_menu.add_command(label="Find Effect Size Values", 
+                                  command=func4)
 
-    method_menu.add_command(label="Flavia's method", command=set_method_to_true)
-    method_menu.add_command(label="Sjoerd's method", command=set_method_to_false)
+    method_menu.add_command(label="Flavia's method", 
+                            command=set_method_to_true)
+    method_menu.add_command(label="Sjoerd's method", 
+                            command=set_method_to_false)
 
-    export_menu.add_command(label="Adb Links", command=export_link)
-    export_menu.add_command(label="Latitude Frequency", command=export_lat_frequency)
-    export_menu.add_command(label="Year Frequency", command=export_year_frequency)
+    export_menu.add_command(label="Adb Links", 
+                            command=export_link)
+    export_menu.add_command(label="Latitude Frequency", 
+                            command=export_lat_frequency)
+    export_menu.add_command(label="Year Frequency", 
+                            command=export_year_frequency)
 
-    options_menu.add_command(label="House System", command=create_hsys_checkbuttons)
-    options_menu.add_command(label="Orb Factor", command=choose_orb_factor)
+    options_menu.add_command(label="House System", 
+                             command=create_hsys_checkbuttons)
+    options_menu.add_command(label="Orb Factor", 
+                             command=choose_orb_factor)
 
-    records_menu.add_command(label="Add New Record", command=add_record)
-    records_menu.add_command(label="Edit & Delete Records", command=edit_and_delete)
+    records_menu.add_command(label="Add New Record", 
+                             command=add_record)
+    records_menu.add_command(label="Edit & Delete Records", 
+                             command=edit_and_delete)
 
-    help_menu.add_command(label="About", command=about)
-    help_menu.add_command(label="Check for Updates", command=update)
+    help_menu.add_command(label="About", 
+                          command=about)
+    help_menu.add_command(label="Check for Updates", 
+                          command=update)
 
     t0 = threading.Thread(target=master.mainloop)
     t0.run()
