@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.3.4"
+__version__ = "1.3.5"
 
 import os
 import sys
@@ -195,7 +195,7 @@ def merge_databases():
         
 def group_categories():
     global category_names
-    category_names = []
+    category_names, all_categories = [], []
     for _i_ in range(5000):
         _records_ = []
         category_groups = {}
@@ -2841,11 +2841,19 @@ def main():
             data = _treeview_.item(focused)["values"]
             create_panel(entries, data, listboxes, list_box, option_menu, 
                          frames, toplevel, _treeview_)
+            record = _treeview_.item(focused)["values"][:]
+            for i in database:
+                if record[3] == i[1]:
+                    database.remove(i)
 
     def delete_record(_treeview_):
         focused = _treeview_.focus()
         no = _treeview_.item(focused)["values"][0]
         cursor.execute("DELETE FROM DATA WHERE no = ?", (no,))
+        record = _treeview_.item(focused)["values"][:]
+        for i in database:
+            if record[3] == i[1]:
+                database.remove(i)
         connect.commit()
         for i in _treeview_.get_children():
             _treeview_.delete(i)
@@ -2926,6 +2934,13 @@ def main():
         search_entry_.bind(
             "<KeyRelease>", 
             lambda event: search_record(event, search_entry_, _treeview_))
+        master.update()
+        
+    def reload_database():
+        merge_databases()
+        group_categories()
+        msgbox.showinfo(title="Reload Database", 
+                        message=f"Database is reloaded.")
         master.update()
 
     def about():
@@ -3056,7 +3071,8 @@ def main():
                              command=add_record)
     records_menu.add_command(label="Edit & Delete Records", 
                              command=edit_and_delete)
-
+    records_menu.add_command(label="Reload Database", 
+                             command=reload_database)
     help_menu.add_command(label="About", 
                           command=about)
     help_menu.add_command(label="Check for Updates", 
