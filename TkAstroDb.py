@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.3.3"
+__version__ = "1.3.4"
 
 import os
 import sys
@@ -2050,6 +2050,9 @@ def calculate(file_name_1, file_name_2, table_name, msg_title):
 
 
 def find_expected_values():
+    global r1, r2, r3, _r1, _r2, _r3
+    r1, r2, r3 = "", "", ""
+    _r1, _r2, _r3 = [], [], []
     calculate(
         file_name_1="control_group",
         file_name_2="observed_values",
@@ -2059,6 +2062,9 @@ def find_expected_values():
 
 
 def find_chi_square_values():
+    global r1, r2, r3, _r1, _r2, _r3
+    r1, r2, r3 = "", "", ""
+    _r1, _r2, _r3 = [], [], []
     calculate(
         file_name_1="observed_values",
         file_name_2="expected_values",
@@ -2068,6 +2074,9 @@ def find_chi_square_values():
 
 
 def find_effect_size_values():
+    global r1, r2, r3, _r1, _r2, _r3
+    r1, r2, r3 = "", "", ""
+    _r1, _r2, _r3 = [], [], []
     calculate(
         file_name_1="observed_values",
         file_name_2="expected_values",
@@ -2922,7 +2931,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "02 April 2019"
+        update_date, _update_date = "Update Date:", "03 April 2019"
         developed_by, _developed_by = "Developed By:", \
             "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", \
