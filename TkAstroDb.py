@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.3.5"
+__version__ = "1.3.6"
 
 import os
 import sys
@@ -38,7 +38,26 @@ try:
     from countryinfo import CountryInfo
 except ModuleNotFoundError:
     os.system("pip3 install countryinfo")
-    from countryinfo import CountryInfo
+    if os.name == "nt":
+        import site
+        sitepackages = site.getsitepackages()[-1]
+        if "countryinfo" in os.listdir(sitepackages):
+            path = os.path.join(sitepackages, "countryinfo")
+            package_file = "countryinfo.py"
+            package_path = os.path.join(path, package_file)
+        script_code = []
+        with open(file=package_path, mode="r+", encoding="utf-8") as f:
+            readlines = f.readlines()
+            for i in readlines:
+                script_code.append(i)
+        if "country_info = json.load(open(file_path))" in script_code[29]:
+            script_code[29] = script_code[29].replace(
+                "file_path", 
+                "file_path, encoding='utf-8'")
+        with open(file=package_path, mode="w+", encoding="utf-8") as f:
+            for i in script_code:
+                f.write(i)
+        from countryinfo import CountryInfo
 try:
     import numpy as np
 except ModuleNotFoundError:
@@ -194,7 +213,7 @@ def merge_databases():
         
         
 def group_categories():
-    global category_names
+    global category_names, all_categories
     category_names, all_categories = [], []
     for _i_ in range(5000):
         _records_ = []
