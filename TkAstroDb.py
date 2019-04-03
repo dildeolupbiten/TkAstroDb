@@ -111,7 +111,7 @@ for _i in os.listdir(os.getcwd()):
 if xml_file.count("xml") == 1:
     tree = xml.etree.ElementTree.parse(f"{xml_file}")
     root = tree.getroot()
-    for _i in range(1000000):
+    for _i in range(10):
         try:
             user_data = []
             for gender, roddenrating, bdata, adb_link, categories in zip(
@@ -2050,9 +2050,6 @@ def calculate(file_name_1, file_name_2, table_name, msg_title):
 
 
 def find_expected_values():
-    global r1, r2, r3, _r1, _r2, _r3
-    r1, r2, r3 = "", "", ""
-    _r1, _r2, _r3 = [], [], []
     calculate(
         file_name_1="control_group",
         file_name_2="observed_values",
@@ -2062,9 +2059,6 @@ def find_expected_values():
 
 
 def find_chi_square_values():
-    global r1, r2, r3, _r1, _r2, _r3
-    r1, r2, r3 = "", "", ""
-    _r1, _r2, _r3 = [], [], []
     calculate(
         file_name_1="observed_values",
         file_name_2="expected_values",
@@ -2074,9 +2068,6 @@ def find_chi_square_values():
 
 
 def find_effect_size_values():
-    global r1, r2, r3, _r1, _r2, _r3
-    r1, r2, r3 = "", "", ""
-    _r1, _r2, _r3 = [], [], []
     calculate(
         file_name_1="observed_values",
         file_name_2="expected_values",
@@ -2098,18 +2089,30 @@ def main():
     freq_frmt = [0, 2000, 100]
 
     def func1():
+        global r1, r2, r3, _r1, _r2, _r3
+        r1, r2, r3 = "", "", ""
+        _r1, _r2, _r3 = [], [], []
         t1 = threading.Thread(target=find_observed_values)
         t1.start()
 
     def func2():
+        global r1, r2, r3, _r1, _r2, _r3
+        r1, r2, r3 = "", "", ""
+        _r1, _r2, _r3 = [], [], []
         t2 = threading.Thread(target=find_expected_values)
         t2.start()
 
     def func3():
+        global r1, r2, r3, _r1, _r2, _r3
+        r1, r2, r3 = "", "", ""
+        _r1, _r2, _r3 = [], [], []
         t3 = threading.Thread(target=find_chi_square_values)
         t3.start()
 
     def func4():
+        global r1, r2, r3, _r1, _r2, _r3
+        r1, r2, r3 = "", "", ""
+        _r1, _r2, _r3 = [], [], []
         t4 = threading.Thread(target=find_effect_size_values)
         t4.start()
 
