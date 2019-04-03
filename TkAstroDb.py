@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.3.5"
+__version__ = "1.3.6"
 
 import os
 import sys
@@ -57,7 +57,7 @@ except ModuleNotFoundError:
             with open(file=package_path, mode="w+", encoding="utf-8") as f:
                 for i in script_code:
                     f.write(i)
-        from countryinfo import CountryInfo
+    from countryinfo import CountryInfo
 try:
     import numpy as np
 except ModuleNotFoundError:
