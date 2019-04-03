@@ -93,26 +93,6 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img12](https://user-images.githubusercontent.com/29302909/55292729-f93b8b00-53f6-11e9-9c81-1b69f6f2789f.png)
 
-The encoding of Windows is [cp1252](https://en.wikipedia.org/wiki/Windows-1252) while the encoding of Unix is [utf-8](https://en.wikipedia.org/wiki/UTF-8). That's why in Windows non-ASCII characters give an [UnicodeDecodeError](https://wiki.python.org/moin/UnicodeDecodeError). When users try to add a new record to the new database users will receive [UnicodeDecodeError](https://wiki.python.org/moin/UnicodeDecodeError) if the place that is found via latitude and longitude values, contains non-ASCII characters. This error occurs because of the codes of the [countryinfo](https://pypi.org/project/countryinfo/) library. That's why users should manually change some parts of [countryinfo](https://pypi.org/project/countryinfo/) library to avoid from this problem.
-
-What users should do is simple:
-
-1. Go to Python's site-packages library folder. For example, if Python3.6 or Python3.7 is installed on Program Files directory, users should go to below path:
-
-       C:\Program Files\Python36\Lib\site-packages\countryinfo
-
-2. Open the **countryinfo.py** script file.
-
-3. Go to the 30'th line, the below codes on this line should be seen:
-
-                country_info = json.load(open(file_path))
-
-4. Replace the above code with below code:
-
-                country_info = json.load(open(file_path, encoding="utf-8"))
-
-5. Save and exit the script file. Now users no longer get an [UnicodeDecodeError](https://wiki.python.org/moin/UnicodeDecodeError) because of non-ASCII characters.
-
 **13.** After added new records to an alternative [SQL](https://www.sqlite.org/index.html) database which name is **TkAstroDb.db**, users should restart the main program to make the added records active or they select the **Reload Database** option. After activated the records if users click the **Select** button which is near the **Categories** label, the newly defined category can be seen.
 
 ![img13](https://user-images.githubusercontent.com/29302909/55161277-2fb6a300-5176-11e9-8d0c-db32a4ac623e.png)
