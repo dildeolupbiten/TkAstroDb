@@ -47,7 +47,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **Note:** When the program first run in Windows, users will get a [PermissionError](https://docs.python.org/3/library/exceptions.html#PermissionError)  during the installation of [Pyswisseph](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyswisseph) library unless they run **cmd** as Administrator.
 
-**2.** Users should see a window after 10-15 minutes which is similar to below. 
+**2.** Users should see a window after 10-15 minutes which is similar to below.  (Note: Waiting time depends whether the xml file is in **TkAstroDb** folder or how many records does [SQL](https://www.sqlite.org/index.html) database include.) 
 
 ![img1](https://user-images.githubusercontent.com/29302909/55158048-09d9d000-516f-11e9-8c2d-3a86a1a537f7.png)
 
