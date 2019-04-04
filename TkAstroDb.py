@@ -2881,18 +2881,18 @@ def main():
             data = _treeview_.item(focused)["values"]
             create_panel(entries, data, listboxes, list_box, option_menu, 
                          frames, toplevel, _treeview_)
-            record = _treeview_.item(focused)["values"][:]
+            _record_ = _treeview_.item(focused)["values"][:]
             for i in database:
-                if record[3] == i[1]:
+                if _record_[3] == i[1]:
                     database.remove(i)
 
     def delete_record(_treeview_):
         focused = _treeview_.focus()
         no = _treeview_.item(focused)["values"][0]
         cursor.execute("DELETE FROM DATA WHERE no = ?", (no,))
-        record = _treeview_.item(focused)["values"][:]
+        _record_ = _treeview_.item(focused)["values"][:]
         for i in database:
-            if record[3] == i[1]:
+            if _record_[3] == i[1]:
                 database.remove(i)
         connect.commit()
         for i in _treeview_.get_children():
