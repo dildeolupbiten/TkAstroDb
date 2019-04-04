@@ -2275,7 +2275,7 @@ def main():
         if len(displayed_results) > 0:
             with open(file="links.txt", mode="w", encoding="utf-8") as f:
                 for i, j in enumerate(displayed_results):
-                    f.write(f"{i + 1}. {j[12]}\n")
+                    f.write(f"{i + 1}. {j[11]}\n")
             msgbox.showinfo(
                 title="Export Links",
                 message=f"{len(displayed_results)} links were exported.")
