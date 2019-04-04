@@ -2762,6 +2762,9 @@ def main():
                                 _treeview_.insert("", no - 1, values=modify)
                             except:
                                 pass
+                            msgbox.showinfo(
+                                title="Edit New Record", 
+                                message="Record is edited.")
                         else:
                             cursor.execute(
                                 f"INSERT INTO DATA VALUES("
@@ -2774,6 +2777,10 @@ def main():
                                 _treeview_.insert("", no - 1, values=modify)
                             except:
                                 pass
+                            msgbox.showinfo(
+                                title="Add New Record", 
+                                message="Record is added.")
+                        master.update()
                         modify_name = modify[-1]
                         connect.commit()
                     else:
