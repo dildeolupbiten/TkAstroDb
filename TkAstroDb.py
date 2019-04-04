@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.3.7"
+__version__ = "1.3.8"
 
 import os
 import sys
@@ -2430,13 +2430,24 @@ def main():
             loc, location.split(", ")[-1]
 
     def julday(year, month, day, hour, minute, second):
-        julday_ = swe.julday(
-            year,
-            month,
-            day,
-            hour + (minute / 60) + (second / 3600),
-            swe.GREG_CAL
-        )
+        time1 = dt.strptime(f"{day}.{month}.{year}", "%d.%m.%Y")
+        time2 = time2 = dt.strptime("15.10.1582", "%d.%m.%Y")
+        if (time2 - time1).days > 0:
+            julday_ = swe.julday(
+                year,
+                month,
+                day,
+                hour + (minute / 60) + (second / 3600),
+                swe.JUL_CAL
+            )
+        elif (time2 - time1).days < 0:
+            julday_ = swe.julday(
+                year,
+                month,
+                day,
+                hour + (minute / 60) + (second / 3600),
+                swe.GREG_CAL
+            )
         deltat = swe.deltat(julday_)
         return {
             "JD": round(julday_ + deltat, 6),
