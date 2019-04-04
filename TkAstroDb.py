@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.3.6"
+__version__ = "1.3.7"
 
 import os
 import sys
@@ -46,17 +46,17 @@ except ModuleNotFoundError:
             package_file = "countryinfo.py"
             package_path = os.path.join(path, package_file)
             script_code = []
-            with open(file=package_path, mode="r+", encoding="utf-8") as f:
-                readlines = f.readlines()
-                for i in readlines:
-                    script_code.append(i)
+            with open(file=package_path, mode="r+", encoding="utf-8") as read_file:
+                readlines = read_file.readlines()
+                for line in readlines:
+                    script_code.append(line)
             if "country_info = json.load(open(file_path))" in script_code[29]:
                 script_code[29] = script_code[29].replace(
                     "file_path", 
                     "file_path, encoding='utf-8'")
-            with open(file=package_path, mode="w+", encoding="utf-8") as f:
-                for i in script_code:
-                    f.write(i)
+            with open(file=package_path, mode="w+", encoding="utf-8") as write_file:
+                for line in script_code:
+                    write_file.write(line)
     from countryinfo import CountryInfo
 try:
     import numpy as np
@@ -1876,7 +1876,7 @@ def find_observed_values():
             trine, sesquiquadrate, biquintile, quincunx, opposite
         ]
         orb_factor = [str(i) for i in orb_factor]
-        with open("output.log", "w", encoding="utf-8") as log:
+        with open(file="output.log", mode="w", encoding="utf-8") as log:
             log.write(f"Adb Version: {xml_file.replace('.xml', '')}\n")
             log.write(f"House System: {house_systems[hsys]}\n")
             if len(displayed_results) == 1:
@@ -2002,13 +2002,13 @@ def calculate(file_name_1, file_name_2, table_name, msg_title):
     except FileNotFoundError:
         msgbox.showinfo(title=f"Find {msg_title} Values",
                         message=f"No such file or directory: "
-                                f"'{file_name_1}.xlsx'")
+                                f"'{file_name_1}'")
     try:
         read_file_2 = xlrd.open_workbook(file_name_2)
     except FileNotFoundError:
         msgbox.showinfo(title=f"Find {msg_title} Values",
                         message=f"No such file or directory: "
-                                f"'{file_name_2}.xlsx'")
+                                f"'{file_name_2}'")
     if read_file_1 is not None and read_file_2 is not None:
         sheet_1 = read_file_1.sheet_by_name("Sheet1")
         sheet_2 = read_file_2.sheet_by_name("Sheet1")
@@ -2272,12 +2272,18 @@ def main():
         apply_button.pack()
 
     def export_link():
-        with open("links.txt", "w", encoding="utf-8") as f:
-            for i, j in enumerate(displayed_results):
-                f.write(f"{i + 1}. {j[12]}\n")
-        msgbox.showinfo(
-            title="Export Links", 
-            message=f"{len(displayed_results)} links were exported.")
+        if len(displayed_results) > 0:
+            with open(file="links.txt", mode="w", encoding="utf-8") as f:
+                for i, j in enumerate(displayed_results):
+                    f.write(f"{i + 1}. {j[12]}\n")
+            msgbox.showinfo(
+                title="Export Links",
+                message=f"{len(displayed_results)} links were exported.")
+        else:
+            msgbox.showinfo(
+                title="Export Links",
+                message="Please select and display records.")
+            master.update()
 
     def export_lat_frequency():
         latitude_freq_north = {
@@ -2287,74 +2293,89 @@ def main():
             f"{-i}\u00b0 - {-i - 1}\u00b0": [] for i in range(90)
         }
         latitudes = []
-        for item in displayed_results:
-            latitude = item[7]
-            if "n" in latitude:
-                latitude = latitude.replace("n", "\u00b0") + "'0\""
-                latitude = dms_to_dd(latitude)
-            elif "s" in latitude:
-                latitude = latitude.replace("s", "\u00b0") + "'0\""
-                latitude = -1 * dms_to_dd(latitude)
-            latitudes.append(latitude)
-        for i in latitudes:
-            for j in range(90):
-                if j <= i < j + 1:
-                    latitude_freq_north[
-                        f"{j}\u00b0 - {j + 1}\u00b0"].append(i)
-                elif -j - 1 <= i < -j:
-                    latitude_freq_south[
-                        f"{-j}\u00b0 - {-j - 1}\u00b0"].append(i)
-        edit_latitude_freq_north = {
-            keys: len(values)
-            for keys, values in latitude_freq_north.items()
-            if len(values) != 0
-        }
-        edit_latitude_freq_south = {
-            keys: len(values)
-            for keys, values in latitude_freq_south.items()
-            if len(values) != 0
-        }
-        with open("latitude-frequency.txt", "w",
-                  encoding="utf-8") as f:
-            f.write("Latitude Intervals\n\n")
-            for i, j in edit_latitude_freq_south.items():
-                f.write(f"{i} = {j}\n")
-            for i, j in edit_latitude_freq_north.items():
-                f.write(f"{i} = {j}\n")
-            f.write(f"\nMean Latitude = "
-                    f"{dd_to_dms(sum(latitudes) / len(latitudes))}\n")
-            f.write(f"\nTotal = {len(displayed_results)}")
+        if len(displayed_results) > 0:
+            for item in displayed_results:
+                latitude = item[7]
+                if "n" in latitude:
+                    latitude = latitude.replace("n", "\u00b0") + "'0\""
+                    latitude = dms_to_dd(latitude)
+                elif "s" in latitude:
+                    latitude = latitude.replace("s", "\u00b0") + "'0\""
+                    latitude = -1 * dms_to_dd(latitude)
+                latitudes.append(latitude)
+            for i in latitudes:
+                for j in range(90):
+                    if j <= i < j + 1:
+                        latitude_freq_north[
+                            f"{j}\u00b0 - {j + 1}\u00b0"].append(i)
+                    elif -j - 1 <= i < -j:
+                        latitude_freq_south[
+                            f"{-j}\u00b0 - {-j - 1}\u00b0"].append(i)
+            edit_latitude_freq_north = {
+                keys: len(values)
+                for keys, values in latitude_freq_north.items()
+                if len(values) != 0
+            }
+            edit_latitude_freq_south = {
+                keys: len(values)
+                for keys, values in latitude_freq_south.items()
+                if len(values) != 0
+            }
+            with open(file="latitude-frequency.txt", mode="w",
+                      encoding="utf-8") as f:
+                f.write("Latitude Intervals\n\n")
+                for i, j in edit_latitude_freq_south.items():
+                    f.write(f"{i} = {j}\n")
+                for i, j in edit_latitude_freq_north.items():
+                    f.write(f"{i} = {j}\n")
+                f.write(f"\nMean Latitude = "
+                        f"{dd_to_dms(sum(latitudes) / len(latitudes))}\n")
+                f.write(f"\nTotal = {len(displayed_results)}")
+                msgbox.showinfo(
+                    title="Export Latitude Frequency",
+                    message=f"{len(displayed_results)} "
+                            f"records were exported.")
+                master.update()
+        else:
             msgbox.showinfo(
                 title="Export Latitude Frequency",
-                message=f"{len(displayed_results)} "
-                        f"records were exported.")
+                message="Please select and display records.")
+            master.update()
 
     def year_frequency_command(parent, date_entries, years):
         min_, max_, step_ = date_entries[:]
         min_, max_, step_ = int(min_.get()), int(max_.get()), \
             int(step_.get())
         freq_frmt[0], freq_frmt[1], freq_frmt[2] = min_, max_, step_
-        with open("year-frequency.txt", "w", encoding="utf-8") as f:
-            year_dict = dict()
-            count = 0
-            for i in range(min_, max_, step_):
-                year_dict[
-                    (min_ + (count * step_),
-                     min_ + (count * step_) + step_)
-                ] = []
-                count += 1
-            for i in years:
+        if len(displayed_results) > 0:
+            with open(file="year-frequency.txt", mode="w",
+                      encoding="utf-8") as f:
+                year_dict = dict()
+                count = 0
+                for i in range(min_, max_, step_):
+                    year_dict[
+                        (min_ + (count * step_),
+                         min_ + (count * step_) + step_)
+                    ] = []
+                    count += 1
+                for i in years:
+                    for keys, values in year_dict.items():
+                        if keys[0] < i < keys[1]:
+                            year_dict[keys[0], keys[1]] += i,
                 for keys, values in year_dict.items():
-                    if keys[0] < i < keys[1]:
-                        year_dict[keys[0], keys[1]] += i,
-            for keys, values in year_dict.items():
-                f.write(f"{keys} = {len(values)}\n")
-            f.write(f"Total = {len(displayed_results)}")
+                    f.write(f"{keys} = {len(values)}\n")
+                f.write(f"Total = {len(displayed_results)}")
+                parent.destroy()
+                msgbox.showinfo(
+                    title="Export Year Frequency",
+                    message=f"{len(displayed_results)} "
+                            f"records were exported.")
+        else:
             parent.destroy()
             msgbox.showinfo(
                 title="Export Year Frequency",
-                message=f"{len(displayed_results)} "
-                        f"records were exported.")
+                message="Please select and display records.")
+            master.update()
 
     def export_year_frequency():
         toplevel5 = tk.Toplevel()
@@ -2689,7 +2710,7 @@ def main():
                 if not all([name, _gender, rr, list_box]):
                     msgbox.showinfo(
                         title="Create New Record",
-                        message=f"Fill the empty fields.")
+                        message="Fill the empty fields.")
                     master.update()
                 else:
                     now = dt.now()
@@ -2959,7 +2980,7 @@ def main():
         merge_databases()
         group_categories()
         msgbox.showinfo(title="Reload Database", 
-                        message=f"Database is reloaded.")
+                        message="Database is reloaded.")
         master.update()
 
     def about():
@@ -2968,7 +2989,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "03 April 2019"
+        update_date, _update_date = "Update Date:", "04 April 2019"
         developed_by, _developed_by = "Developed By:", \
             "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", \
@@ -3019,7 +3040,7 @@ def main():
                                 context=ssl.SSLContext(ssl.PROTOCOL_SSLv23))
         data_2 = urllib.urlopen(url=url_2, 
                                 context=ssl.SSLContext(ssl.PROTOCOL_SSLv23))
-        with open("TkAstroDb.py", "r", encoding="utf-8") as f:
+        with open(file="TkAstroDb.py", mode="r", encoding="utf-8") as f:
             var_1 = [i.decode("utf-8") for i in data_1]
             var_2 = [i.decode("utf-8") for i in data_2]
             var_3 = [i for i in f]
@@ -3027,11 +3048,11 @@ def main():
                 msgbox.showinfo(title="Update", 
                                 message="Program is up-to-date.")
             else:
-                with open("README.md", "w", encoding="utf-8") as g:
+                with open(file="README.md", mode="w", encoding="utf-8") as g:
                     for i in var_2:
                         g.write(i)
                         g.flush()
-                with open("TkAstroDb.py", "w", encoding="utf-8") as h:
+                with open(file="TkAstroDb.py", mode="w", encoding="utf-8") as h:
                     for i in var_1:
                         h.write(i)
                         h.flush()
