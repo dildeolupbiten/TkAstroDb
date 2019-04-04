@@ -46,7 +46,8 @@ except ModuleNotFoundError:
             package_file = "countryinfo.py"
             package_path = os.path.join(path, package_file)
             script_code = []
-            with open(file=package_path, mode="r+", encoding="utf-8") as read_file:
+            with open(file=package_path, mode="r+", encoding="utf-8") \
+                    as read_file:
                 readlines = read_file.readlines()
                 for line in readlines:
                     script_code.append(line)
@@ -54,7 +55,8 @@ except ModuleNotFoundError:
                 script_code[29] = script_code[29].replace(
                     "file_path", 
                     "file_path, encoding='utf-8'")
-            with open(file=package_path, mode="w+", encoding="utf-8") as write_file:
+            with open(file=package_path, mode="w+", encoding="utf-8") \
+                    as write_file:
                 for line in script_code:
                     write_file.write(line)
     from countryinfo import CountryInfo
@@ -3066,11 +3068,13 @@ def main():
                 msgbox.showinfo(title="Update", 
                                 message="Program is up-to-date.")
             else:
-                with open(file="README.md", mode="w", encoding="utf-8") as g:
+                with open(file="README.md", mode="w", encoding="utf-8") \
+                        as g:
                     for i in var_2:
                         g.write(i)
                         g.flush()
-                with open(file="TkAstroDb.py", mode="w", encoding="utf-8") as h:
+                with open(file="TkAstroDb.py", mode="w", encoding="utf-8") \
+                        as h:
                     for i in var_1:
                         h.write(i)
                         h.flush()
