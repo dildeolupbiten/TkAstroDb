@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.3.8"
+__version__ = "1.3.9"
 
 import os
 import sys
@@ -9,6 +9,7 @@ import ssl
 import time
 import shutil
 import threading
+import traceback
 import webbrowser
 import tkinter as tk
 import sqlite3 as sql
@@ -19,6 +20,11 @@ import tkinter.messagebox as msgbox
 from tkinter.ttk import Progressbar, Treeview
 from datetime import datetime as dt
 
+try:
+    import certifi
+except ModuleNotFoundError:
+    os.system("pip3 install certifi")
+    import certifi
 try:
     from dateutil import tz
 except ModuleNotFoundError:
@@ -2410,10 +2416,14 @@ def main():
 
     def callback(event, url):
         webbrowser.open_new(url)
+        
+    def url_open(args, **kwargs):
+        return urllib.urlopen(args, cafile=certifi.where(), **kwargs)
 
     def from_local_to_utc(year, month, day, hour, minute,
                           _lat, _lon):
         nominatim = Nominatim()
+        nominatim.urlopen = url_open
         location = nominatim.reverse([_lat, _lon])[0]
         tzw = tzwhere.tzwhere()
         timezone = tzw.tzNameAt(_lat, _lon)
@@ -3009,7 +3019,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "04 April 2019"
+        update_date, _update_date = "Update Date:", "05 April 2019"
         developed_by, _developed_by = "Developed By:", \
             "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", \
