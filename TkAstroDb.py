@@ -21,11 +21,6 @@ from tkinter.ttk import Progressbar, Treeview
 from datetime import datetime as dt
 
 try:
-    import certifi
-except ModuleNotFoundError:
-    os.system("pip3 install certifi")
-    import certifi
-try:
     from dateutil import tz
 except ModuleNotFoundError:
     os.system("pip3 install python-dateutil")
@@ -66,6 +61,11 @@ except ModuleNotFoundError:
                 for line in script_code:
                     write_file.write(line)
     from countryinfo import CountryInfo
+try:
+    import certifi
+except ModuleNotFoundError:
+    os.system("pip3 install certifi")
+    import certifi
 try:
     import numpy as np
 except ModuleNotFoundError:
