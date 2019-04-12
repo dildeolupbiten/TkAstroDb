@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.3.9"
+__version__ = "1.4.0"
 
 import os
 import sys
@@ -9,7 +9,6 @@ import ssl
 import time
 import shutil
 import threading
-import traceback
 import webbrowser
 import tkinter as tk
 import sqlite3 as sql
@@ -2443,7 +2442,7 @@ def main():
 
     def julday(year, month, day, hour, minute, second):
         time1 = dt.strptime(f"{day}.{month}.{year}", "%d.%m.%Y")
-        time2 = time2 = dt.strptime("15.10.1582", "%d.%m.%Y")
+        time2 = dt.strptime("15.10.1582", "%d.%m.%Y")
         if (time2 - time1).days > 0:
             julday_ = swe.julday(
                 year,
@@ -2452,6 +2451,11 @@ def main():
                 hour + (minute / 60) + (second / 3600),
                 swe.JUL_CAL
             )
+            deltat = swe.deltat(julday_)
+            return {
+                "JD": round(julday_ + deltat, 6),
+                "TT": round(deltat * 86400, 1)
+            }
         elif (time2 - time1).days < 0:
             julday_ = swe.julday(
                 year,
@@ -2460,11 +2464,11 @@ def main():
                 hour + (minute / 60) + (second / 3600),
                 swe.GREG_CAL
             )
-        deltat = swe.deltat(julday_)
-        return {
-            "JD": round(julday_ + deltat, 6),
-            "TT": round(deltat * 86400, 1)
-        }
+            deltat = swe.deltat(julday_)
+            return {
+                "JD": round(julday_ + deltat, 6),
+                "TT": round(deltat * 86400, 1)
+            }
 
     def add(cat_entry, listbox, list_box):
         global record_categories
@@ -3019,7 +3023,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "05 April 2019"
+        update_date, _update_date = "Update Date:", "12 April 2019"
         developed_by, _developed_by = "Developed By:", \
             "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", \
