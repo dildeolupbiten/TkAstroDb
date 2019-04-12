@@ -2443,32 +2443,26 @@ def main():
     def julday(year, month, day, hour, minute, second):
         time1 = dt.strptime(f"{day}.{month}.{year}", "%d.%m.%Y")
         time2 = dt.strptime("15.10.1582", "%d.%m.%Y")
+
+        def _julday_(calendar):
+            julday_ = swe.julday(
+                year,
+                month,
+                day,
+                hour + (minute / 60) + (second / 3600),
+                calendar
+            )
+
+            deltat = swe.deltat(julday_)
+            return {
+                "JD": round(julday_ + deltat, 6),
+                "TT": round(deltat * 86400, 1)
+            }
+
         if (time2 - time1).days > 0:
-            julday_ = swe.julday(
-                year,
-                month,
-                day,
-                hour + (minute / 60) + (second / 3600),
-                swe.JUL_CAL
-            )
-            deltat = swe.deltat(julday_)
-            return {
-                "JD": round(julday_ + deltat, 6),
-                "TT": round(deltat * 86400, 1)
-            }
+            return _julday_(calendar=swe.JUL_CAL)
         elif (time2 - time1).days < 0:
-            julday_ = swe.julday(
-                year,
-                month,
-                day,
-                hour + (minute / 60) + (second / 3600),
-                swe.GREG_CAL
-            )
-            deltat = swe.deltat(julday_)
-            return {
-                "JD": round(julday_ + deltat, 6),
-                "TT": round(deltat * 86400, 1)
-            }
+            return _julday_(calendar=swe.GREG_CAL)
 
     def add(cat_entry, listbox, list_box):
         global record_categories
@@ -2845,24 +2839,26 @@ def main():
             add_record_button = tk.Button(
                 master=frames[7], 
                 text="Apply",
-                command=lambda: get_record_data(toplevel, 
-                                                treeviews[0], 
-                                                entries, 
-                                                option_menu, 
-                                                listboxes,
-                                                list_box, 
-                                                data=None))
+                command=lambda: get_record_data(
+                    toplevel,
+                    treeviews[0],
+                    entries,
+                    option_menu,
+                    listboxes,
+                    list_box,
+                    data=None))
         else:
             add_record_button = tk.Button(
                 master=frames[7], 
                 text="Apply",
-                command=lambda: get_record_data(toplevel, 
-                                                None, 
-                                                entries, 
-                                                option_menu, 
-                                                listboxes, 
-                                                list_box, 
-                                                data=None))
+                command=lambda: get_record_data(
+                    toplevel,
+                    None,
+                    entries,
+                    option_menu,
+                    listboxes,
+                    list_box,
+                    data=None))
         add_record_button.grid(row=0, column=0)
 
     def create_panel(entries, data, listboxes, list_box, 
