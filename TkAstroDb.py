@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.4.1"
+__version__ = "1.4.2"
 
 import os
 import sys
@@ -272,7 +272,7 @@ def create_canvas(master_):
     if canvas is not None:
         canvas.destroy()
     canvas = tk.Canvas(master=master_, bg="white", width=1270, height=660)
-    canvas.grid(row=0, column=0)
+    canvas.grid(row=0, column=1)
     return canvas
 
 
@@ -740,7 +740,7 @@ class Chart:
 
     @staticmethod
     def line_components(angle, r):
-        x1, y1 = 550, 350
+        x1, y1 = 610, 350
         x2 = x1 + (r * cos(radians(angle)))
         y2 = y1 - (r * sin(radians(angle)))
         return x1, y1, x2, y2
@@ -751,7 +751,7 @@ class Chart:
         return x2, y2, _x2, _y2
 
     @staticmethod
-    def draw_oval_object(x=550, y=350):
+    def draw_oval_object(x=610, y=350):
         oval_object(x=x, y=y, r=260, dash=False)
         oval_object(x=x, y=y, r=210, dash=False)
         oval_object(x=x, y=y, r=165)
@@ -1776,15 +1776,10 @@ def button_3_open_chart(_treeview_):
         open_chart = True
         _toplevel_ = create_toplevel()
         canvas = create_canvas(master_=_toplevel_)
-        string1 = ""
-        string2 = ""
-        string3 = ""
-        string4 = "House System"
-        string5 = ":"
-        string6 = f"{house_systems[hsys]}"
         aspect_list = [
             f"{key} ({value})"
-            for key, value in ASPECT_SYMBOLS.items() if key != "Null"]
+            for key, value in ASPECT_SYMBOLS.items() if key != "Null"
+        ]
         orb_list = [
             conjunction,
             semi_sextile,
@@ -1798,51 +1793,104 @@ def button_3_open_chart(_treeview_):
             quincunx,
             opposite
         ]
-        string7 = "\n".join(aspect_list)
-        string8 = "\n".join([":" for _ in orb_list])
-        string9 = "\n".join([f"{_}" for _ in orb_list])
-        for j, k in enumerate(_items_):
-            if j == 0 or j == 6 or j == 10 or j == 11 or j == 12:
+        info_frame_1 = tk.Frame(master=canvas, bg="white")
+        info_frame_1.place(x=10, y=7)
+        for i, j in enumerate(columns_1):
+            if i == 0 or i == 6 or i == 10 or i == 11 or i == 12:
                 pass
-            elif j == 9:
-                string1 += f"{columns_1[j]}\n"
-                string2 += ":\n"
-                string3 += f"{_items_[j]}, {_items_[j + 1]}\n"
-            else:
-                string1 += f"{columns_1[j]}\n"
-                string2 += ":\n"
-                string3 += f"{_items_[j]}\n"
-        text_object(x=50, y=75, _text=string1, font="Arial 10")
-        text_object(x=125, y=75, _text=string2, font="Arial 10")
-        if len(_items_[1]) > 25 and len(_items_[4]) < 25:
-            text_object(x=227, y=75, _text=string3, font="Arial 10")
-        elif len(_items_[1]) > 25 and len(_items_[4]) > 25:
-            text_object(x=274, y=75, _text=string3, font="Arial 10")
-        elif len(_items_[1]) < 25 and len(_items_[4]) > 25:
-            text_object(x=264, y=75, _text=string3, font="Arial 10")
-        else:
-            text_object(x=200, y=75, _text=string3, font="Arial 10")
-        line_object(x1=5, x2=260, y1=140, y2=140, width=1)
-        text_object(x=50, y=150, _text=string4, font="Arial 10")
-        text_object(x=125, y=150, _text=string5, font="Arial 10")
-        if hsys == "P":
-            text_object(x=167, y=150, _text=string6, font="Arial 10")
-        elif hsys == "K":
-            text_object(x=157, y=150, _text=string6, font="Arial 10")
-        elif hsys == "O":
-            text_object(x=173, y=150, _text=string6, font="Arial 10")
-        elif hsys == "R":
-            text_object(x=187, y=150, _text=string6, font="Arial 10")
-        elif hsys == "C":
-            text_object(x=173, y=150, _text=string6, font="Arial 10")
-        elif hsys == "E":
-            text_object(x=159, y=150, _text=string6, font="Arial 10")
-        elif hsys == "W":
-            text_object(x=177, y=150, _text=string6, font="Arial 10")
-        line_object(x1=5, x2=260, y1=160, y2=160, width=1)
-        text_object(x=61, y=250, _text=string7, font="Arial 10")
-        text_object(x=125, y=250, _text=string8, font="Arial 10")
-        text_object(x=145, y=250, _text=string9, font="Arial 10")
+            elif i == 9:
+                l1 = tk.Label(
+                    master=info_frame_1, 
+                    text=j, 
+                    bg="white", 
+                    font="Arial 10"
+                )
+                l1.grid(row=i, column=0, sticky="w")
+                l2 = tk.Label(
+                    master=info_frame_1, 
+                    text="      :", 
+                    bg="white",
+                    font="Arial 10"
+                )
+                l2.grid(row=i, column=1, sticky="w")
+                l3 = tk.Label(
+                    master=info_frame_1, 
+                    text=f"{_items_[i]}, {_items_[i + 1]}", 
+                    bg="white",
+                    font="Arial 10"
+                )
+                l3.grid(row=i, column=2, sticky="w")
+            else:   
+                l1 = tk.Label(
+                    master=info_frame_1, 
+                    text=j, 
+                    bg="white", 
+                    font="Arial 10"
+                )
+                l1.grid(row=i, column=0, sticky="w")
+                l2 = tk.Label(
+                    master=info_frame_1, 
+                    text="      :", 
+                    bg="white",
+                    font="Arial 10"
+                )
+                l2.grid(row=i, column=1)
+                l3 = tk.Label(
+                    master=info_frame_1, 
+                    text=_items_[i], 
+                    bg="white",
+                    font="Arial 10"
+                )
+                l3.grid(row=i, column=2, sticky="w")
+        line_object(x1=5, x2=260, y1=170, y2=170, width=1)
+        info_frame_2 = tk.Frame(master=canvas, bg="white")
+        info_frame_2.place(x=10, y=172)
+        l4 = tk.Label(
+            master=info_frame_2,
+            text="House System      ",
+            bg="white",
+            font="Arial 10"
+        )
+        l4.grid(row=0, column=0, sticky="w")
+        l5 = tk.Label(
+            master=info_frame_2,
+            text=":",
+            bg="white",
+            font="Arial 10"
+        )
+        l5.grid(row=0, column=1, sticky="w")
+        l6 = tk.Label(
+            master=info_frame_2,
+            text=house_systems[hsys],
+            bg="white",
+            font="Arial 10"
+        )
+        l6.grid(row=0, column=2, sticky="w")
+        line_object(x1=5, x2=260, y1=192, y2=192, width=1)
+        info_frame_3 = tk.Frame(master=canvas, bg="white")
+        info_frame_3.place(x=10, y=197)
+        for i, j in enumerate(aspect_list):
+            l7 = tk.Label(
+                master=info_frame_3,
+                text=j,
+                bg="white",
+                font="Arial 10"
+            )
+            l7.grid(row=i, column=0, sticky="w")
+            l8 = tk.Label(
+                master=info_frame_3,
+                text=":",
+                bg="white",
+                font="Arial 10"
+            )
+            l8.grid(row=i, column=1, sticky="w")
+            l9 = tk.Label(
+                master=info_frame_3,
+                text=orb_list[i],
+                bg="white",
+                font="Arial 10"
+            )
+            l9.grid(row=i, column=2, sticky="w")
         Chart(
             julian_date=julian_date,
             latitude=latitude,
