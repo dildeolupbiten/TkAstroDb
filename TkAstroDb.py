@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 
 import os
 import sys
@@ -16,6 +16,7 @@ import xml.etree.ElementTree
 import urllib.request as urllib
 import tkinter.messagebox as msgbox
 
+from math import cos, sin, radians
 from tkinter.ttk import Progressbar, Treeview
 from datetime import datetime as dt
 
@@ -252,15 +253,96 @@ group_categories()
 
 swe.set_ephe_path(os.path.join(os.getcwd(), "Eph"))
 
+canvas = None
+_toplevel_ = None
+
+
+def create_toplevel():
+    global _toplevel_
+    if _toplevel_ is not None:
+        _toplevel_.destroy()
+    _toplevel_ = tk.Toplevel()
+    _toplevel_.resizable(width=False, height=False)
+    _toplevel_.title("Open Chart")
+    return _toplevel_
+
+
+def create_canvas(master_):
+    global canvas
+    if canvas is not None:
+        canvas.destroy()
+    canvas = tk.Canvas(master=master_, bg="white", width=1270, height=660)
+    canvas.grid(row=0, column=0)
+    return canvas
+
+
+PLANETS = {
+    "Sun": swe.SUN,
+    "Moon": swe.MOON,
+    "Mercury": swe.MERCURY,
+    "Venus": swe.VENUS,
+    "Mars": swe.MARS,
+    "Jupiter": swe.JUPITER,
+    "Saturn": swe.SATURN,
+    "Uranus": swe.URANUS,
+    "Neptune": swe.NEPTUNE,
+    "Pluto": swe.PLUTO,
+    "North Node": swe.TRUE_NODE,
+    "Chiron": swe.CHIRON
+}
+
+ASPECT_SYMBOLS = {
+    "Conjunction": "\u260C",
+    "Semi-Sextile": "\u26BA",
+    "Semi-Square": "\u2220",
+    "Sextile": "\u26B9",
+    "Quintile": "Q",
+    "Square": "\u25A1",
+    "Trine": "\u25B3",
+    "Sesquiquadrate": "\u26BC",
+    "BiQuintile": "bQ",
+    "Quincunx": "\u26BB",
+    "Opposite": "\u260D",
+}
+
+
+def oval_object(x, y, r, dash=True):
+    if dash is True:
+        dash = (1, 10)
+        canvas.create_oval(
+            x - r,
+            y - r,
+            x + r,
+            y + r,
+            fill="white",
+            width=2,
+            dash=dash
+        )
+    else:
+        canvas.create_oval(
+            x - r,
+            y - r,
+            x + r,
+            y + r,
+            fill="white",
+            width=2,
+        )
+
+
+def line_object(x1, y1, x2, y2, width=2, fill="black"):
+    canvas.create_line(x1, y1, x2, y2, width=width, fill=fill)
+
+
+def text_object(x, y, _text, width=0, font="Arial", fill="black"):
+    canvas.create_text(x, y, text=_text, width=width, font=font, fill=fill)
+
+
 signs = [
     "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
     "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ]
 
-planets = [
-    "Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter",
-    "Saturn", "Uranus", "Neptune", "Pluto", "North Node", "Chiron"
-]
+planets = [i for i, j in PLANETS.items()]
 
 modern_rulership = {
     "Aries": "Pluto",
@@ -322,28 +404,43 @@ def dms_to_dd(dms):
     return degree + minute + second
 
 
+open_chart = False
+
+
 class Chart:
     def __init__(self, julian_date: float, longitude: float, latitude: float):
         self.julian_date = julian_date
         self.longitude = longitude
         self.latitude = latitude
-
-        self.SIGNS = {j: 30 * i for i, j in enumerate(signs)}
-        self.PLANETS = {
-            planets[0]: swe.SUN,
-            planets[1]: swe.MOON,
-            planets[2]: swe.MERCURY,
-            planets[3]: swe.VENUS,
-            planets[4]: swe.MARS,
-            planets[5]: swe.JUPITER,
-            planets[6]: swe.SATURN,
-            planets[7]: swe.URANUS,
-            planets[8]: swe.NEPTUNE,
-            planets[9]: swe.PLUTO,
-            planets[10]: swe.TRUE_NODE,
-            planets[11]: swe.CHIRON
+        self.PLANETS = PLANETS
+        self._PLANETS = {i: j for i, j in self.PLANETS.items()}
+        self._SIGNS = {j: 30 * i for i, j in enumerate(signs)}
+        self.SIGNS = [
+            "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+            "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]
+        self.SIGN_SYMBOLS = [
+            "\u2648", "\u2649", "\u264A", "\u264B", "\u264C", "\u264D",
+            "\u264E", "\u264F", "\u2650", "\u2651", "\u2652", "\u2653"]
+        self.SIGN_COLORS = ["red", "green", "yellow", "blue"] * 3
+        self._SIGN_SYMBOLS = {i: j for i, j in zip(self.SIGNS, self.SIGN_SYMBOLS)}
+        self._SIGN_COLORS = {i: j for i, j in zip(self.SIGNS, self.SIGN_COLORS)}
+        self.PLANET_SYMBOLS = {
+            "Sun": "\u2299",
+            "Moon": "\u263E",
+            "Mercury": "\u263F",
+            "Venus": "\u2640",
+            "Mars": "\u2642",
+            "Jupiter": "\u2643",
+            "Saturn": "\u2644",
+            "Uranus": "\u2645",
+            "Neptune": "\u2646",
+            "Pluto": "\u2647",
+            "North Node": "\u260A",
+            "Chiron": "\u26B7"
         }
-
+        self.ASPECT_SYMBOLS = ASPECT_SYMBOLS
+        self.ASPECT_SYMBOLS["Null"] = " "
+        self.ASPECTS = {i: [] for i in self._PLANETS.keys()}
         self.PLANET_INFO_FORMAT = []
         self.MODIFY_PLANET_INFO_FORMAT = []
         self.PLANET_DEGREES = []
@@ -351,12 +448,43 @@ class Chart:
         self.HOUSE_SIGN = []
         self.PLANET_SIGN_HOUSE = []
         self.NEW_HOUSE_DEGREES = []
-
+        self.MIDPOINTS = {}
+        self.ORB_FACTORS = {}
+        self.CONJUNCTION = []
+        self.SEMI_SEXTILE = []
+        self.SEMI_SQUARE = []
+        self.SEXTILE = []
+        self.QUINTILE = []
+        self.SQUARE = []
+        self.TRINE = []
+        self.SESQUIQUADRATE = []
+        self.BIQUINTILE = []
+        self.QUINCUNX = []
+        self.OPPOSITE = []
+        self.NULL = []
+        self.__PLANET_DEGREES = []
+        self.MIDPOINT_OF_HOUSES = []
+        self.__PLANET_INFO_FORMAT = []
+        self.__HOUSE_INFO_FORMAT = []
         self.organize_chart_data()
         self.convert_planet_degrees()
         self.convert_house_info()
         self.convert_house_degrees()
         self.find_planet_positions()
+        if open_chart is True:
+            self.draw_oval_object()
+            self.draw_line_object()
+            self.draw_houses()
+            self.draw_signs()
+            self.draw_house_numbers()
+            self.draw_sign_symbols()
+            self.draw_planets()
+            self.draw_aspects()
+            self.parse_aspects()
+            self.new_order_of_the_aspects()
+            self.draw_house_info()
+            self.draw_planet_info()
+            self.draw_aspect_info()
 
     @staticmethod
     def convert_angle(angle):
@@ -367,6 +495,10 @@ class Chart:
     def planet_pos(self, planet):
         calc = self.convert_angle(swe.calc_ut(self.julian_date, planet)[0])
         return calc[0], calc[1]
+
+    def planet_pos_(self, planet):
+        calc = self.convert_angle(swe.calc_ut(self.julian_date, planet)[0])
+        return dd_to_dms(calc[0]), calc[1]
 
     def house_cusps(self):
         global hsys
@@ -412,8 +544,8 @@ class Chart:
 
     def convert_planet_degrees(self):
         for i in self.PLANET_INFO_FORMAT:
-            planet_info_1 = [i[0], i[1] + self.SIGNS[i[2]], i[2]]
-            planet_info_2 = [i[0], i[1] + self.SIGNS[i[2]]]
+            planet_info_1 = [i[0], i[1] + self._SIGNS[i[2]], i[2]]
+            planet_info_2 = [i[0], i[1] + self._SIGNS[i[2]]]
             self.MODIFY_PLANET_INFO_FORMAT.append(planet_info_1)
             self.PLANET_DEGREES.append(planet_info_2)
 
@@ -424,7 +556,7 @@ class Chart:
 
     def convert_house_degrees(self):
         for i in self.HOUSE_INFO_FORMAT:
-            house_info = [i[0], float(i[1]) + self.SIGNS[i[2]], i[2]]
+            house_info = [i[0], float(i[1]) + self._SIGNS[i[2]], i[2]]
             self.NEW_HOUSE_DEGREES.append(house_info)
 
     def find_planet_positions(self):
@@ -534,6 +666,641 @@ class Chart:
             traditional_ruler, modern_ruler, trad_ruler_sign, \
             mode_ruler_sign, trad_lords, mode_lords
 
+    def append_house(self, house, i, j, name=""):
+        if name == "":
+            house.append((
+                f"House {i + 1}",
+                f"{dd_to_dms(self.convert_angle(j)[0])}",
+                f"{self.convert_angle(j)[1]}"))
+        else:
+            house.append((
+                f"{name}",
+                f"{dd_to_dms(self.convert_angle(j)[0])}",
+                f"{self.convert_angle(j)[1]}"))
+
+    def house_cusps_(self):
+        houses_ = []
+        asc = 0
+        angle = []
+        for i, j in enumerate(swe.houses(
+                self.julian_date, self.latitude, self.longitude)[0]):
+            if i == 0:
+                asc += j
+            angle.append(j)
+            if i + 1 == 1:
+                self.append_house(houses_, i, j, name="Asc")
+            elif i + 1 == 4:
+                self.append_house(houses_, i, j, name="IC")
+            elif i + 1 == 7:
+                self.append_house(houses_, i, j, name="Dsc")
+            elif i + 1 == 10:
+                self.append_house(houses_, i, j, name="MC")
+            else:
+                self.append_house(houses_, i, j)
+        return houses_, asc, angle
+
+    def sign_pos(self):
+        asc = self.house_cusps_()[1]
+        degree = self.house_cusps_()[0][0][1].replace("'", "")\
+            .replace('"', "").replace("\u00b0", "")
+        end = 30 - dms_to_dd(degree) + asc
+        start = end - 30
+        signs_ = []
+        for i, j in enumerate(self.house_cusps_()[0]):
+            signs_.append(j[2])
+        for i in self.SIGNS:
+            if i not in signs_:
+                if self.SIGNS.index(i) != 11:
+                    index_1 = self.SIGNS.index(i) + 1
+                    sign = self.SIGNS[index_1]
+                    index_2 = signs_.index(sign)
+                    signs_.insert(index_2, i)
+                else:
+                    index_1 = self.SIGNS.index(i) - 1
+                    sign = self.SIGNS[index_1]
+                    index_2 = signs_.index(sign) + 1
+                    signs_.insert(index_2, i)
+                sign = self.SIGNS[index_1]
+                index_2 = signs_.index(sign)
+                signs_.insert(index_2, i)
+        for i in signs_:
+            count = signs_.count(i)
+            if count > 1:
+                signs_.pop(signs_.index(i, 1))
+        _signs_ = []
+        for i, j in enumerate(signs_):
+            _start = start + (i * 30)
+            _end = end + (i * 30)
+            if _start > 360:
+                _start -= 360
+            if _end > 360:
+                _end -= 360
+            _signs_.append(_start)
+        return _signs_, signs_
+
+    @staticmethod
+    def line_components(angle, r):
+        x1, y1 = 550, 350
+        x2 = x1 + (r * cos(radians(angle)))
+        y2 = y1 - (r * sin(radians(angle)))
+        return x1, y1, x2, y2
+
+    def x_y(self, angle, r1_, r2_):
+        x1, y1, x2, y2 = self.line_components(angle=angle, r=r1_)
+        _x1, _y1, _x2, _y2 = self.line_components(angle=angle, r=r2_)
+        return x2, y2, _x2, _y2
+
+    @staticmethod
+    def draw_oval_object(x=550, y=350):
+        oval_object(x=x, y=y, r=260, dash=False)
+        oval_object(x=x, y=y, r=210, dash=False)
+        oval_object(x=x, y=y, r=165)
+        oval_object(x=x, y=y, r=60, dash=False)
+
+    @staticmethod
+    def draw_line_object(x=900, y=1200):
+        line_object(x1=x, y1=205, x2=y, y2=205, width=1)
+        line_object(x1=x, y1=410, x2=y, y2=410, width=1)
+        line_object(x1=x, y1=428, x2=x, y2=624, width=1)
+        line_object(x1=x, y1=428 + (13 * 15), x2=x + 25 + (20 * 15),
+                    y2=428 + (13 * 15), width=1)
+
+    def draw_houses(self):
+        for i, j in enumerate(self.house_pos()):
+            _degree = j - (self.house_pos()[0] - 180)
+            if _degree < 0:
+                _degree += 360
+            elif _degree > 360:
+                _degree -= 360
+            self.MIDPOINT_OF_HOUSES.append(_degree)
+            x1, y1, x2, y2 = self.x_y(angle=_degree, r1_=60, r2_=210)
+            if i == 0 or i == 3 or i == 6 or i == 9:
+                line_object(x1, y1, x2, y2, width=4)
+            else:
+                line_object(x1, y1, x2, y2, width=2)
+
+    def draw_signs(self):
+        sign_pos = self.sign_pos()[0]
+        for i in sign_pos:
+            _degree = i - (self.house_pos()[0] - sign_pos[1])
+            if _degree > 360:
+                _degree -= 360
+            x1, y1, x2, y2 = self.x_y(angle=_degree, r1_=210, r2_=260)
+            line_object(x1, y1, x2, y2, width=2)
+
+    def draw_house_numbers(self):
+        for i, j in enumerate(self.MIDPOINT_OF_HOUSES):
+            if i == 11:
+                midpoint = (self.MIDPOINT_OF_HOUSES[i] +
+                            self.MIDPOINT_OF_HOUSES[0]) / 2
+            else:
+                if self.MIDPOINT_OF_HOUSES[i] == 360:
+                    midpoint = self.MIDPOINT_OF_HOUSES[i + 1] / 2
+                else:
+                    if self.MIDPOINT_OF_HOUSES[i + 1] == 0 or \
+                            self.MIDPOINT_OF_HOUSES[i + 1] < 30:
+                        midpoint = (self.MIDPOINT_OF_HOUSES[i] +
+                                    self.MIDPOINT_OF_HOUSES[i + 1] + 360) / 2
+                    else:
+                        midpoint = (self.MIDPOINT_OF_HOUSES[i] +
+                                    self.MIDPOINT_OF_HOUSES[i + 1]) / 2
+            x1, y1, x2, y2 = self.x_y(angle=midpoint, r1_=60, r2_=110)
+            x = (x1 + x2) / 2
+            y = (y1 + y2) / 2
+            text_object(x=x, y=y, _text=f"{i + 1}")
+
+    def draw_sign_symbols(self):
+        asc = self.house_cusps()[1]
+        for i, j in enumerate(self.SIGNS):
+            end = 30 - (asc % 30) + 180
+            start = end - 30
+            start += (30 * i)
+            end += (30 * i)
+            if start > 360:
+                start -= 360
+            if end > 360:
+                end -= 360
+            if start > 330:
+                midpoint = (start + end + 360) / 2
+            else:
+                midpoint = (start + end) / 2
+            if midpoint > 360:
+                midpoint -= 360
+            x1, y1, x2, y2 = self.x_y(angle=midpoint, r1_=210, r2_=260)
+            x = (x1 + x2) / 2
+            y = (y1 + y2) / 2
+            text_object(
+                x=x,
+                y=y,
+                _text=self._SIGN_SYMBOLS[self.sign_pos()[1][i]],
+                font="Arial 25",
+                fill=self._SIGN_COLORS[self.sign_pos()[1][i]]
+            )
+
+    def modify_text_object(self, planet_symbol, key, value, offset):
+        x1, y1, x2, y2 = self.x_y(angle=value, r1_=210, r2_=175)
+        x = ((x1 + x2) / 2) + offset
+        y = ((y1 + y2) / 2) + offset
+        if key == "Mars" or key == "Venus":
+            if os.name == "posix":
+                text_object(
+                    x=x,
+                    y=y,
+                    _text=f"{planet_symbol}",
+                    width=0,
+                    font="Arial 30"
+                )
+            elif os.name == "nt":
+                text_object(
+                    x=x,
+                    y=y,
+                    _text=f"{planet_symbol}",
+                    width=0,
+                    font="Arial 20"
+                )
+        else:
+            text_object(
+                x=x,
+                y=y,
+                _text=f"{planet_symbol}",
+                width=0,
+                font="Arial 20"
+            )
+
+    def draw_planets(self):
+        count = 0
+        planet_info_format = []
+        house_info_format = []
+        for key, value in self._PLANETS.items():
+            planet = self.planet_pos_(value)
+            split_degree_1 = planet[0].split(" ")
+            degree_1, minute_1, second_1 = split_degree_1
+            planet_info = (
+                self.PLANET_SYMBOLS[key],
+                key,
+                degree_1,
+                minute_1,
+                second_1,
+                self._SIGN_SYMBOLS[planet[1]],
+                planet[1]
+            )
+            planet_info_format.append(planet_info)
+            split_degree_2 = self.house_cusps_()[0][count][1].split(" ")
+            degree_2, minute_2, second_2 = split_degree_2
+            house_info = [
+                self.house_cusps()[0][count][0],
+                degree_2,
+                minute_2,
+                second_2,
+                self._SIGN_SYMBOLS[self.house_cusps_()[0][count][-1]],
+                self.house_cusps_()[0][count][-1]
+            ]
+            house_info_format.append(house_info)
+            count += 1
+            convert_planet_degree = dms_to_dd(
+                self.planet_pos_(value)[0].replace("'", "")
+                    .replace('"', "").replace("\u00b0", ""))
+            asc = self.house_cusps_()[1]
+            _signs_ = []
+            for i, j in enumerate(self.SIGNS):
+                end = 30 - (asc % 30) + 180
+                start = end - 30
+                start += (30 * i)
+                end += (30 * i)
+                if start > 360:
+                    start -= 360
+                if end > 360:
+                    end -= 360
+                _signs_.append(start)
+            planet_index = self.sign_pos()[1].index(planet[1])
+            new_degree_of_planet = convert_planet_degree + _signs_[planet_index]
+            self.__PLANET_DEGREES.append(new_degree_of_planet)
+        self.__PLANET_INFO_FORMAT = planet_info_format
+        self.__HOUSE_INFO_FORMAT = house_info_format
+        count1 = 0
+        count2 = 0
+        for i, j in zip(["Ascendant", "Medium Coeli"], ["Asc", "Mc"]):
+            self._PLANETS[i] = 16 + count1
+            self.PLANET_SYMBOLS[i] = j
+            self.__PLANET_DEGREES.append(self.MIDPOINT_OF_HOUSES[count2])
+            count1 += 3
+            count2 += 9
+        planet_degrees = {
+            i: j for i, j in zip(self._PLANETS, self.__PLANET_DEGREES)
+        }
+        drawn_signs = []
+        for key, value in planet_degrees.items():
+            x1, y1, x2, y2 = self.x_y(angle=value, r1_=210, r2_=205)
+            line_object(x1, y1, x2, y2, width=2, fill="red")
+            for _key, _value in planet_degrees.items():
+                aspect = value - _value
+                if 0 < aspect < 4:
+                    drawn_signs.append(key)
+                    drawn_signs.append(_key)
+                    self.modify_text_object(
+                        planet_symbol=self.PLANET_SYMBOLS[key],
+                        key=key, value=value, offset=6)
+                elif -4 < aspect < 0:
+                    self.modify_text_object(
+                        planet_symbol=self.PLANET_SYMBOLS[key],
+                        key=key, value=_value, offset=-6)
+        drawn_signs = set(drawn_signs)
+        for key, value in planet_degrees.items():
+            if key not in drawn_signs:
+                self.modify_text_object(
+                    planet_symbol=self.PLANET_SYMBOLS[key],
+                    key=key, value=value, offset=4)
+
+    def create_aspect(self, planet_degrees, value, color, r1_=160, r2_=165):
+        x1, y1, x2, y2 = self.x_y(angle=value, r1_=r1_, r2_=r2_)
+        _x1, _y1, _x2, _y2 = self.x_y(angle=planet_degrees, r1_=r1_, r2_=r2_)
+        line_object(x2, y2, _x2, _y2, width=2, fill=color)
+
+    def select_aspect(self, aspect, value, planet_degrees, key, _key):
+        if 0 < aspect < conjunction or 360 - conjunction < aspect < 360:
+            self.CONJUNCTION.append(
+                (key, self.ASPECT_SYMBOLS["Conjunction"], _key)
+            )
+            self.create_aspect(planet_degrees, value, color="red")
+        elif 30 - semi_sextile < aspect < 30 + semi_sextile or \
+                330 - semi_sextile < aspect < 330 + semi_sextile:
+            self.SEMI_SEXTILE.append(
+                (key, self.ASPECT_SYMBOLS["Semi-Sextile"], _key)
+            )
+            self.create_aspect(planet_degrees, value, color="black")
+        elif 45 - semi_square < aspect < 45 + semi_square or \
+                315 - semi_square < aspect < 315 + semi_square:
+            self.SEMI_SQUARE.append(
+                (key, self.ASPECT_SYMBOLS["Semi-Square"], _key)
+            )
+            self.create_aspect(planet_degrees, value, color="black")
+        elif 60 - sextile < aspect < 60 + sextile or \
+                300 - sextile < aspect < 300 + sextile:
+            self.SEXTILE.append(
+                (key, self.ASPECT_SYMBOLS["Sextile"], _key)
+            )
+            self.create_aspect(planet_degrees, value, color="blue")
+        elif 72 - quintile < aspect < 72 + quintile or \
+                288 - quintile < aspect < 288 + quintile:
+            self.QUINTILE.append(
+                (key, self.ASPECT_SYMBOLS["Quintile"], _key)
+            )
+            self.create_aspect(planet_degrees, value, color="purple")
+        elif 90 - square < aspect < 90 + square or \
+                270 - square < aspect < 270 + square:
+            self.SQUARE.append(
+                (key, self.ASPECT_SYMBOLS["Square"], _key)
+            )
+            self.create_aspect(planet_degrees, value, color="red")
+        elif 120 - trine < aspect < 120 + trine or \
+                240 - trine < aspect < 240 + trine:
+            self.TRINE.append(
+                (key, self.ASPECT_SYMBOLS["Trine"], _key)
+            )
+            self.create_aspect(planet_degrees, value, color="blue")
+        elif 135 - sesquiquadrate < aspect < 135 + sesquiquadrate or \
+                225 - sesquiquadrate < aspect < 225 + sesquiquadrate:
+            self.SESQUIQUADRATE.append(
+                (key, self.ASPECT_SYMBOLS["Sesquiquadrate"], _key)
+            )
+            self.create_aspect(planet_degrees, value, color="orange")
+        elif 144 - biquintile < aspect < 144 + biquintile or \
+                204 - biquintile < aspect < 204 + biquintile:
+            self.BIQUINTILE.append(
+                (key, self.ASPECT_SYMBOLS["BiQuintile"], _key)
+            )
+            self.create_aspect(planet_degrees, value, color="gray")
+        elif 150 - quincunx < aspect < 150 + quincunx or \
+                210 - quincunx < aspect < 210 + quincunx:
+            self.QUINCUNX.append(
+                (key, self.ASPECT_SYMBOLS["Quincunx"], _key)
+            )
+            self.create_aspect(planet_degrees, value, color="pink")
+        elif 180 - opposite < aspect < 180 + opposite:
+            self.OPPOSITE.append(
+                (key, self.ASPECT_SYMBOLS["Opposite"], _key)
+            )
+            self.create_aspect(planet_degrees, value, color="red")
+        else:
+            self.NULL.append((key, self.ASPECT_SYMBOLS["Null"], _key))
+
+    def draw_aspects(self):
+        planet_degrees = {
+            i: j for i, j in zip(self._PLANETS, self.__PLANET_DEGREES)
+        }
+        planet_degrees["Asc"] = self.MIDPOINT_OF_HOUSES[0]
+        planet_degrees["Mc"] = self.MIDPOINT_OF_HOUSES[9]
+        for key, value in planet_degrees.items():
+            for _key, _value in planet_degrees.items():
+                aspect = abs(value - _value)
+                if key != _key:
+                    self.select_aspect(aspect, value, _value, key, _key)
+
+    def select_planet(self, i):
+        for key, value in self.ASPECTS.items():
+            if i[0] == key:
+                value.append(i)
+
+    def parse_aspects(self):
+        for i in self.CONJUNCTION:
+            self.select_planet(i)
+        for i in self.SEMI_SEXTILE:
+            self.select_planet(i)
+        for i in self.SEMI_SQUARE:
+            self.select_planet(i)
+        for i in self.SEXTILE:
+            self.select_planet(i)
+        for i in self.QUINTILE:
+            self.select_planet(i)
+        for i in self.SQUARE:
+            self.select_planet(i)
+        for i in self.TRINE:
+            self.select_planet(i)
+        for i in self.SESQUIQUADRATE:
+            self.select_planet(i)
+        for i in self.BIQUINTILE:
+            self.select_planet(i)
+        for i in self.QUINCUNX:
+            self.select_planet(i)
+        for i in self.OPPOSITE:
+            self.select_planet(i)
+        for i in self.NULL:
+            self.select_planet(i)
+
+    def order_aspects(self):
+        for planet in self.ASPECTS:
+            planet_aspects = self.ASPECTS[planet]
+            new_order = []
+            save_aspects = {}
+            for i, j in enumerate(planet_aspects):
+                new_order.append(j[2])
+                save_aspects[j[2]] = j[1]
+            yield [(save_aspects[i], i) for i in
+                   self._PLANETS.keys() if i in new_order]
+
+    def new_order_of_the_aspects(self):
+        for i, j in zip(self.order_aspects(), self.ASPECTS):
+            self.ASPECTS[j] = i
+            aspect_list = []
+            for m in i:
+                try:
+                    if list(self.ASPECTS.keys()).index(j) < \
+                            list(self.ASPECTS.keys()).index(m[1]):
+                        aspect_list.append(m[0])
+                except ValueError:
+                    aspect_list.append(m[0])
+            self.ASPECTS[j] = aspect_list
+        self.ASPECTS["Ascendant"] = []
+        self.ASPECTS["Medium Coeli"] = []
+
+    def modify_info(self, k, x, m, i, count1, count2):
+        if k == self._SIGN_SYMBOLS["Aries"] or \
+                k == self._SIGN_SYMBOLS["Leo"] or \
+                k == self._SIGN_SYMBOLS["Sagittarius"]:
+            text_object(
+                x=x + count1 + (m * 55),
+                y=count2 + (i * 16),
+                font="Arial 10",
+                _text=k,
+                fill="red"
+            )
+        elif k == self._SIGN_SYMBOLS["Taurus"] or \
+                k == self._SIGN_SYMBOLS["Virgo"] or \
+                k == self._SIGN_SYMBOLS["Capricorn"]:
+            text_object(
+                x=x + count1 + (m * 55),
+                y=count2 + (i * 16),
+                font="Arial 10",
+                _text=k,
+                fill="green"
+            )
+        elif k == self._SIGN_SYMBOLS["Gemini"] or \
+                k == self._SIGN_SYMBOLS["Libra"] or \
+                k == self._SIGN_SYMBOLS["Aquarius"]:
+            text_object(
+                x=x + count1 + (m * 55),
+                y=count2 + (i * 16),
+                font="Arial 10",
+                _text=k,
+                fill="yellow"
+            )
+        elif k == self._SIGN_SYMBOLS["Cancer"] or \
+                k == self._SIGN_SYMBOLS["Scorpio"] or \
+                k == self._SIGN_SYMBOLS["Pisces"]:
+            text_object(
+                x=x + count1 + (m * 55),
+                y=count2 + (i * 16),
+                font="Arial 10",
+                _text=k,
+                fill="blue"
+            )
+        elif k in self.SIGNS or "\u00b0" in k or \
+                "'" in k or '"' in k or k in self._PLANETS:
+            pass
+        else:
+            text_object(
+                x=x + count1 + (m * 55),
+                y=count2 + (i * 16),
+                font="Arial 10",
+                _text=k,
+                fill="black"
+            )
+
+    def draw_planet_info(self, x=900):
+        planet_symbols = ""
+        __planets__ = ""
+        degrees = ""
+        minutes = ""
+        seconds = ""
+        sign_symbols = ""
+        __signs__ = ""
+        for i, j in enumerate(self.__PLANET_INFO_FORMAT):
+            planet_symbols += f"{j[0]}\n"
+            __planets__ += f"{j[1]}\n"
+            degrees += f"{j[2]}\n"
+            minutes += f"{j[3]}\n"
+            seconds += f"{j[4]}\n"
+            sign_symbols += f"{j[5]}\n"
+            __signs__ += f"{j[6]}\n"
+            for m, k in enumerate(j):
+                if k == self.PLANET_SYMBOLS["Mars"] or \
+                        k == self.PLANET_SYMBOLS["Venus"]:
+                    if os.name == "posix":
+                        text_object(
+                            x=x + 10 + (m * 60),
+                            y=15 + (i * 15),
+                            font="Arial 15",
+                            _text=k
+                        )
+                    elif os.name == "nt":
+                        text_object(
+                            x=x + 10 + (m * 60),
+                            y=15 + (i * 15),
+                            font="Arial 9",
+                            _text=k
+                        )
+                else:
+                    self.modify_info(
+                        k=k, x=x, m=m, i=i, count1=10, count2=15
+                    )
+        text_object(x=x + 240, y=110, font="Arial 10", _text=__signs__)
+        text_object(x=x + 60, y=110, font="Arial 10", _text=__planets__)
+        text_object(x=x + 180, y=110, font="Arial 10", _text=seconds)
+        text_object(x=x + 150, y=110, font="Arial 10", _text=minutes)
+        text_object(x=x + 120, y=110, font="Arial 10", _text=degrees)
+
+    def draw_house_info(self, x=900):
+        __houses__ = ""
+        degrees = ""
+        minutes = ""
+        seconds = ""
+        sign_symbols = ""
+        __signs__ = ""
+        for i, j in enumerate(self.__HOUSE_INFO_FORMAT):
+            if i == 0:
+                __houses__ += "Asc\n"
+            elif i == 3:
+                __houses__ += "Ic\n"
+            elif i == 6:
+                __houses__ += "Dsc\n"
+            elif i == 9:
+                __houses__ += "Mc\n"
+            else:
+                __houses__ += f"House {j[0]}\n"
+            degrees += f"{j[1]}\n"
+            minutes += f"{j[2]}\n"
+            seconds += f"{j[3]}\n"
+            sign_symbols += f"{j[4]}\n"
+            __signs__ += f"{j[5]}\n"
+            for m, k in enumerate(j):
+                if k == j[0]:
+                    pass
+                else:
+                    self.modify_info(
+                        k=k, x=x, m=m, i=i, count1=65, count2=220
+                    )
+        text_object(x=x + 30, y=315, font="Arial 10", _text=__houses__)
+        text_object(x=x + 120, y=315, font="Arial 10", _text=degrees)
+        text_object(x=x + 150, y=315, font="Arial 10", _text=minutes)
+        text_object(x=x + 180, y=315, font="Arial 10", _text=seconds)
+        text_object(x=x + 240, y=315, font="Arial 10", _text=__signs__)
+
+    def draw_aspect_info(self, x=900):
+        for i, j in enumerate(self.ASPECTS.items()):
+            if i != len(self.ASPECTS.items()) - 1:
+                line_object(
+                    x1=x + 25 + (i * 25),
+                    y1=428 + (i * 15),
+                    x2=x + 25 + (i * 25),
+                    y2=624,
+                    width=1
+                )
+                line_object(
+                    x1=x,
+                    y1=428 + (i * 15),
+                    x2=x + 25 + (i * 25),
+                    y2=428 + (i * 15),
+                    width=1
+                )
+            if j[0] == "Mars" or j[0] == "Venus":
+                if os.name == "posix":
+                    text_object(
+                        x=x + 15 + (i * 25),
+                        y=420 + (i * 15),
+                        _text=self.PLANET_SYMBOLS[j[0]],
+                        font="Arial 15"
+                    )
+                elif os.name == "nt":
+                    text_object(
+                        x=x + 15 + (i * 25),
+                        y=420 + (i * 15),
+                        _text=self.PLANET_SYMBOLS[j[0]],
+                        font="Arial 10"
+                    )
+            else:
+                text_object(
+                    x=x + 15 + (i * 25),
+                    y=420 + (i * 15),
+                    _text=self.PLANET_SYMBOLS[j[0]],
+                    font="Arial 10"
+                )
+            for k, m in enumerate(j[1]):
+                if m == self.ASPECT_SYMBOLS["Sextile"] or \
+                        m == self.ASPECT_SYMBOLS["Trine"]:
+                    text_object(
+                        x=x + 15 + (i * 25),
+                        y=420 + (i * 15) + ((k + 1) * 15),
+                        _text=m,
+                        font="Arial 10",
+                        fill="blue"
+                    )
+                elif m == self.ASPECT_SYMBOLS["Conjunction"] or \
+                        m == self.ASPECT_SYMBOLS["Square"] or \
+                        m == self.ASPECT_SYMBOLS["Opposite"]:
+                    text_object(
+                        x=x + 15 + (i * 25),
+                        y=420 + (i * 15) + ((k + 1) * 15),
+                        _text=m,
+                        font="Arial 10",
+                        fill="red"
+                    )
+                elif m == self.ASPECT_SYMBOLS["Semi-Sextile"] or \
+                        m == self.ASPECT_SYMBOLS["Quincunx"]:
+                    text_object(
+                        x=x + 15 + (i * 25),
+                        y=420 + (i * 15) + ((k + 1) * 15),
+                        _text=m,
+                        font="Arial 10",
+                        fill="green"
+                    )
+                else:
+                    text_object(
+                        x=x + 15 + (i * 25),
+                        y=420 + (i * 15) + ((k + 1) * 15),
+                        _text=m,
+                        font="Arial 10"
+                    )
+
 
 # ---------------------------------tkinter--------------------------------------
 
@@ -544,7 +1311,7 @@ selected_categories, selected_ratings, displayed_results, \
 toplevel1, toplevel2, menu, search_menu, listbox_menu = None, None, None, \
     None, None
 
-record = False
+record, on_toplevel = False, False
 
 _num_ = 0
 
@@ -979,13 +1746,119 @@ def button_3_open_url():
                 webbrowser.open(i[11])
 
 
+def button_3_open_chart(_treeview_):
+    global open_chart, _toplevel_, canvas
+    focused = _treeview_.focus()
+    master.update()
+    if not focused:
+        pass
+    else:
+        if on_toplevel is False:
+            _items_ = _treeview_.item(focused)["values"]
+        else:
+            _items_ = _treeview_.item(focused)["values"][2:]
+        julian_date = float(_items_[6])
+        latitude = _items_[7]
+        if "n" in latitude:
+            latitude = latitude.replace("n", "\u00b0") + "'0\""
+            latitude = dms_to_dd(latitude)
+        elif "s" in latitude:
+            latitude = latitude.replace("s", "\u00b0") + "'0\""
+            latitude = -1 * dms_to_dd(latitude)
+
+        longitude = _items_[8]
+        if "e" in longitude:
+            longitude = longitude.replace("e", "\u00b0") + "'0\""
+            longitude = dms_to_dd(longitude)
+        elif "w" in longitude:
+            longitude = longitude.replace("w", "\u00b0") + "'0\""
+            longitude = -1 * dms_to_dd(longitude)
+        open_chart = True
+        _toplevel_ = create_toplevel()
+        canvas = create_canvas(master_=_toplevel_)
+        string1 = ""
+        string2 = ""
+        string3 = ""
+        string4 = "House System"
+        string5 = ":"
+        string6 = f"{house_systems[hsys]}"
+        aspect_list = [
+            f"{key} ({value})"
+            for key, value in ASPECT_SYMBOLS.items() if key != "Null"]
+        orb_list = [
+            conjunction,
+            semi_sextile,
+            semi_square,
+            sextile,
+            quintile,
+            square,
+            trine,
+            sesquiquadrate,
+            biquintile,
+            quincunx,
+            opposite
+        ]
+        string7 = "\n".join(aspect_list)
+        string8 = "\n".join([":" for _ in orb_list])
+        string9 = "\n".join([f"{_}" for _ in orb_list])
+        for j, k in enumerate(_items_):
+            if j == 0 or j == 6 or j == 10 or j == 11 or j == 12:
+                pass
+            elif j == 9:
+                string1 += f"{columns_1[j]}\n"
+                string2 += ":\n"
+                string3 += f"{_items_[j]}, {_items_[j + 1]}\n"
+            else:
+                string1 += f"{columns_1[j]}\n"
+                string2 += ":\n"
+                string3 += f"{_items_[j]}\n"
+        text_object(x=50, y=75, _text=string1, font="Arial 10")
+        text_object(x=125, y=75, _text=string2, font="Arial 10")
+        if len(_items_[1]) > 25 and len(_items_[4]) < 25:
+            text_object(x=227, y=75, _text=string3, font="Arial 10")
+        elif len(_items_[1]) > 25 and len(_items_[4]) > 25:
+            text_object(x=274, y=75, _text=string3, font="Arial 10")
+        elif len(_items_[1]) < 25 and len(_items_[4]) > 25:
+            text_object(x=264, y=75, _text=string3, font="Arial 10")
+        else:
+            text_object(x=200, y=75, _text=string3, font="Arial 10")
+        line_object(x1=5, x2=260, y1=140, y2=140, width=1)
+        text_object(x=50, y=150, _text=string4, font="Arial 10")
+        text_object(x=125, y=150, _text=string5, font="Arial 10")
+        if hsys == "P":
+            text_object(x=167, y=150, _text=string6, font="Arial 10")
+        elif hsys == "K":
+            text_object(x=157, y=150, _text=string6, font="Arial 10")
+        elif hsys == "O":
+            text_object(x=173, y=150, _text=string6, font="Arial 10")
+        elif hsys == "R":
+            text_object(x=187, y=150, _text=string6, font="Arial 10")
+        elif hsys == "C":
+            text_object(x=173, y=150, _text=string6, font="Arial 10")
+        elif hsys == "E":
+            text_object(x=159, y=150, _text=string6, font="Arial 10")
+        elif hsys == "W":
+            text_object(x=177, y=150, _text=string6, font="Arial 10")
+        line_object(x1=5, x2=260, y1=160, y2=160, width=1)
+        text_object(x=61, y=250, _text=string7, font="Arial 10")
+        text_object(x=125, y=250, _text=string8, font="Arial 10")
+        text_object(x=145, y=250, _text=string9, font="Arial 10")
+        Chart(
+            julian_date=julian_date,
+            latitude=latitude,
+            longitude=longitude
+        )
+        master.update()
+
+
 def destroy(event):
     if menu is not None:
         menu.destroy()
 
 
 def button_3_on_treeview(event):
-    global menu
+    global menu, on_toplevel
+    on_toplevel = False
     if menu is not None:
         destroy(event)
     menu = tk.Menu(master=None, tearoff=False)
@@ -993,6 +1866,8 @@ def button_3_on_treeview(event):
         label="Remove", command=lambda: button_3_remove(_treeview=treeview))
     menu.add_command(
         label="Open ADB Page", command=button_3_open_url)
+    menu.add_command(
+        label="Open Chart", command=lambda: button_3_open_chart(_treeview_=treeview))
     menu.post(event.x_root, event.y_root)
 
 
@@ -1860,7 +2735,7 @@ def dir_names(cat, dir1, orb_factor):
 
 
 def find_observed_values():
-    global selection, dir2
+    global selection, dir2, open_chart
     selection = "observed"
     if len(displayed_results) == 0:
         msgbox.showinfo(
@@ -1929,6 +2804,7 @@ def find_observed_values():
                     elif "s" in latitude:
                         latitude = -1 * float(latitude.replace("s", "."))
                 try:
+                    open_chart = False
                     chart = Chart(julian_date, longitude, latitude)
                     write_datas_to_excel(chart.get_chart_data())
                 except BaseException as err:
@@ -2940,7 +3816,8 @@ def main():
             master.update()
 
     def button_3_on_treeview_(event, _treeview_):
-        global menu
+        global menu, on_toplevel
+        on_toplevel = True
         if menu is not None:
             destroy(event)
         menu = tk.Menu(master=None, tearoff=False)
@@ -2948,6 +3825,9 @@ def main():
             label="Edit", command=lambda: edit_record(_treeview_))
         menu.add_command(
             label="Delete", command=lambda: delete_record(_treeview_))
+        menu.add_command(
+            label="Open Chart", command=lambda: button_3_open_chart(_treeview_)
+        )
         menu.post(event.x_root, event.y_root)
 
     def search_record(event, search_entry_, _treeview_):
@@ -2968,7 +3848,7 @@ def main():
                 break
 
     def edit_and_delete():
-        global add_or_edit
+        global add_or_edit, on_toplevel
         add_or_edit = True
         master.update()
         toplevel7 = tk.Toplevel()
@@ -3019,7 +3899,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "12 April 2019"
+        update_date, _update_date = "Update Date:", "13 April 2019"
         developed_by, _developed_by = "Developed By:", \
             "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", \
