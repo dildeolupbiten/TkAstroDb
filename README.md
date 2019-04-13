@@ -121,7 +121,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **19.** If users select **Open Chart** option, the chart of the selected record will be displayed.
 
-![img19](https://user-images.githubusercontent.com/29302909/56081527-02752080-5e17-11e9-8956-61897df7a3c9.png)
+![img19](https://user-images.githubusercontent.com/29302909/56081607-d017f300-5e17-11e9-8cba-89e8e0d421c6.png)
 
 **20.** If users select **Reload Database** option, all the added, edited and deleted records are activated and the database is reloaded. The time of reloading the database may vary according to the record number of both databases.
 
