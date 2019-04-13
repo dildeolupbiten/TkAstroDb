@@ -71,49 +71,51 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img6](https://user-images.githubusercontent.com/29302909/55159608-83bf8880-5172-11e9-8ea8-a2fecc98fcdf.png)
 
-**7.** Users can focus on a record then by right clicking to that record they can see some options that can be done with the focused record. One of the options is deleting the record from displayed results. The deleted record will not be used in the computation later. The other option opens the [Astro-Databank](https://www.astro.com/astro-databank/Main_Page) webpage of the selected record.
+**7.** Users can focus on a record then by right clicking to that record they can see some options that can be done with the focused record. One of the options is deleting the record from displayed results. The deleted record will not be used in the computation later. The other option opens the [Astro-Databank](https://www.astro.com/astro-databank/Main_Page) webpage of the selected record. And the last option display the chart of the focused record.
 
-![img7](https://user-images.githubusercontent.com/29302909/55159437-10b61200-5172-11e9-8bd9-bce0a526623b.png)
+![img7](https://user-images.githubusercontent.com/29302909/56081437-12403500-5e16-11e9-8298-702cc83d12ca.png)
+
+![img8](https://user-images.githubusercontent.com/29302909/56081446-24ba6e80-5e16-11e9-9976-4e7418196d9d.png)
 
 **8.** If users click **Export** menu button, they can see **Adb Links**, **Latitude Frequency** and **Year Frequency** options. By clicking **Adb Links** option, they can export the links of displayed records to [links.txt](https://www.dropbox.com/s/l69mhy5v5341gyr/links.txt) file. This file will be created at **TkAstroDb** directory. By clicking the **Latitude Frequency** option, the latitude intervals of the selected categories and the mean latitude value will be written inside [latitude-frequency.txt](https://www.dropbox.com/s/gncr0ywdk2xy056/latitude-frequency.txt) file. By clicking the **Year Frequency** option, a windows is opened as below. Users can specify the maximum, minimum and step values. After clicked the **Apply** button, the frequency of the years of displayed records will be put in a [year-frequency.txt](https://www.dropbox.com/s/2hx9gvstf0tso9r/year-frequency.txt) file.
 
-![img8](https://user-images.githubusercontent.com/29302909/51045381-80394e00-15d4-11e9-8eed-881fa66f0afb.png)
+![img9](https://user-images.githubusercontent.com/29302909/51045381-80394e00-15d4-11e9-8eed-881fa66f0afb.png)
 
 **9.** If users click **Options** menu button, they can see **House System** option. And by clicking that menu button, they can define the house system they want to use. If they don't click this menu button, the house system will be defined according to the default setting. The default house system were defined as **Placidus**.
 
-![img9](https://user-images.githubusercontent.com/29302909/51045506-d1e1d880-15d4-11e9-88f6-b63011273862.png)
+![img10](https://user-images.githubusercontent.com/29302909/51045506-d1e1d880-15d4-11e9-88f6-b63011273862.png)
 
 **10.** If users click **Options** menu button, they can see **Orb Factor** option. And by clicking that menu button, they can define the orb factors for each astrological aspect. If users don't click this menu button, the orb factors will be defined according to their default settings. The default orb factors were defined as follow:
 
-![img10](https://user-images.githubusercontent.com/29302909/50407124-2cf88a80-07e2-11e9-92f4-d51a4f7a6697.png)
+![img11](https://user-images.githubusercontent.com/29302909/50407124-2cf88a80-07e2-11e9-92f4-d51a4f7a6697.png)
 
 **11.** If users click **Records** menu button, they can see three options which names are as **Add New Record**, **Edit & Delete Records** and **Reload Database**. If users select **Add New Record** option, they will see a new window which is as follows:
 
-![img11](https://user-images.githubusercontent.com/29302909/55292823-eb3a3a00-53f7-11e9-8051-ffab3d7ce8ce.png)
+![img12](https://user-images.githubusercontent.com/29302909/55292823-eb3a3a00-53f7-11e9-8051-ffab3d7ce8ce.png)
 
 **12.** Users should fill all the entry fields that can be seen on the image. They can select any existing categories or they can define new categories using entry field if they want. Finally users should press the **Apply** button, then the selected or defined categories will be added to the category listbox. Note that users should use decimal latitude and longitude coordinates for a place.
 
-![img12](https://user-images.githubusercontent.com/29302909/55292729-f93b8b00-53f6-11e9-9c81-1b69f6f2789f.png)
+![img13](https://user-images.githubusercontent.com/29302909/55292729-f93b8b00-53f6-11e9-9c81-1b69f6f2789f.png)
 
 **13.** After added new records to an alternative [SQL](https://www.sqlite.org/index.html) database which name is **TkAstroDb.db**, users should restart the main program to make the added records active or they select the **Reload Database** option. After activated the records if users click the **Select** button which is near the **Categories** label, the newly defined category can be seen.
 
-![img13](https://user-images.githubusercontent.com/29302909/55161277-2fb6a300-5176-11e9-8d0c-db32a4ac623e.png)
+![img14](https://user-images.githubusercontent.com/29302909/55161277-2fb6a300-5176-11e9-8d0c-db32a4ac623e.png)
 
 **14.** After selected the **Reload Database** button and specified the **Rodden Rating**, the newly added record can be displayed.
 
-![img14](https://user-images.githubusercontent.com/29302909/55326449-7404b480-5490-11e9-8b4b-4146dd5decb2.png)
+![img15](https://user-images.githubusercontent.com/29302909/55326449-7404b480-5490-11e9-8b4b-4146dd5decb2.png)
 
 **15.** If users click **Edit & Delete Records**, they will see a new window which is as below. Users can see all the records of the [SQL](https://www.sqlite.org/index.html) database. If users correctly typed the record name to the search entry which is under **Search A Record By Name** label, the information of the found record will be displayed in a record window. 
 
-![img15](https://user-images.githubusercontent.com/29302909/55294306-39a40480-5409-11e9-948e-33945cd46e48.png)
+![img16](https://user-images.githubusercontent.com/29302909/55294306-39a40480-5409-11e9-948e-33945cd46e48.png)
 
 **16.** If users right click after selected a record, a right click menu will occur as can be seen on following image.
 
-![img16](https://user-images.githubusercontent.com/29302909/55294294-15482800-5409-11e9-828b-c8790014c061.png)
+![img17](https://user-images.githubusercontent.com/29302909/55294294-15482800-5409-11e9-828b-c8790014c061.png)
 
 **17.** If users select **Edit** option, a panel will be formed which contains the information of the selected record. After required changes have been done, users should click  **Apply** button to finish the editing process.
 
-![img17](https://user-images.githubusercontent.com/29302909/55292598-7c5be180-53f5-11e9-9191-0f06987cbb79.png)
+![img18](https://user-images.githubusercontent.com/29302909/55292598-7c5be180-53f5-11e9-9191-0f06987cbb79.png)
 
 **18.** If users select **Delete** option, the selected record is removed from the [SQL](https://www.sqlite.org/index.html) database.
 
@@ -121,11 +123,11 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **20.** If users click **Calculations** menu button, they can see options which are as follows: **Find Observed Values**, **Find Expected Values**, **Find Chi-Square Values** and **Find Effect Size Values**. If users want to find the astrological pattern distributions of any category, they should click **Find Observed Values** button. After clicked that menu button, a progress bar should be created as follows:
 
-![img18](https://user-images.githubusercontent.com/29302909/55159732-cc774180-5172-11e9-88b8-14ad17ccd6c2.png)
+![img19](https://user-images.githubusercontent.com/29302909/55159732-cc774180-5172-11e9-88b8-14ad17ccd6c2.png)
 
 **21.** After the computation finished, a log file (**output.log**) and an excel spreadsheet file (**observed_values.xlsx**) can be found inside nested directories like **Vocation/Occult_Fields/Astrologer/Rodden_Rating_AA/Orb_Factor_6_2_2_4_2_6_6_2_2_2_6/House_System_Placidus**. The directory names can be different according to the settings selected by the users. The spreadsheet file contains the astrological pattern distributions of displayed records.
 
-![img19](https://user-images.githubusercontent.com/29302909/51046181-79133f80-15d6-11e9-8457-cc72a010e63f.png)
+![img20](https://user-images.githubusercontent.com/29302909/51046181-79133f80-15d6-11e9-8457-cc72a010e63f.png)
 
 **22.** In order to calculate the expected values, the users must have two tables which include the astrological pattern distributions of two different categories. The expected values are calculated by comparing this two different categories. One category will be used as a *control group*, the other category will be used as a *research group*. While the table which is wanted to use as a *control group* should be renamed as **control_group.xlsx**, there is no need to change the name of *research group*, so it's name should be **observed_values.xlsx**. Note that users should copy the related tables to the **TkAstroDb** folder, then users can click **Calculations** menu button and they should select **Find Expected Values** option. There are two different methods to calculate the expected results.
 
@@ -155,33 +157,33 @@ def formula(x: list, y: list):
 
 **23.** After the calculation finished, **control_group.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheet file will be created as **expected_values.xlsx**. And it is recommended to move **expected_values.xlsx** file to the related category folder:
 
-![img20](https://user-images.githubusercontent.com/29302909/51046081-3b161b80-15d6-11e9-81d9-936c39d982e0.png)
+![img21](https://user-images.githubusercontent.com/29302909/51046081-3b161b80-15d6-11e9-81d9-936c39d982e0.png)
 
 **24.** In order to calculate the chi-square values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to **TkAstroDb** folder. Then they should select **Calculations** menu button. After that, they should click **Find Chi-Square Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheed file will be created as **chi-square.xlsx** in **TkAstroDb** folder. It is recommended that the users cut the file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **chi-square.xlsx** file to the related folder:
 
-![img21](https://user-images.githubusercontent.com/29302909/51046111-48330a80-15d6-11e9-8e05-d3e21d619b61.png)
+![img22](https://user-images.githubusercontent.com/29302909/51046111-48330a80-15d6-11e9-8e05-d3e21d619b61.png)
 
 **25.** In order to calculate the effect size values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to the **TkAstroDb** directory. Then they should select **Calculations** menu button. After that, they should select **Find Effect Size Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** will be deleted and a new excel spreadsheed file will be created as **effect-size.xlsx** in **TkAstroDb** folder. It is recommended that the users cut this file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **effect-size.xlsx** file to the related folder:
 
-![img22](https://user-images.githubusercontent.com/29302909/51046129-54b76300-15d6-11e9-9c18-ac49810666cb.png)
+![img23](https://user-images.githubusercontent.com/29302909/51046129-54b76300-15d6-11e9-9c18-ac49810666cb.png)
 
 ## Spreadsheets
 
 [observed_values.ods](https://www.dropbox.com/s/jtyu063qwloi8ru/observed_values.ods)
 
-![img23](https://user-images.githubusercontent.com/29302909/55176661-9944aa80-5192-11e9-8891-ca4498541e8b.png)
+![img24](https://user-images.githubusercontent.com/29302909/55176661-9944aa80-5192-11e9-8891-ca4498541e8b.png)
 
 [expected_values.ods](https://www.dropbox.com/s/rkjet5vwg8pny3o/expected_values.ods)
 
-![img24](https://user-images.githubusercontent.com/29302909/55176770-d27d1a80-5192-11e9-95e9-9aee8916ccfb.png)
+![img25](https://user-images.githubusercontent.com/29302909/55176770-d27d1a80-5192-11e9-95e9-9aee8916ccfb.png)
 
 [chi-square.ods](https://www.dropbox.com/s/8chuztedv16s2yi/chi-square.ods)
 
-![img25](https://user-images.githubusercontent.com/29302909/55176879-0c4e2100-5193-11e9-923f-dfe0c3b4a934.png)
+![img26](https://user-images.githubusercontent.com/29302909/55176879-0c4e2100-5193-11e9-923f-dfe0c3b4a934.png)
 
 [effect-size.ods](https://www.dropbox.com/s/8t20csz95txghex/effect-size.ods)
 
-![img26](https://user-images.githubusercontent.com/29302909/55176960-369fde80-5193-11e9-979a-f7429821261d.png)
+![img27](https://user-images.githubusercontent.com/29302909/55176960-369fde80-5193-11e9-979a-f7429821261d.png)
 
 ## Notes
 
