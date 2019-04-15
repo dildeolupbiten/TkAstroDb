@@ -95,7 +95,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **12.** Users should fill all the entry fields that can be seen on the image. They can select any existing categories or they can define new categories using entry field if they want. Finally users should press the **Apply** button, then the selected or defined categories will be added to the category listbox. Note that users should use decimal latitude and longitude coordinates for a place.
 
-![img13](https://user-images.githubusercontent.com/29302909/55292729-f93b8b00-53f6-11e9-9c81-1b69f6f2789f.png)
+![img13](https://user-images.githubusercontent.com/29302909/56122350-e8545300-5f7a-11e9-846d-745359da7cfe.png)
 
 **13.** After added new records to an alternative [SQL](https://www.sqlite.org/index.html) database which name is **TkAstroDb.db**, users should restart the main program to make the added records active or they select the **Reload Database** option. After activated the records if users click the **Select** button which is near the **Categories** label, the newly defined category can be seen.
 
@@ -115,7 +115,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **17.** If users select **Edit** option, a panel will be formed which contains the information of the selected record. After required changes have been done, users should click  **Apply** button to finish the editing process.
 
-![img18](https://user-images.githubusercontent.com/29302909/55292598-7c5be180-53f5-11e9-9191-0f06987cbb79.png)
+![img18](https://user-images.githubusercontent.com/29302909/56122350-e8545300-5f7a-11e9-846d-745359da7cfe.png)
 
 **18.** If users select **Delete** option, the selected record is removed from the [SQL](https://www.sqlite.org/index.html) database.
 
