@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.4.2"
+__version__ = "1.4.3"
 
 import os
 import sys
@@ -32,46 +32,53 @@ except ModuleNotFoundError:
     os.system("pip3 install geopy")
     from geopy.geocoders import Nominatim
     
+whl_path = os.path.join(os.getcwd(), "Eph", "Whl")
+    
     
 def select_module(module_name, module_files):
     if os.name == "posix":
         os.system(f"pip3 install {module_name}")
     elif os.name == "nt":
-        path = os.path.join(os.getcwd(), "Eph", "Whl")
         if sys.version_info.minor == 6:
-            if platform.architecture()[0] == "64bit":
-                new_path = os.path.join(path, module_files[0])
+            if platform.architecture()[0] == "32bit":
+                new_path = os.path.join(whl_path, module_files[0])
                 os.system(f"pip3 install {new_path}")
-            elif platform.architecture()[0] == "32bit":
-                new_path = os.path.join(path, module_files[1])
+            elif platform.architecture()[0] == "64bit":
+                new_path = os.path.join(whl_path, module_files[1])
                 os.system(f"pip3 install {new_path}")
         elif sys.version_info.minor == 7:
-            if platform.architecture()[0] == "64bit":
-                new_path = os.path.join(path, module_files[2])
+            if platform.architecture()[0] == "32bit":
+                new_path = os.path.join(whl_path, module_files[2])
                 os.system(f"pip3 install {new_path}")
-            elif platform.architecture()[0] == "32bit":
-                new_path = os.path.join(path, module_files[3])
+            elif platform.architecture()[0] == "64bit":
+                new_path = os.path.join(whl_path, module_files[3])
                 os.system(f"pip3 install {new_path}")
-                
-                
+       
+                      
 try:
     import shapely
 except ModuleNotFoundError:
-    shapely_whl_files = [
-        "Shapely-1.6.4.post1-cp36-cp36m-win_amd64.whl",
-        "Shapely-1.6.4.post1-cp36-cp36m-win32.whl",
-        "Shapely-1.6.4.post1-cp37-cp37m-win_amd64.whl",
-        "Shapely-1.6.4.post1-cp37-cp37m-win32.whl"
-    ]
+    whl_shapely = [i for i in os.listdir(whl_path) if "Shapely" in i]
     select_module(
         module_name="shapely", 
-        module_files=shapely_whl_files
+        module_files=whl_shapely
     )
+try:
+    import swisseph as swe
+except ModuleNotFoundError:
+    whl_pyswisseph = [i for i in os.listdir(whl_path) if "pyswisseph" in i]
+    select_module(
+        module_name="pyswisseph", 
+        module_files=whl_pyswisseph
+    )
+    import swisseph as swe
+    
 try:
     from tzwhere import tzwhere
 except ModuleNotFoundError:
     os.system("pip3 install tzwhere")
     from tzwhere import tzwhere
+    
 try:
     from countryinfo import CountryInfo
 except ModuleNotFoundError:
@@ -98,6 +105,7 @@ except ModuleNotFoundError:
                 for line in script_code:
                     write_file.write(line)
     from countryinfo import CountryInfo
+    
 try:
     import certifi
 except ModuleNotFoundError:
@@ -118,20 +126,6 @@ try:
 except ModuleNotFoundError:
     os.system("pip3 install xlwt")
     import xlwt
-try:
-    import swisseph as swe
-except ModuleNotFoundError:
-    pyswisseph_whl_files = [
-        "pyswisseph-2.5.1.post0-cp36-cp36m-win_amd64.whl",
-        "pyswisseph-2.5.1.post0-cp36-cp36m-win32.whl",
-        "pyswisseph-2.5.1.post0-cp37-cp37m-win_amd64.whl",
-        "pyswisseph-2.5.1.post0-cp37-cp37m-win32.whl"   
-    ]
-    select_module(
-        module_name="pyswisseph", 
-        module_files=pyswisseph_whl_files
-    )
-    import swisseph as swe
 
 
 # -----------------------------sqlite3 & xml------------------------------------
@@ -3980,7 +3974,7 @@ def main():
         name = "TkAstroDb"
         version, _version = "Version:", __version__
         build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "13 April 2019"
+        update_date, _update_date = "Update Date:", "28 April 2019"
         developed_by, _developed_by = "Developed By:", \
             "Tanberk Celalettin Kutlu"
         thanks_to, _thanks_to = "Special Thanks To:", \
