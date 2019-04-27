@@ -2838,111 +2838,112 @@ def find_observed_values():
             trine, sesquiquadrate, biquintile, quincunx, opposite
         ]
         orb_factor = [str(i) for i in orb_factor]
-        with open(file="output.log", mode="w", encoding="utf-8") as log:
-            log.write(f"Adb Version: {xml_file.replace('.xml', '')}\n")
-            log.write(f"House System: {house_systems[hsys]}\n")
+        log = open(file="output.log", mode="w", encoding="utf-8")
+        log.write(f"Adb Version: {xml_file.replace('.xml', '')}\n")
+        log.write(f"House System: {house_systems[hsys]}\n")
+        if len(displayed_results) == 1:
+            log.write(f"Rodden Rating: {displayed_results[0][3]}\n")
+        else:
+            log.write(f"Rodden Rating: {'+'.join(selected_ratings)}\n")
+        log.write(f"Orb Factor: {'_'.join(orb_factor)}\n")
+        if len(selected_categories) == 1:
             if len(displayed_results) == 1:
-                log.write(f"Rodden Rating: {displayed_results[0][3]}\n")
+                dis_res = displayed_results[0][1]
+                cnt = dis_res.count(' ')
+                dis_res = dis_res.replace(' ', '_', cnt)
+                log.write(f"Category: {dis_res}\n\n")
             else:
-                log.write(f"Rodden Rating: {'+'.join(selected_ratings)}\n")
-            log.write(f"Orb Factor: {'_'.join(orb_factor)}\n")
-            if len(selected_categories) == 1:
-                if len(displayed_results) == 1:
-                    dis_res = displayed_results[0][1]
-                    cnt = dis_res.count(' ')
-                    dis_res = dis_res.replace(' ', '_', cnt)
-                    log.write(f"Category: {dis_res}\n\n")
+                mod_cat_names = '/'.join(modify_category_names())
+                log.write(f"Category: {mod_cat_names}\n\n")
+        elif len(selected_categories) > 1:
+            log.write(f"Category: Control_Group\n\n")
+            criterias = ["Event", "Human", "Male", "Female",
+                         "North Hemisphere", "South Hemisphere"]
+            checkbuttons = [var_checkbutton_1, var_checkbutton_2,
+                            var_checkbutton_3, var_checkbutton_4,
+                            var_checkbutton_5, var_checkbutton_6]
+            for i in range(6):
+                if checkbuttons[i].get() == "0":
+                    log.write(f"{criterias[i]}: True\n")
                 else:
-                    mod_cat_names = '/'.join(modify_category_names())
-                    log.write(f"Category: {mod_cat_names}\n\n")
-            elif len(selected_categories) > 1:
-                log.write(f"Category: Control_Group\n\n")
-                criterias = ["Event", "Human", "Male", "Female", 
-                             "North Hemisphere", "South Hemisphere"]
-                checkbuttons = [var_checkbutton_1, var_checkbutton_2, 
-                                var_checkbutton_3, var_checkbutton_4, 
-                                var_checkbutton_5, var_checkbutton_6]
-                for i in range(6):
-                    if checkbuttons[i].get() == "0":
-                        log.write(f"{criterias[i]}: True\n")
-                    else:
-                        log.write(f"{criterias[i]}: False\n")
-            log.write(f"|{str(dt.now())[:-7]}| Process started.\n\n")
-            log.flush()
-            for records in displayed_results:
-                julian_date = float(records[6])
-                latitude = records[7]
-                longitude = records[8]
-                if type(longitude) != float:
-                    if "e" in longitude:
-                        longitude = float(longitude.replace("e", "."))
-                    elif "w" in longitude:
-                        longitude = -1 * float(longitude.replace("w", "."))
-                if type(latitude) != float:
-                    if "n" in latitude:
-                        latitude = float(latitude.replace("n", "."))
-                    elif "s" in latitude:
-                        latitude = -1 * float(latitude.replace("s", "."))
+                    log.write(f"{criterias[i]}: False\n")
+        log.write(f"|{str(dt.now())[:-7]}| Process started.\n\n")
+        log.flush()
+        for records in displayed_results:
+            julian_date = float(records[6])
+            latitude = records[7]
+            longitude = records[8]
+            if type(longitude) != float:
+                if "e" in longitude:
+                    longitude = float(longitude.replace("e", "."))
+                elif "w" in longitude:
+                    longitude = -1 * float(longitude.replace("w", "."))
+            if type(latitude) != float:
+                if "n" in latitude:
+                    latitude = float(latitude.replace("n", "."))
+                elif "s" in latitude:
+                    latitude = -1 * float(latitude.replace("s", "."))
+            try:
+                open_chart = False
+                chart = Chart(julian_date, longitude, latitude)
+                write_datas_to_excel(chart.get_chart_data())
+            except BaseException as err:
+                log.write(f"|{str(dt.now())[:-7]}| Error Type: {err}\n"
+                          f"{' ' * 22}Record: {records}\n\n")
+                log.flush()
+            __received__ += 1
+            if __received__ != __size__:
+                pbar["value"] = __received__
+                pbar["maximum"] = __size__
+                pstring.set("{} %, {} minutes remaining.".format(
+                    int(100 * __received__ / __size__),
+                    round(
+                        (int(__size__ /
+                             (__received__ / (time.time() - __now__)))
+                         - int(time.time() - __now__)) / 60)))
+            else:
+                pframe.destroy()
+                pbar.destroy()
+                plabel.destroy()
                 try:
-                    open_chart = False
-                    chart = Chart(julian_date, longitude, latitude)
-                    write_datas_to_excel(chart.get_chart_data())
-                except BaseException as err:
-                    log.write(f"|{str(dt.now())[:-7]}| Error Type: {err}\n"
-                              f"{' ' * 22}Record: {records}\n\n")
-                    log.flush()
-                __received__ += 1
-                if __received__ != __size__:
-                    pbar["value"] = __received__
-                    pbar["maximum"] = __size__
-                    pstring.set("{} %, {} minutes remaining.".format(
-                        int(100 * __received__ / __size__),
-                        round(
-                            (int(__size__ /
-                                 (__received__ / (time.time() - __now__)))
-                             - int(time.time() - __now__)) / 60)))
-                else:
-                    pframe.destroy()
-                    pbar.destroy()
-                    plabel.destroy()
+                    os.rename("table0.xlsx", "observed_values.xlsx")
+                    dir1 = f"RR_{'+'.join(selected_ratings)}"
+                    if len(selected_categories) == 1:
+                        if len(displayed_results) == 1:
+                            dis_res = displayed_results[0][1]
+                            cnt = dis_res.count(" ")
+                            dis_res = dis_res.replace(" ", "_", cnt)
+                            cat = [dis_res]
+                            dir1 = f"RR_{displayed_results[0][3]}"
+                        else:
+                            cat = modify_category_names()
+                        dir2 = dir_names(cat, dir1, orb_factor)
+                    elif len(selected_categories) > 1:
+                        cat = ["Control_Group"]
+                        dir2 = dir_names(cat, dir1, orb_factor)
                     try:
-                        os.rename("table0.xlsx", "observed_values.xlsx")
-                        dir1 = f"RR_{'+'.join(selected_ratings)}"
-                        if len(selected_categories) == 1:
-                            if len(displayed_results) == 1:
-                                dis_res = displayed_results[0][1]
-                                cnt = dis_res.count(" ")
-                                dis_res = dis_res.replace(" ", "_", cnt)
-                                cat = [dis_res]
-                                dir1 = f"RR_{displayed_results[0][3]}"
-                            else:
-                                cat = modify_category_names()
-                            dir2 = dir_names(cat, dir1, orb_factor)
-                        elif len(selected_categories) > 1:
-                            cat = ["Control_Group"]
-                            dir2 = dir_names(cat, dir1, orb_factor)
-                        try:
-                            os.makedirs(dir2)
-                            shutil.move(
-                                src=os.path.join(os.getcwd(),
-                                                 "observed_values.xlsx"),
-                                dst=os.path.join(os.getcwd(),
-                                                 dir2,
-                                                 "observed_values.xlsx"))
-                        except FileExistsError as err:
-                            log.write(
-                                f"|{str(dt.now())[:-7]}| "
-                                f"Error Type: {err}\n\n")
-                            log.flush()
-                    except FileNotFoundError:
-                        pass
-                    master.update()
-                    log.write(f"|{str(dt.now())[:-7]}| Process finished.")
-                    shutil.move(
-                        src=os.path.join(os.getcwd(), "output.log"),
-                        dst=os.path.join(os.getcwd(), dir2, "output.log"))
-                    msgbox.showinfo(title="Find Observed Values",
-                                    message="Process finished successfully.")
+                        os.makedirs(dir2)
+                        shutil.move(
+                            src=os.path.join(os.getcwd(),
+                                             "observed_values.xlsx"),
+                            dst=os.path.join(os.getcwd(),
+                                             dir2,
+                                             "observed_values.xlsx"))
+                    except FileExistsError as err:
+                        log.write(
+                            f"|{str(dt.now())[:-7]}| "
+                            f"Error Type: {err}\n\n")
+                        log.flush()
+                except FileNotFoundError:
+                    pass
+                master.update()
+                log.write(f"|{str(dt.now())[:-7]}| Process finished.")
+                log.close()
+                shutil.move(
+                    src=os.path.join(os.getcwd(), "output.log"),
+                    dst=os.path.join(os.getcwd(), dir2, "output.log"))
+                msgbox.showinfo(title="Find Observed Values",
+                                message="Process finished successfully.")
 
 
 def sum_of_row(table):
