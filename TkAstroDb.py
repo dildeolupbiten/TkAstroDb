@@ -8,6 +8,7 @@ import sys
 import ssl
 import time
 import shutil
+import platform
 import threading
 import webbrowser
 import tkinter as tk
@@ -30,6 +31,32 @@ try:
 except ModuleNotFoundError:
     os.system("pip3 install geopy")
     from geopy.geocoders import Nominatim
+try:
+    import shapely
+except ModuleNotFoundError:
+    if os.name == "posix":
+        os.system("pip3 install shapely")
+    elif os.name == "nt":
+        path = os.path.join(os.getcwd(), "Eph", "Whl")
+        if sys.version_info.minor == 6:
+            if platform.architecture()[0] == "64bit":
+                new_path = os.path.join(
+                    path,
+                    "Shapely-1.6.4.post1-cp36-cp36m-win_amd64.whl")
+                os.system(f"pip3 install {new_path}")
+            elif platform.architecture()[0] == "32bit":
+                new_path = os.path.join(
+                    path, "Shapely-1.6.4.post1-cp36-cp36m-win32.whl")
+                os.system(f"pip3 install {new_path}")
+        elif sys.version_info.minor == 7:
+            if platform.architecture()[0] == "64bit":
+                new_path = os.path.join(
+                    path, "Shapely-1.6.4.post1-cp37-cp37m-win_amd64.whl")
+                os.system(f"pip3 install {new_path}")
+            elif platform.architecture()[0] == "32bit":
+                new_path = os.path.join(
+                    path, "Shapely-1.6.4.post1-cp37-cp37m-win32.whl")
+                os.system(f"pip3 install {new_path}")
 try:
     from tzwhere import tzwhere
 except ModuleNotFoundError:
@@ -87,7 +114,6 @@ except ModuleNotFoundError:
     if os.name == "posix":
         os.system("pip3 install pyswisseph")
     elif os.name == "nt":
-        import platform
         path = os.path.join(os.getcwd(), "Eph", "Whl")
         if sys.version_info.minor == 6:
             if platform.architecture()[0] == "64bit":
