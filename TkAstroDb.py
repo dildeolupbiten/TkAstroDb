@@ -58,18 +58,16 @@ def select_module(module_name, module_files):
 try:
     import shapely
 except ModuleNotFoundError:
-    whl_shapely = [i for i in os.listdir(whl_path) if "Shapely" in i]
     select_module(
         module_name="shapely", 
-        module_files=whl_shapely
+        module_files=[i for i in os.listdir(whl_path) if "Shapely" in i]
     )
 try:
     import swisseph as swe
 except ModuleNotFoundError:
-    whl_pyswisseph = [i for i in os.listdir(whl_path) if "pyswisseph" in i]
     select_module(
         module_name="pyswisseph", 
-        module_files=whl_pyswisseph
+        module_files=[i for i in os.listdir(whl_path) if "pyswisseph" in i]
     )
     import swisseph as swe
     
