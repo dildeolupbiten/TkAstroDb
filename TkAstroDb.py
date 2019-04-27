@@ -1868,9 +1868,14 @@ def button_3_open_chart(_treeview_):
                     font="Arial 10"
                 )
                 l3.grid(row=i, column=2, sticky="w")
-        line_object(x1=5, x2=260, y1=170, y2=170, width=1)
+
         info_frame_2 = tk.Frame(master=canvas, bg="white")
-        info_frame_2.place(x=10, y=172)
+        if os.name == "nt":
+            line_object(x1=5, x2=260, y1=183, y2=183, width=1)
+            info_frame_2.place(x=10, y=185)       
+        else:
+            line_object(x1=5, x2=260, y1=170, y2=170, width=1)
+            info_frame_2.place(x=10, y=172)
         l4 = tk.Label(
             master=info_frame_2,
             text="House System      ",
@@ -1892,9 +1897,13 @@ def button_3_open_chart(_treeview_):
             font="Arial 10"
         )
         l6.grid(row=0, column=2, sticky="w")
-        line_object(x1=5, x2=260, y1=192, y2=192, width=1)
         info_frame_3 = tk.Frame(master=canvas, bg="white")
-        info_frame_3.place(x=10, y=197)
+        if os.name == "nt":
+            line_object(x1=5, x2=260, y1=210, y2=210, width=1)
+            info_frame_3.place(x=10, y=215)
+        else:
+            line_object(x1=5, x2=260, y1=195, y2=195, width=1)        
+            info_frame_3.place(x=10, y=197)
         for i, j in enumerate(aspect_list):
             l7 = tk.Label(
                 master=info_frame_3,
