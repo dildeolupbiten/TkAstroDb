@@ -6,6 +6,7 @@ __version__ = "1.4.3"
 import os
 import sys
 import ssl
+import pip
 import time
 import shutil
 import platform
@@ -54,14 +55,20 @@ def select_module(module_name, module_files):
                 new_path = os.path.join(whl_path, module_files[3])
                 os.system(f"pip3 install {new_path}")
        
-                      
-try:
-    import shapely
-except ModuleNotFoundError:
+
+packages = [str(i) for i in pip.get_installed_distributions()]               
+if "Shapely 1.6.4.post2" not in packages:
     select_module(
         module_name="shapely", 
         module_files=[i for i in os.listdir(whl_path) if "Shapely" in i]
     )
+    
+try:
+    from tzwhere import tzwhere
+except ModuleNotFoundError:
+    os.system("pip3 install tzwhere")
+    from tzwhere import tzwhere
+    
 try:
     import swisseph as swe
 except ModuleNotFoundError:
@@ -70,12 +77,6 @@ except ModuleNotFoundError:
         module_files=[i for i in os.listdir(whl_path) if "pyswisseph" in i]
     )
     import swisseph as swe
-    
-try:
-    from tzwhere import tzwhere
-except ModuleNotFoundError:
-    os.system("pip3 install tzwhere")
-    from tzwhere import tzwhere
     
 try:
     from countryinfo import CountryInfo
