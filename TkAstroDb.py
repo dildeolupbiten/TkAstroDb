@@ -3059,7 +3059,7 @@ def find_effect_size_values():
     )
 
 
-# ----------------------------------main ---------------------------------------
+# --------------------menu variables functions------------------------
 
 
 add_or_edit = False
@@ -4099,6 +4099,9 @@ def update():
                     os.system(f"TASKKILL /F /PID {os.getpid()}")
 
 
+# ------------------------------menu--------------------------------
+
+
 menubar = tk.Menu(master=master)
 master.configure(menu=menubar)
 
@@ -4154,5 +4157,10 @@ help_menu.add_command(label="About",
 help_menu.add_command(label="Check for Updates",
                       command=update)
 
-t0 = threading.Thread(target=master.mainloop)
-t0.run()
+
+# -----------------------------run---------------------------
+
+
+if __name__ == "__main__":
+    t0 = threading.Thread(target=master.mainloop)
+    t0.run()
