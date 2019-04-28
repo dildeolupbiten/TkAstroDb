@@ -56,12 +56,13 @@ def select_module(module_name, module_files):
                 os.system(f"pip3 install {new_path}")
        
 
-packages = [str(i) for i in pip.get_installed_distributions()]               
-if "Shapely 1.6.4.post2" not in packages:
-    select_module(
-        module_name="shapely", 
-        module_files=[i for i in os.listdir(whl_path) if "Shapely" in i]
-    )
+if os.name == "nt":
+    packages = [str(i) for i in pip.get_installed_distributions()]               
+    if "Shapely 1.6.4.post1" not in packages:
+        select_module(
+            module_name="shapely", 
+            module_files=[i for i in os.listdir(whl_path) if "Shapely" in i]
+        )
     
 try:
     from tzwhere import tzwhere
