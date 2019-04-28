@@ -1516,11 +1516,11 @@ def select_ratings():
         cvar_list = []
         checkbutton_list = []
         check_all = tk.BooleanVar()
-        check_uncheck = tk.Checkbutton(master=rating_frame, 
-                                       text="Check/Uncheck All", 
-                                       variable=check_all)
+        check_uncheck_ = tk.Checkbutton(master=rating_frame,
+                                        text="Check/Uncheck All",
+                                        variable=check_all)
         check_all.set(False)
-        check_uncheck.grid(row=0, column=0, sticky="nw")
+        check_uncheck_.grid(row=0, column=0, sticky="nw")
         for num, c in enumerate(
                 ["AA", "A", "B", "C", "DD", "X", "XX", "AX"], 1):
             _rating_ = c
@@ -1535,7 +1535,7 @@ def select_ratings():
             command=lambda: tbutton_command(cvar_list, 
                                             toplevel2, 
                                             selected_ratings))
-        check_uncheck.configure(
+        check_uncheck_.configure(
             command=lambda: check_all_command(check_all, 
                                               cvar_list, 
                                               checkbutton_list))
@@ -1575,11 +1575,11 @@ def select_categories():
         cvar_list = []
         checkbutton_list = []
         check_all = tk.BooleanVar()
-        check_uncheck = tk.Checkbutton(master=tframe, 
-                                       text="Check/Uncheck All", 
-                                       variable=check_all)
+        check_uncheck_ = tk.Checkbutton(master=tframe,
+                                        text="Check/Uncheck All",
+                                        variable=check_all)
         check_all.set(False)
-        check_uncheck.grid(row=0, column=0, sticky="nw")
+        check_uncheck_.grid(row=0, column=0, sticky="nw")
         for num, _category_ in enumerate(category_names, 1):
             cvar = tk.BooleanVar()
             cvar_list.append([cvar, _category_])
@@ -1600,7 +1600,7 @@ def select_categories():
                 command=lambda: tbutton_command(cvar_list, 
                                                 toplevel1, 
                                                 record_categories))
-        check_uncheck.configure(
+        check_uncheck_.configure(
             command=lambda: check_all_command(check_all, 
                                               cvar_list, 
                                               checkbutton_list))
@@ -3067,1056 +3067,1093 @@ edit_or_search = False
 treeviews = []
 items = []
 
+freq_frmt = [0, 2000, 100]
 
-def main():
-    freq_frmt = [0, 2000, 100]
 
-    def func1():
-        global r1, r2, r3, _r1, _r2, _r3
-        r1, r2, r3 = "", "", ""
-        _r1, _r2, _r3 = [], [], []
-        t1 = threading.Thread(target=find_observed_values)
-        t1.start()
+def func1():
+    global r1, r2, r3, _r1, _r2, _r3
+    r1, r2, r3 = "", "", ""
+    _r1, _r2, _r3 = [], [], []
+    t1 = threading.Thread(target=find_observed_values)
+    t1.start()
 
-    def func2():
-        global r1, r2, r3, _r1, _r2, _r3
-        r1, r2, r3 = "", "", ""
-        _r1, _r2, _r3 = [], [], []
-        t2 = threading.Thread(target=find_expected_values)
-        t2.start()
 
-    def func3():
-        global r1, r2, r3, _r1, _r2, _r3
-        r1, r2, r3 = "", "", ""
-        _r1, _r2, _r3 = [], [], []
-        t3 = threading.Thread(target=find_chi_square_values)
-        t3.start()
+def func2():
+    global r1, r2, r3, _r1, _r2, _r3
+    r1, r2, r3 = "", "", ""
+    _r1, _r2, _r3 = [], [], []
+    t2 = threading.Thread(target=find_expected_values)
+    t2.start()
 
-    def func4():
-        global r1, r2, r3, _r1, _r2, _r3
-        r1, r2, r3 = "", "", ""
-        _r1, _r2, _r3 = [], [], []
-        t4 = threading.Thread(target=find_effect_size_values)
-        t4.start()
 
-    def set_method_to_false():
-        global method
-        method = False
-        func2()
+def func3():
+    global r1, r2, r3, _r1, _r2, _r3
+    r1, r2, r3 = "", "", ""
+    _r1, _r2, _r3 = [], [], []
+    t3 = threading.Thread(target=find_chi_square_values)
+    t3.start()
 
-    def set_method_to_true():
-        global method
-        method = True
-        func2()
 
-    def change_orb_factors(parent, orb_entries):
-        global conjunction, semi_sextile, semi_square, sextile
-        global quintile, square, trine, sesquiquadrate, biquintile
-        global quincunx, opposite
-        conjunction = int(orb_entries[0].get())
-        semi_sextile = int(orb_entries[1].get())
-        semi_square = int(orb_entries[2].get())
-        sextile = int(orb_entries[3].get())
-        quintile = int(orb_entries[4].get())
-        square = int(orb_entries[5].get())
-        trine = int(orb_entries[6].get())
-        sesquiquadrate = int(orb_entries[7].get())
-        biquintile = int(orb_entries[8].get())
-        quincunx = int(orb_entries[9].get())
-        opposite = int(orb_entries[10].get())
-        parent.destroy()
+def func4():
+    global r1, r2, r3, _r1, _r2, _r3
+    r1, r2, r3 = "", "", ""
+    _r1, _r2, _r3 = [], [], []
+    t4 = threading.Thread(target=find_effect_size_values)
+    t4.start()
 
-    def choose_orb_factor():
-        toplevel3 = tk.Toplevel()
-        toplevel3.title("Orb Factor")
-        toplevel3.resizable(width=False, height=False)
-        aspects = ["Conjunction", "Semi-Sextile", "Semi-Square", 
-                   "Sextile", "Quintile", "Square", "Trine", 
-                   "Sesquiquadrate", "BiQuintile", "Quincunx", "Opposite"]
-        default_orbs = [conjunction, semi_sextile, semi_square, sextile, 
-                        quintile, square, trine, sesquiquadrate, biquintile, 
-                        quincunx, opposite]
-        orb_entries = []
-        for i, j in enumerate(aspects):
-            aspect_label = tk.Label(master=toplevel3, text=f"{j}")
-            aspect_label.grid(row=i, column=0, sticky="w")
-            equal_to = tk.Label(master=toplevel3, text="=")
-            equal_to.grid(row=i, column=1, sticky="e")
-            orb_entry = tk.Entry(master=toplevel3, width=5)
-            orb_entry.grid(row=i, column=2)
-            orb_entry.insert(0, default_orbs[i])
-            orb_entries.append(orb_entry)
-        apply_button = tk.Button(
-            master=toplevel3, 
-            text="Apply",
-            command=lambda: change_orb_factors(parent=toplevel3, 
-                                               orb_entries=orb_entries))
-        apply_button.grid(row=11, column=0, columnspan=3)
 
-    def change_hsys(parent, checkbuttons, _house_systems_):
-        global hsys
-        if checkbuttons[_house_systems_[0]][1].get() == "1":
-            hsys = "P"
-        elif checkbuttons[_house_systems_[1]][1].get() == "1":
-            hsys = "K"
-        elif checkbuttons[_house_systems_[2]][1].get() == "1":
-            hsys = "O"
-        elif checkbuttons[_house_systems_[3]][1].get() == "1":
-            hsys = "R"
-        elif checkbuttons[_house_systems_[4]][1].get() == "1":
-            hsys = "C"
-        elif checkbuttons[_house_systems_[5]][1].get() == "1":
-            hsys = "E"
-        elif checkbuttons[_house_systems_[6]][1].get() == "1":
-            hsys = "W"
-        parent.destroy()
+def set_method_to_false():
+    global method
+    method = False
+    func2()
 
-    def check_uncheck(checkbuttons, _house_systems_, j):
-        for i in _house_systems_:
-            if i != j:
-                checkbuttons[i][1].set("0")
-                checkbuttons[i][0].configure(variable=checkbuttons[i][1])
 
-    def create_hsys_checkbuttons():
-        toplevel4 = tk.Toplevel()
-        toplevel4.title("House System")
-        toplevel4.geometry("200x200")
-        toplevel4.resizable(width=False, height=False)
-        hsys_frame = tk.Frame(master=toplevel4)
-        hsys_frame.pack(side="top")
-        button_frame = tk.Frame(master=toplevel4)
-        button_frame.pack(side="bottom")
-        _house_systems_ = [values for keys, values in house_systems.items()]
-        checkbuttons = dict()
-        for i, j in enumerate(_house_systems_):
-            _var_ = tk.StringVar()
-            if j == house_systems[hsys]:
-                _var_.set(value="1")
-            else:
-                _var_.set(value="0")
-            _checkbutton_ = tk.Checkbutton(
-                master=hsys_frame,
-                text=j,
-                variable=_var_)
-            _checkbutton_.grid(row=i, column=0, sticky="w")
-            checkbuttons[j] = [_checkbutton_, _var_]
-        checkbuttons["Placidus"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, 
-                                          _house_systems_, 
-                                          "Placidus"))
-        checkbuttons["Koch"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, 
-                                          _house_systems_, 
-                                          "Koch"))
-        checkbuttons["Porphyrius"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, 
-                                          _house_systems_, 
-                                          "Porphyrius"))
-        checkbuttons["Regiomontanus"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, 
-                                          _house_systems_, 
-                                          "Regiomontanus"))
-        checkbuttons["Campanus"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, 
-                                          _house_systems_, 
-                                          "Campanus"))
-        checkbuttons["Equal"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, 
-                                          _house_systems_, 
-                                          "Equal"))
-        checkbuttons["Whole Signs"][0].configure(
-            command=lambda: check_uncheck(checkbuttons, 
-                                          _house_systems_, 
-                                          "Whole Signs"))
-        apply_button = tk.Button(master=button_frame, text="Apply",
-                                 command=lambda: change_hsys(
-                                     parent=toplevel4,
-                                     checkbuttons=checkbuttons,
-                                     _house_systems_=_house_systems_))
-        apply_button.pack()
+def set_method_to_true():
+    global method
+    method = True
+    func2()
 
-    def export_link():
-        if len(displayed_results) > 0:
-            with open(file="links.txt", mode="w", encoding="utf-8") as f:
-                for i, j in enumerate(displayed_results):
-                    f.write(f"{i + 1}. {j[11]}\n")
-            msgbox.showinfo(
-                title="Export Links",
-                message=f"{len(displayed_results)} links were exported.")
+
+def change_orb_factors(parent, orb_entries):
+    global conjunction, semi_sextile, semi_square, sextile
+    global quintile, square, trine, sesquiquadrate, biquintile
+    global quincunx, opposite
+    conjunction = int(orb_entries[0].get())
+    semi_sextile = int(orb_entries[1].get())
+    semi_square = int(orb_entries[2].get())
+    sextile = int(orb_entries[3].get())
+    quintile = int(orb_entries[4].get())
+    square = int(orb_entries[5].get())
+    trine = int(orb_entries[6].get())
+    sesquiquadrate = int(orb_entries[7].get())
+    biquintile = int(orb_entries[8].get())
+    quincunx = int(orb_entries[9].get())
+    opposite = int(orb_entries[10].get())
+    parent.destroy()
+
+
+def choose_orb_factor():
+    toplevel3 = tk.Toplevel()
+    toplevel3.title("Orb Factor")
+    toplevel3.resizable(width=False, height=False)
+    aspects = ["Conjunction", "Semi-Sextile", "Semi-Square",
+               "Sextile", "Quintile", "Square", "Trine",
+               "Sesquiquadrate", "BiQuintile", "Quincunx", "Opposite"]
+    default_orbs = [conjunction, semi_sextile, semi_square, sextile,
+                    quintile, square, trine, sesquiquadrate, biquintile,
+                    quincunx, opposite]
+    orb_entries = []
+    for i, j in enumerate(aspects):
+        aspect_label = tk.Label(master=toplevel3, text=f"{j}")
+        aspect_label.grid(row=i, column=0, sticky="w")
+        equal_to = tk.Label(master=toplevel3, text="=")
+        equal_to.grid(row=i, column=1, sticky="e")
+        orb_entry = tk.Entry(master=toplevel3, width=5)
+        orb_entry.grid(row=i, column=2)
+        orb_entry.insert(0, default_orbs[i])
+        orb_entries.append(orb_entry)
+    apply_button = tk.Button(
+        master=toplevel3,
+        text="Apply",
+        command=lambda: change_orb_factors(parent=toplevel3,
+                                           orb_entries=orb_entries))
+    apply_button.grid(row=11, column=0, columnspan=3)
+
+
+def change_hsys(parent, checkbuttons, _house_systems_):
+    global hsys
+    if checkbuttons[_house_systems_[0]][1].get() == "1":
+        hsys = "P"
+    elif checkbuttons[_house_systems_[1]][1].get() == "1":
+        hsys = "K"
+    elif checkbuttons[_house_systems_[2]][1].get() == "1":
+        hsys = "O"
+    elif checkbuttons[_house_systems_[3]][1].get() == "1":
+        hsys = "R"
+    elif checkbuttons[_house_systems_[4]][1].get() == "1":
+        hsys = "C"
+    elif checkbuttons[_house_systems_[5]][1].get() == "1":
+        hsys = "E"
+    elif checkbuttons[_house_systems_[6]][1].get() == "1":
+        hsys = "W"
+    parent.destroy()
+
+
+def check_uncheck(checkbuttons, _house_systems_, j):
+    for i in _house_systems_:
+        if i != j:
+            checkbuttons[i][1].set("0")
+            checkbuttons[i][0].configure(variable=checkbuttons[i][1])
+
+
+def create_hsys_checkbuttons():
+    toplevel4 = tk.Toplevel()
+    toplevel4.title("House System")
+    toplevel4.geometry("200x200")
+    toplevel4.resizable(width=False, height=False)
+    hsys_frame = tk.Frame(master=toplevel4)
+    hsys_frame.pack(side="top")
+    button_frame = tk.Frame(master=toplevel4)
+    button_frame.pack(side="bottom")
+    _house_systems_ = [values for keys, values in house_systems.items()]
+    checkbuttons = dict()
+    for i, j in enumerate(_house_systems_):
+        _var_ = tk.StringVar()
+        if j == house_systems[hsys]:
+            _var_.set(value="1")
         else:
-            msgbox.showinfo(
-                title="Export Links",
-                message="Please select and display records.")
-            master.update()
+            _var_.set(value="0")
+        _checkbutton_ = tk.Checkbutton(
+            master=hsys_frame,
+            text=j,
+            variable=_var_)
+        _checkbutton_.grid(row=i, column=0, sticky="w")
+        checkbuttons[j] = [_checkbutton_, _var_]
+    checkbuttons["Placidus"][0].configure(
+        command=lambda: check_uncheck(checkbuttons,
+                                      _house_systems_,
+                                      "Placidus"))
+    checkbuttons["Koch"][0].configure(
+        command=lambda: check_uncheck(checkbuttons,
+                                      _house_systems_,
+                                      "Koch"))
+    checkbuttons["Porphyrius"][0].configure(
+        command=lambda: check_uncheck(checkbuttons,
+                                      _house_systems_,
+                                      "Porphyrius"))
+    checkbuttons["Regiomontanus"][0].configure(
+        command=lambda: check_uncheck(checkbuttons,
+                                      _house_systems_,
+                                      "Regiomontanus"))
+    checkbuttons["Campanus"][0].configure(
+        command=lambda: check_uncheck(checkbuttons,
+                                      _house_systems_,
+                                      "Campanus"))
+    checkbuttons["Equal"][0].configure(
+        command=lambda: check_uncheck(checkbuttons,
+                                      _house_systems_,
+                                      "Equal"))
+    checkbuttons["Whole Signs"][0].configure(
+        command=lambda: check_uncheck(checkbuttons,
+                                      _house_systems_,
+                                      "Whole Signs"))
+    apply_button = tk.Button(master=button_frame, text="Apply",
+                             command=lambda: change_hsys(
+                                 parent=toplevel4,
+                                 checkbuttons=checkbuttons,
+                                 _house_systems_=_house_systems_))
+    apply_button.pack()
 
-    def export_lat_frequency():
-        latitude_freq_north = {
-            f"{i}\u00b0 - {i + 1}\u00b0": [] for i in range(90)
+
+def export_link():
+    if len(displayed_results) > 0:
+        with open(file="links.txt", mode="w", encoding="utf-8") as f:
+            for i, j in enumerate(displayed_results):
+                f.write(f"{i + 1}. {j[11]}\n")
+        msgbox.showinfo(
+            title="Export Links",
+            message=f"{len(displayed_results)} links were exported.")
+    else:
+        msgbox.showinfo(
+            title="Export Links",
+            message="Please select and display records.")
+        master.update()
+
+
+def export_lat_frequency():
+    latitude_freq_north = {
+        f"{i}\u00b0 - {i + 1}\u00b0": [] for i in range(90)
+    }
+    latitude_freq_south = {
+        f"{-i}\u00b0 - {-i - 1}\u00b0": [] for i in range(90)
+    }
+    latitudes = []
+    if len(displayed_results) > 0:
+        for item in displayed_results:
+            latitude = item[7]
+            if "n" in latitude:
+                latitude = latitude.replace("n", "\u00b0") + "'0\""
+                latitude = dms_to_dd(latitude)
+            elif "s" in latitude:
+                latitude = latitude.replace("s", "\u00b0") + "'0\""
+                latitude = -1 * dms_to_dd(latitude)
+            latitudes.append(latitude)
+        for i in latitudes:
+            for j in range(90):
+                if j <= i < j + 1:
+                    latitude_freq_north[
+                        f"{j}\u00b0 - {j + 1}\u00b0"].append(i)
+                elif -j - 1 <= i < -j:
+                    latitude_freq_south[
+                        f"{-j}\u00b0 - {-j - 1}\u00b0"].append(i)
+        edit_latitude_freq_north = {
+            keys: len(values)
+            for keys, values in latitude_freq_north.items()
+            if len(values) != 0
         }
-        latitude_freq_south = {
-            f"{-i}\u00b0 - {-i - 1}\u00b0": [] for i in range(90)
+        edit_latitude_freq_south = {
+            keys: len(values)
+            for keys, values in latitude_freq_south.items()
+            if len(values) != 0
         }
-        latitudes = []
-        if len(displayed_results) > 0:
-            for item in displayed_results:
-                latitude = item[7]
-                if "n" in latitude:
-                    latitude = latitude.replace("n", "\u00b0") + "'0\""
-                    latitude = dms_to_dd(latitude)
-                elif "s" in latitude:
-                    latitude = latitude.replace("s", "\u00b0") + "'0\""
-                    latitude = -1 * dms_to_dd(latitude)
-                latitudes.append(latitude)
-            for i in latitudes:
-                for j in range(90):
-                    if j <= i < j + 1:
-                        latitude_freq_north[
-                            f"{j}\u00b0 - {j + 1}\u00b0"].append(i)
-                    elif -j - 1 <= i < -j:
-                        latitude_freq_south[
-                            f"{-j}\u00b0 - {-j - 1}\u00b0"].append(i)
-            edit_latitude_freq_north = {
-                keys: len(values)
-                for keys, values in latitude_freq_north.items()
-                if len(values) != 0
-            }
-            edit_latitude_freq_south = {
-                keys: len(values)
-                for keys, values in latitude_freq_south.items()
-                if len(values) != 0
-            }
-            with open(file="latitude-frequency.txt", mode="w",
-                      encoding="utf-8") as f:
-                f.write("Latitude Intervals\n\n")
-                for i, j in edit_latitude_freq_south.items():
-                    f.write(f"{i} = {j}\n")
-                for i, j in edit_latitude_freq_north.items():
-                    f.write(f"{i} = {j}\n")
-                f.write(f"\nMean Latitude = "
-                        f"{dd_to_dms(sum(latitudes) / len(latitudes))}\n")
-                f.write(f"\nTotal = {len(displayed_results)}")
-                msgbox.showinfo(
-                    title="Export Latitude Frequency",
-                    message=f"{len(displayed_results)} "
-                            f"records were exported.")
-                master.update()
-        else:
+        with open(file="latitude-frequency.txt", mode="w",
+                  encoding="utf-8") as f:
+            f.write("Latitude Intervals\n\n")
+            for i, j in edit_latitude_freq_south.items():
+                f.write(f"{i} = {j}\n")
+            for i, j in edit_latitude_freq_north.items():
+                f.write(f"{i} = {j}\n")
+            f.write(f"\nMean Latitude = "
+                    f"{dd_to_dms(sum(latitudes) / len(latitudes))}\n")
+            f.write(f"\nTotal = {len(displayed_results)}")
             msgbox.showinfo(
                 title="Export Latitude Frequency",
-                message="Please select and display records.")
+                message=f"{len(displayed_results)} "
+                f"records were exported.")
             master.update()
+    else:
+        msgbox.showinfo(
+            title="Export Latitude Frequency",
+            message="Please select and display records.")
+        master.update()
 
-    def year_frequency_command(parent, date_entries, years):
-        min_, max_, step_ = date_entries[:]
-        min_, max_, step_ = int(min_.get()), int(max_.get()), \
-            int(step_.get())
-        freq_frmt[0], freq_frmt[1], freq_frmt[2] = min_, max_, step_
-        if len(displayed_results) > 0:
-            with open(file="year-frequency.txt", mode="w",
-                      encoding="utf-8") as f:
-                year_dict = dict()
-                count = 0
-                for i in range(min_, max_, step_):
-                    year_dict[
-                        (min_ + (count * step_),
-                         min_ + (count * step_) + step_)
-                    ] = []
-                    count += 1
-                for i in years:
-                    for keys, values in year_dict.items():
-                        if keys[0] < i < keys[1]:
-                            year_dict[keys[0], keys[1]] += i,
+
+def year_frequency_command(parent, date_entries, years):
+    min_, max_, step_ = date_entries[:]
+    min_, max_, step_ = int(min_.get()), int(max_.get()), \
+                        int(step_.get())
+    freq_frmt[0], freq_frmt[1], freq_frmt[2] = min_, max_, step_
+    if len(displayed_results) > 0:
+        with open(file="year-frequency.txt", mode="w",
+                  encoding="utf-8") as f:
+            year_dict = dict()
+            count = 0
+            for i in range(min_, max_, step_):
+                year_dict[
+                    (min_ + (count * step_),
+                     min_ + (count * step_) + step_)
+                ] = []
+                count += 1
+            for i in years:
                 for keys, values in year_dict.items():
-                    f.write(f"{keys} = {len(values)}\n")
-                f.write(f"Total = {len(displayed_results)}")
-                parent.destroy()
-                msgbox.showinfo(
-                    title="Export Year Frequency",
-                    message=f"{len(displayed_results)} "
-                            f"records were exported.")
-        else:
+                    if keys[0] < i < keys[1]:
+                        year_dict[keys[0], keys[1]] += i,
+            for keys, values in year_dict.items():
+                f.write(f"{keys} = {len(values)}\n")
+            f.write(f"Total = {len(displayed_results)}")
             parent.destroy()
             msgbox.showinfo(
                 title="Export Year Frequency",
-                message="Please select and display records.")
-            master.update()
-
-    def export_year_frequency():
-        toplevel5 = tk.Toplevel()
-        toplevel5.title("Year Frequency")
-        toplevel5.geometry("200x100")
-        toplevel5.resizable(width=False, height=False)
-        t5frame = tk.Frame(master=toplevel5)
-        t5frame.pack()
-        date_entries = []
-        years = [int(i[4].split(" ")[2]) for i in displayed_results]
-        if len(years) != 0:
-            freq_frmt[0], freq_frmt[1], freq_frmt[2] = \
-                min(years), max(years), 100
-        for i, j in enumerate(("Minimum", "Maximum", "Step")):
-            date_label = tk.Label(master=t5frame, text=j)
-            date_label.grid(row=i, column=0, sticky="w")
-            date_entry = tk.Entry(master=t5frame, width=5)
-            date_entry.grid(row=i, column=1, sticky="w")
-            date_entry.insert("1", f"{freq_frmt[i]}")
-            date_entries.append(date_entry)
-        apply_button = tk.Button(
-            master=t5frame,
-            text="Apply",
-            command=lambda: year_frequency_command(
-                parent=toplevel5,
-                date_entries=date_entries,
-                years=years)
-        )
-        apply_button.grid(row=3, column=0, columnspan=3)
-
-    def callback(event, url):
-        webbrowser.open_new(url)
-        
-    def url_open(args, **kwargs):
-        return urllib.urlopen(args, cafile=certifi.where(), **kwargs)
-
-    def from_local_to_utc(year, month, day, hour, minute,
-                          _lat, _lon):
-        nominatim = Nominatim()
-        nominatim.urlopen = url_open
-        location = nominatim.reverse([_lat, _lon])[0]
-        tzw = tzwhere.tzwhere()
-        timezone = tzw.tzNameAt(_lat, _lon)
-        local_zone = tz.gettz(timezone)
-        utc_zone = tz.gettz("UTC")
-        global_time = dt.strptime(
-            f"{year}-{month}-{day} {hour}:{minute}:00",
-            "%Y-%m-%d %H:%M:%S")
-        local_time = global_time.replace(tzinfo=local_zone)
-        utc_time = local_time.astimezone(utc_zone)
-        if location.split(", ")[0].isnumeric():
-            loc = location.split(", ")[2]
-        else:
-            loc = location.split(", ")[0]
-        return utc_time.hour, utc_time.minute, utc_time.second, \
-            loc, location.split(", ")[-1]
-
-    def julday(year, month, day, hour, minute, second):
-        time1 = dt.strptime(f"{day}.{month}.{year}", "%d.%m.%Y")
-        time2 = dt.strptime("15.10.1582", "%d.%m.%Y")
-
-        def _julday_(calendar):
-            julday_ = swe.julday(
-                year,
-                month,
-                day,
-                hour + (minute / 60) + (second / 3600),
-                calendar
-            )
-
-            deltat = swe.deltat(julday_)
-            return {
-                "JD": round(julday_ + deltat, 6),
-                "TT": round(deltat * 86400, 1)
-            }
-
-        if (time2 - time1).days > 0:
-            return _julday_(calendar=swe.JUL_CAL)
-        elif (time2 - time1).days < 0:
-            return _julday_(calendar=swe.GREG_CAL)
-
-    def add(cat_entry, listbox, list_box):
-        global record_categories
-        for rec in record_categories:
-            if rec not in listbox.get("0", "end"):
-                listbox.insert("end", "".join(rec))
-                list_box.append("".join(rec))
-                master.update()
-        if cat_entry.get() != "":
-            if cat_entry.get() not in listbox.get("0", "end"):
-                listbox.insert("end", cat_entry.get())
-                list_box.append(cat_entry.get())
-        record_categories = []
-        cat_entry.delete("0", "end")
-
-    def cat_cmd():
-        global record
-        record = True
-        select_categories()
-        record = False
-
-    def delete(lb):
-        for item in lb.curselection()[::-1]:
-            lb.delete(item)
-
-    def button_3_on_listbox(event, lb):
-        global listbox_menu
-        if listbox_menu is not None:
-            destroy_menu(event, listbox_menu)
-        listbox_menu = tk.Menu(master=None, tearoff=False)
-        listbox_menu.add_command(
-            label="Remove", command=lambda: delete(lb))
-        listbox_menu.post(event.x_root, event.y_root)
-
-    def select_set(event):
-        event.widget.select_set("0", "end")
-
-    def delete_(event, lb):
-        delete(lb)
-
-    def widget(_entries_, _listboxes_, _option_menu_, list_box,
-               _frame, text, width, row1, col1, row2, col2):
-        label = tk.Label(master=_frame, text=text, fg="red")
-        if text == "Gender":
-            label.grid(row=row1, column=col1, columnspan=3)
-            menu_var = tk.StringVar()
-            gender_menu = tk.OptionMenu(_frame,
-                                        menu_var, "M", "F", "N/A")
-            gender_menu.grid(row=row2, column=col2)
-            _option_menu_.append(menu_var)
-        elif text == "Add Category":
-            label.grid(row=row1, column=col1, columnspan=3)
-            cat_button = tk.Button(master=_frame, text="Select",
-                                   width=10, command=cat_cmd)
-            cat_button.grid(row=1, column=0, columnspan=3)
-            cat_entry = tk.Entry(master=_frame)
-            cat_entry.grid(row=2, column=0, columnspan=3)
-            cat_entry.bind(
-                "<Control-KeyRelease-a>",
-                lambda event: select_range(event))
-            cat_entry.bind(
-                "<Button-1>",
-                lambda event: destroy_menu(event, search_menu))
-            cat_entry.bind(
-                "<Button-3>",
-                lambda event: button_3_on_entry(event))
-            _option_menu_.append(cat_entry)
-            lbox_frame = tk.Frame(master=_frame)
-            lbox_frame.grid(row=4, column=0, columnspan=3)
-            listbox = tk.Listbox(master=lbox_frame, width=50,
-                                 selectmode="extended")
-            listbox.pack(side="left")
-            listbox.bind(
-                "<Delete>",
-                lambda event: delete_(event, listbox))
-            listbox.bind(
-                "<Control-a>",
-                lambda event: select_set(event))
-            listbox.bind(
-                "<Button-1>",
-                lambda event: destroy_menu(event, listbox_menu))
-            listbox.bind(
-                "<Button-3>",
-                lambda event: button_3_on_listbox(event, listbox))
-            lbox_y_sbar = tk.Scrollbar(master=lbox_frame,
-                                       orient="vertical",
-                                       command=listbox.yview)
-            lbox_y_sbar.pack(side="left", fill="y")
-            listbox.configure(yscrollcommand=lbox_y_sbar.set)
-            _add_button = tk.Button(
-                master=_frame,
-                text="Add",
-                command=lambda: add(cat_entry, listbox, list_box))
-            _add_button.grid(row=3, column=0, columnspan=3)
-            _listboxes_.append(listbox)
-        elif text == "Rodden Rating":
-            label.grid(row=row1, column=col1)
-            menu_var = tk.StringVar()
-            rodden_menu = tk.OptionMenu(
-                _frame,
-                menu_var,
-                "AA",
-                "A",
-                "B",
-                "C",
-                "DD",
-                "X",
-                "XX",
-                "AX")
-            rodden_menu.grid(row=row2, column=col2)
-            _option_menu_.append(menu_var)
-        else:
-            entry = tk.Entry(master=_frame, width=width)
-            entry.grid(row=row2, column=col2)
-            entry.bind(
-                "<Control-KeyRelease-a>",
-                lambda event: select_range(event))
-            entry.bind(
-                "<Button-1>",
-                lambda event: destroy_menu(event, search_menu))
-            entry.bind(
-                "<Button-3>",
-                lambda event: button_3_on_entry(event))
-            _entries_.append(entry)
-            label.grid(row=row1, column=col1)
+                message=f"{len(displayed_results)} "
+                f"records were exported.")
+    else:
+        parent.destroy()
+        msgbox.showinfo(
+            title="Export Year Frequency",
+            message="Please select and display records.")
         master.update()
 
-    def widgets(entries, listboxes, option_menu, list_box, frames):
-        widget(
-            entries,
-            listboxes,
-            option_menu,
-            list_box,
-            frames[0],
-            "Name", 28, row1=0, col1=0, row2=1, col2=0)
-        widget(
-            entries,
-            listboxes,
-            option_menu,
-            list_box,
-            frames[1],
-            "Gender", 28, row1=0, col1=0, row2=1, col2=0)
-        widget(
-            entries,
-            listboxes,
-            option_menu,
-            list_box,
-            frames[2],
-            "Rodden Rating", 28, row1=0, col1=0, row2=1, col2=0)
-        widget(
-            entries,
-            listboxes,
-            option_menu,
-            list_box,
-            frames[3],
-            "Day", 2, row1=0, col1=0, row2=1, col2=0)
-        widget(
-            entries,
-            listboxes,
-            option_menu,
-            list_box,
-            frames[3],
-            "Month", 2, row1=0, col1=1, row2=1, col2=1)
-        widget(
-            entries,
-            listboxes,
-            option_menu,
-            list_box,
-            frames[3],
-            "Year", 4, row1=0, col1=2, row2=1, col2=2)
-        widget(
-            entries,
-            listboxes,
-            option_menu,
-            list_box,
-            frames[4],
-            "Hour", 2, row1=0, col1=0, row2=1, col2=0)
-        widget(
-            entries,
-            listboxes,
-            option_menu,
-            list_box,
-            frames[4],
-            "Minute", 2, row1=0, col1=1, row2=1, col2=1)
-        widget(
-            entries,
-            listboxes,
-            option_menu,
-            list_box,
-            frames[5],
-            "Latitude", 10, row1=0, col1=0, row2=1, col2=0)
-        widget(
-            entries,
-            listboxes,
-            option_menu,
-            list_box,
-            frames[5],
-            "Longitude", 10, row1=0, col1=1, row2=1, col2=1)
-        widget(
-            entries,
-            listboxes,
-            option_menu,
-            list_box,
-            frames[6],
-            "Add Category", 28, row1=0, col1=0, row2=1, col2=0)
 
-    def create_frames(toplevel):
-        for i in range(8):
-            frame = tk.Frame(toplevel, bd=1, relief="sunken")
-            frame.grid(row=i, column=0, pady=4, padx=4)
+def export_year_frequency():
+    toplevel5 = tk.Toplevel()
+    toplevel5.title("Year Frequency")
+    toplevel5.geometry("200x100")
+    toplevel5.resizable(width=False, height=False)
+    t5frame = tk.Frame(master=toplevel5)
+    t5frame.pack()
+    date_entries = []
+    years = [int(i[4].split(" ")[2]) for i in displayed_results]
+    if len(years) != 0:
+        freq_frmt[0], freq_frmt[1], freq_frmt[2] = \
+            min(years), max(years), 100
+    for i, j in enumerate(("Minimum", "Maximum", "Step")):
+        date_label = tk.Label(master=t5frame, text=j)
+        date_label.grid(row=i, column=0, sticky="w")
+        date_entry = tk.Entry(master=t5frame, width=5)
+        date_entry.grid(row=i, column=1, sticky="w")
+        date_entry.insert("1", f"{freq_frmt[i]}")
+        date_entries.append(date_entry)
+    apply_button = tk.Button(
+        master=t5frame,
+        text="Apply",
+        command=lambda: year_frequency_command(
+            parent=toplevel5,
+            date_entries=date_entries,
+            years=years)
+    )
+    apply_button.grid(row=3, column=0, columnspan=3)
+
+
+def callback(event, url):
+    webbrowser.open_new(url)
+
+
+def url_open(args, **kwargs):
+    return urllib.urlopen(args, cafile=certifi.where(), **kwargs)
+
+
+def from_local_to_utc(year, month, day, hour, minute,
+                      _lat, _lon):
+    nominatim = Nominatim()
+    nominatim.urlopen = url_open
+    location = nominatim.reverse([_lat, _lon])[0]
+    tzw = tzwhere.tzwhere()
+    timezone = tzw.tzNameAt(_lat, _lon)
+    local_zone = tz.gettz(timezone)
+    utc_zone = tz.gettz("UTC")
+    global_time = dt.strptime(
+        f"{year}-{month}-{day} {hour}:{minute}:00",
+        "%Y-%m-%d %H:%M:%S")
+    local_time = global_time.replace(tzinfo=local_zone)
+    utc_time = local_time.astimezone(utc_zone)
+    if location.split(", ")[0].isnumeric():
+        loc = location.split(", ")[2]
+    else:
+        loc = location.split(", ")[0]
+    return utc_time.hour, utc_time.minute, utc_time.second, \
+           loc, location.split(", ")[-1]
+
+
+def julday(year, month, day, hour, minute, second):
+    time1 = dt.strptime(f"{day}.{month}.{year}", "%d.%m.%Y")
+    time2 = dt.strptime("15.10.1582", "%d.%m.%Y")
+
+    def _julday_(calendar):
+        julday_ = swe.julday(
+            year,
+            month,
+            day,
+            hour + (minute / 60) + (second / 3600),
+            calendar
+        )
+
+        deltat = swe.deltat(julday_)
+        return {
+            "JD": round(julday_ + deltat, 6),
+            "TT": round(deltat * 86400, 1)
+        }
+
+    if (time2 - time1).days > 0:
+        return _julday_(calendar=swe.JUL_CAL)
+    elif (time2 - time1).days < 0:
+        return _julday_(calendar=swe.GREG_CAL)
+
+
+def add(cat_entry, listbox, list_box):
+    global record_categories
+    for rec in record_categories:
+        if rec not in listbox.get("0", "end"):
+            listbox.insert("end", "".join(rec))
+            list_box.append("".join(rec))
             master.update()
-            yield frame
+    if cat_entry.get() != "":
+        if cat_entry.get() not in listbox.get("0", "end"):
+            listbox.insert("end", cat_entry.get())
+            list_box.append(cat_entry.get())
+    record_categories = []
+    cat_entry.delete("0", "end")
 
-    def get_record_data(toplevel, _treeview_, entries, option_menu, 
-                        listboxes, list_box, data):
-        global add_or_edit, edit_or_search, modify_name
-        name = entries[0].get()
-        if option_menu[0].get() == "M":
-            _gender = "M"
-        elif option_menu[0].get() == "F":
-            _gender = "F"
-        else:
-            _gender = "N/A"
-        rr = option_menu[1].get()
-        day = entries[1].get()
-        month = entries[2].get()
-        year = entries[3].get()
-        hour = entries[4].get()
-        minute = entries[5].get()
-        _latitude_ = float(entries[6].get())
-        _longitude_ = float(entries[7].get())
+
+def cat_cmd():
+    global record
+    record = True
+    select_categories()
+    record = False
+
+
+def delete(lb):
+    for item in lb.curselection()[::-1]:
+        lb.delete(item)
+
+
+def button_3_on_listbox(event, lb):
+    global listbox_menu
+    if listbox_menu is not None:
+        destroy_menu(event, listbox_menu)
+    listbox_menu = tk.Menu(master=None, tearoff=False)
+    listbox_menu.add_command(
+        label="Remove", command=lambda: delete(lb))
+    listbox_menu.post(event.x_root, event.y_root)
+
+
+def select_set(event):
+    event.widget.select_set("0", "end")
+
+
+def delete_(event, lb):
+    delete(lb)
+
+
+def widget(_entries_, _listboxes_, _option_menu_, list_box,
+           _frame, text, width, row1, col1, row2, col2):
+    label = tk.Label(master=_frame, text=text, fg="red")
+    if text == "Gender":
+        label.grid(row=row1, column=col1, columnspan=3)
+        menu_var = tk.StringVar()
+        gender_menu = tk.OptionMenu(_frame,
+                                    menu_var, "M", "F", "N/A")
+        gender_menu.grid(row=row2, column=col2)
+        _option_menu_.append(menu_var)
+    elif text == "Add Category":
+        label.grid(row=row1, column=col1, columnspan=3)
+        cat_button = tk.Button(master=_frame, text="Select",
+                               width=10, command=cat_cmd)
+        cat_button.grid(row=1, column=0, columnspan=3)
+        cat_entry = tk.Entry(master=_frame)
+        cat_entry.grid(row=2, column=0, columnspan=3)
+        cat_entry.bind(
+            "<Control-KeyRelease-a>",
+            lambda event: select_range(event))
+        cat_entry.bind(
+            "<Button-1>",
+            lambda event: destroy_menu(event, search_menu))
+        cat_entry.bind(
+            "<Button-3>",
+            lambda event: button_3_on_entry(event))
+        _option_menu_.append(cat_entry)
+        lbox_frame = tk.Frame(master=_frame)
+        lbox_frame.grid(row=4, column=0, columnspan=3)
+        listbox = tk.Listbox(master=lbox_frame, width=50,
+                             selectmode="extended")
+        listbox.pack(side="left")
+        listbox.bind(
+            "<Delete>",
+            lambda event: delete_(event, listbox))
+        listbox.bind(
+            "<Control-a>",
+            lambda event: select_set(event))
+        listbox.bind(
+            "<Button-1>",
+            lambda event: destroy_menu(event, listbox_menu))
+        listbox.bind(
+            "<Button-3>",
+            lambda event: button_3_on_listbox(event, listbox))
+        lbox_y_sbar = tk.Scrollbar(master=lbox_frame,
+                                   orient="vertical",
+                                   command=listbox.yview)
+        lbox_y_sbar.pack(side="left", fill="y")
+        listbox.configure(yscrollcommand=lbox_y_sbar.set)
+        _add_button = tk.Button(
+            master=_frame,
+            text="Add",
+            command=lambda: add(cat_entry, listbox, list_box))
+        _add_button.grid(row=3, column=0, columnspan=3)
+        _listboxes_.append(listbox)
+    elif text == "Rodden Rating":
+        label.grid(row=row1, column=col1)
+        menu_var = tk.StringVar()
+        rodden_menu = tk.OptionMenu(
+            _frame,
+            menu_var,
+            "AA",
+            "A",
+            "B",
+            "C",
+            "DD",
+            "X",
+            "XX",
+            "AX")
+        rodden_menu.grid(row=row2, column=col2)
+        _option_menu_.append(menu_var)
+    else:
+        entry = tk.Entry(master=_frame, width=width)
+        entry.grid(row=row2, column=col2)
+        entry.bind(
+            "<Control-KeyRelease-a>",
+            lambda event: select_range(event))
+        entry.bind(
+            "<Button-1>",
+            lambda event: destroy_menu(event, search_menu))
+        entry.bind(
+            "<Button-3>",
+            lambda event: button_3_on_entry(event))
+        _entries_.append(entry)
+        label.grid(row=row1, column=col1)
+    master.update()
+
+
+def widgets(entries, listboxes, option_menu, list_box, frames):
+    widget(
+        entries,
+        listboxes,
+        option_menu,
+        list_box,
+        frames[0],
+        "Name", 28, row1=0, col1=0, row2=1, col2=0)
+    widget(
+        entries,
+        listboxes,
+        option_menu,
+        list_box,
+        frames[1],
+        "Gender", 28, row1=0, col1=0, row2=1, col2=0)
+    widget(
+        entries,
+        listboxes,
+        option_menu,
+        list_box,
+        frames[2],
+        "Rodden Rating", 28, row1=0, col1=0, row2=1, col2=0)
+    widget(
+        entries,
+        listboxes,
+        option_menu,
+        list_box,
+        frames[3],
+        "Day", 2, row1=0, col1=0, row2=1, col2=0)
+    widget(
+        entries,
+        listboxes,
+        option_menu,
+        list_box,
+        frames[3],
+        "Month", 2, row1=0, col1=1, row2=1, col2=1)
+    widget(
+        entries,
+        listboxes,
+        option_menu,
+        list_box,
+        frames[3],
+        "Year", 4, row1=0, col1=2, row2=1, col2=2)
+    widget(
+        entries,
+        listboxes,
+        option_menu,
+        list_box,
+        frames[4],
+        "Hour", 2, row1=0, col1=0, row2=1, col2=0)
+    widget(
+        entries,
+        listboxes,
+        option_menu,
+        list_box,
+        frames[4],
+        "Minute", 2, row1=0, col1=1, row2=1, col2=1)
+    widget(
+        entries,
+        listboxes,
+        option_menu,
+        list_box,
+        frames[5],
+        "Latitude", 10, row1=0, col1=0, row2=1, col2=0)
+    widget(
+        entries,
+        listboxes,
+        option_menu,
+        list_box,
+        frames[5],
+        "Longitude", 10, row1=0, col1=1, row2=1, col2=1)
+    widget(
+        entries,
+        listboxes,
+        option_menu,
+        list_box,
+        frames[6],
+        "Add Category", 28, row1=0, col1=0, row2=1, col2=0)
+
+
+def create_frames(toplevel):
+    for i in range(8):
+        frame = tk.Frame(toplevel, bd=1, relief="sunken")
+        frame.grid(row=i, column=0, pady=4, padx=4)
+        master.update()
+        yield frame
+
+
+def get_record_data(toplevel, _treeview_, entries, option_menu,
+                    listboxes, list_box, data):
+    global add_or_edit, edit_or_search, modify_name
+    name = entries[0].get()
+    if option_menu[0].get() == "M":
+        _gender = "M"
+    elif option_menu[0].get() == "F":
+        _gender = "F"
+    else:
+        _gender = "N/A"
+    rr = option_menu[1].get()
+    day = entries[1].get()
+    month = entries[2].get()
+    year = entries[3].get()
+    hour = entries[4].get()
+    minute = entries[5].get()
+    _latitude_ = float(entries[6].get())
+    _longitude_ = float(entries[7].get())
+    try:
+        date = dt.strptime(f"{year} {month} {day}", "%Y %m %d")
+        _country_ = ""
         try:
-            date = dt.strptime(f"{year} {month} {day}", "%Y %m %d")
-            _country_ = ""
-            try:
-                utc_hour, utc_minute, utc_second, _place, country_ = \
-                    from_local_to_utc(year, month, day, hour, minute, 
-                                      _latitude_, _longitude_)
-                jd = julday(int(year), int(month), int(day), int(utc_hour), 
-                            int(utc_minute), int(utc_second))["JD"]
-                latitude, longitude = "", ""
-                if _latitude_ < 0:
-                    _latitude_ *= -1
-                    _degree = int(_latitude_)
-                    _minute = int((_latitude_ - _degree) * 60)
-                    latitude += f"{_degree}s{_minute}"
-                elif _latitude_ > 0:
-                    _degree = int(_latitude_)
-                    _minute = int((_latitude_ - _degree) * 60)
-                    latitude += f"{_degree}n{_minute}"
-                if _longitude_ < 0:
-                    _longitude_ *= -1
-                    _degree = int(_longitude_)
-                    _minute = int((_longitude_ - _degree) * 60)
-                    latitude += f"{_degree}w{_minute}"
-                elif _longitude_ > 0:
-                    _degree = int(_longitude_)
-                    _minute = int((_longitude_ - _degree) * 60)
-                    longitude += f"{_degree}e{_minute}"
-                _country = CountryInfo()
-                for keys, values in _country.all().items():
-                    for k, v in values.items():
-                        if k == "nativeName":
-                            if country_ in v or v in country_:
-                                _country_ += values["name"]
-                if not all([name, _gender, rr, list_box]):
-                    msgbox.showinfo(
-                        title="Create New Record",
-                        message="Fill the empty fields.")
-                    master.update()
-                else:
-                    now = dt.now()
-                    now_frmt = now.strftime("%d %B %Y %H:%M")
-                    select_from_data = [
-                        list(_) for _ in cursor.execute("SELECT * FROM DATA")
-                    ]
-                    if add_or_edit is True:
-                        no = data[0]
-                    else:
-                        no = len(select_from_data) + 1
-                    lb = listboxes[0].get("0", "end")
-                    if len(list_box) > 1:
-                        _record_data = [
-                            no, now_frmt, "-", name, _gender, rr, 
-                            date.strftime("%d %B %Y"), f"{hour}:{minute}",
-                            jd, latitude, _latitude_, longitude, _longitude_,
-                            _place, _country_, "-", "|".join(lb)]
-                    else:
-                        _record_data = [
-                            no, now_frmt, "-", name, _gender, rr, 
-                            date.strftime("%d %B %Y"), f"{hour}:{minute}",
-                            jd, latitude, _latitude_, longitude, _longitude_,
-                            _place, _country_, "-", "".join(lb)]
-                    toplevel.destroy()
-                    master.update()
-                    if _record_data not in select_from_data:
-                        if add_or_edit is True:
-                            names = col_names.split(", ")
-                            if edit_or_search is False:
-                                focused = _treeview_.focus()
-                                _treeview_.delete(focused)
-                            else:
-                                _treeview_.delete(items[0])
-                            for j, k in enumerate(names):
-                                if j < 3:
-                                    pass
-                                else:
-                                    cursor.execute(
-                                        f"UPDATE DATA SET {names[j]} = ? "
-                                        f"WHERE no = ?",
-                                        (_record_data[j], no))
-                            modify = _record_data[:10] + \
-                                [_record_data[11]] + _record_data[13:]
-                            for i in cursor.execute("SELECT * FROM DATA"):
-                                if modify[0] == i[0]:
-                                    modify[1] = i[1]
-                            try:
-                                _treeview_.insert("", no - 1, values=modify)
-                            except:
-                                pass
-                            msgbox.showinfo(
-                                title="Edit New Record", 
-                                message="Record is edited.")
-                        else:
-                            cursor.execute(
-                                f"INSERT INTO DATA VALUES("
-                                f"{', '.join('?' * len(_record_data))})",
-                                _record_data)
-                            modify = _record_data
-                            modify.pop(10)
-                            modify.pop(11)
-                            try:
-                                _treeview_.insert("", no - 1, values=modify)
-                            except:
-                                pass
-                            msgbox.showinfo(
-                                title="Add New Record", 
-                                message="Record is added.")
-                        master.update()
-                        modify_name = modify[-1]
-                        connect.commit()
-                    else:
-                        msg = "This record is also stored in the database."
-                        msgbox.showinfo(title="Add New Record", 
-                                        message=f"Error: {msg}")
-                        master.update()
-            except BaseException as err:
-                msgbox.showinfo(title="Add New Record", 
-                                message=f"Error: {err}")
+            utc_hour, utc_minute, utc_second, _place, country_ = \
+                from_local_to_utc(year, month, day, hour, minute,
+                                  _latitude_, _longitude_)
+            jd = julday(int(year), int(month), int(day), int(utc_hour),
+                        int(utc_minute), int(utc_second))["JD"]
+            latitude, longitude = "", ""
+            if _latitude_ < 0:
+                _latitude_ *= -1
+                _degree = int(_latitude_)
+                _minute = int((_latitude_ - _degree) * 60)
+                latitude += f"{_degree}s{_minute}"
+            elif _latitude_ > 0:
+                _degree = int(_latitude_)
+                _minute = int((_latitude_ - _degree) * 60)
+                latitude += f"{_degree}n{_minute}"
+            if _longitude_ < 0:
+                _longitude_ *= -1
+                _degree = int(_longitude_)
+                _minute = int((_longitude_ - _degree) * 60)
+                latitude += f"{_degree}w{_minute}"
+            elif _longitude_ > 0:
+                _degree = int(_longitude_)
+                _minute = int((_longitude_ - _degree) * 60)
+                longitude += f"{_degree}e{_minute}"
+            _country = CountryInfo()
+            for keys, values in _country.all().items():
+                for k, v in values.items():
+                    if k == "nativeName":
+                        if country_ in v or v in country_:
+                            _country_ += values["name"]
+            if not all([name, _gender, rr, list_box]):
+                msgbox.showinfo(
+                    title="Create New Record",
+                    message="Fill the empty fields.")
                 master.update()
-        except ValueError as err:
-            msgbox.showinfo(title="Add New Record", 
+            else:
+                now = dt.now()
+                now_frmt = now.strftime("%d %B %Y %H:%M")
+                select_from_data = [
+                    list(_) for _ in cursor.execute("SELECT * FROM DATA")
+                ]
+                if add_or_edit is True:
+                    no = data[0]
+                else:
+                    no = len(select_from_data) + 1
+                lb = listboxes[0].get("0", "end")
+                if len(list_box) > 1:
+                    _record_data = [
+                        no, now_frmt, "-", name, _gender, rr,
+                        date.strftime("%d %B %Y"), f"{hour}:{minute}",
+                        jd, latitude, _latitude_, longitude, _longitude_,
+                        _place, _country_, "-", "|".join(lb)]
+                else:
+                    _record_data = [
+                        no, now_frmt, "-", name, _gender, rr,
+                        date.strftime("%d %B %Y"), f"{hour}:{minute}",
+                        jd, latitude, _latitude_, longitude, _longitude_,
+                        _place, _country_, "-", "".join(lb)]
+                toplevel.destroy()
+                master.update()
+                if _record_data not in select_from_data:
+                    if add_or_edit is True:
+                        names = col_names.split(", ")
+                        if edit_or_search is False:
+                            focused = _treeview_.focus()
+                            _treeview_.delete(focused)
+                        else:
+                            _treeview_.delete(items[0])
+                        for j, k in enumerate(names):
+                            if j < 3:
+                                pass
+                            else:
+                                cursor.execute(
+                                    f"UPDATE DATA SET {names[j]} = ? "
+                                    f"WHERE no = ?",
+                                    (_record_data[j], no))
+                        modify = _record_data[:10] + \
+                                 [_record_data[11]] + _record_data[13:]
+                        for i in cursor.execute("SELECT * FROM DATA"):
+                            if modify[0] == i[0]:
+                                modify[1] = i[1]
+                        try:
+                            _treeview_.insert("", no - 1, values=modify)
+                        except:
+                            pass
+                        msgbox.showinfo(
+                            title="Edit New Record",
+                            message="Record is edited.")
+                    else:
+                        cursor.execute(
+                            f"INSERT INTO DATA VALUES("
+                            f"{', '.join('?' * len(_record_data))})",
+                            _record_data)
+                        modify = _record_data
+                        modify.pop(10)
+                        modify.pop(11)
+                        try:
+                            _treeview_.insert("", no - 1, values=modify)
+                        except:
+                            pass
+                        msgbox.showinfo(
+                            title="Add New Record",
+                            message="Record is added.")
+                    master.update()
+                    modify_name = modify[-1]
+                    connect.commit()
+                else:
+                    msg = "This record is also stored in the database."
+                    msgbox.showinfo(title="Add New Record",
+                                    message=f"Error: {msg}")
+                    master.update()
+        except BaseException as err:
+            msgbox.showinfo(title="Add New Record",
                             message=f"Error: {err}")
             master.update()
-
-    def record_panel(text):
-        toplevel = tk.Toplevel()
-        toplevel.title(text)
-        toplevel.resizable(width=False, height=False)
-        frames = [i for i in create_frames(toplevel)]
-        entries = []
-        listboxes = []
-        list_box = []
-        option_menu = []
-        widgets(entries, listboxes, option_menu, list_box, frames)
-        return toplevel, frames, entries, listboxes, list_box, option_menu
-
-    def add_record():
-        global add_or_edit
-        add_or_edit = False
-        toplevel, frames, entries, listboxes, list_box, option_menu = \
-            record_panel(text="Add Record")
-        if len(treeviews) != 0:
-            add_record_button = tk.Button(
-                master=frames[7], 
-                text="Apply",
-                command=lambda: get_record_data(
-                    toplevel,
-                    treeviews[0],
-                    entries,
-                    option_menu,
-                    listboxes,
-                    list_box,
-                    data=None))
-        else:
-            add_record_button = tk.Button(
-                master=frames[7], 
-                text="Apply",
-                command=lambda: get_record_data(
-                    toplevel,
-                    None,
-                    entries,
-                    option_menu,
-                    listboxes,
-                    list_box,
-                    data=None))
-        add_record_button.grid(row=0, column=0)
-
-    def create_panel(entries, data, listboxes, list_box, 
-                     option_menu, frames, toplevel, _treeview_):
-        entries[0].insert("end", data[3])
-        date = dt.strptime(f"{data[6]} {data[7]}", "%d %B %Y %H:%M")
-        date_frmt = date.strftime("%d %m %Y %H %M")
-        for i, j in enumerate(cursor.execute("SELECT * FROM DATA")):
-            if data[0] == j[0]:
-                entries[6].insert("end", j[10])
-                entries[7].insert("end", j[12])
-                master.update()
-        for i, j in enumerate(date_frmt.split(" ")):
-            entries[i + 1].insert("end", j)
-            master.update()
-        if "|" in data[-1]:
-            for i in data[-1].split("|"):
-                listboxes[0].insert("end", i)
-                list_box.append(i)
-                master.update()
-        else:
-            listboxes[0].insert("end", data[-1])
-            list_box.append(data[-1])
-            master.update()
-        option_menu[0].set(data[4])
-        option_menu[1].set(data[5])
+    except ValueError as err:
+        msgbox.showinfo(title="Add New Record",
+                        message=f"Error: {err}")
         master.update()
+
+
+def record_panel(text):
+    toplevel = tk.Toplevel()
+    toplevel.title(text)
+    toplevel.resizable(width=False, height=False)
+    frames = [i for i in create_frames(toplevel)]
+    entries = []
+    listboxes = []
+    list_box = []
+    option_menu = []
+    widgets(entries, listboxes, option_menu, list_box, frames)
+    return toplevel, frames, entries, listboxes, list_box, option_menu
+
+
+def add_record():
+    global add_or_edit
+    add_or_edit = False
+    toplevel, frames, entries, listboxes, list_box, option_menu = \
+        record_panel(text="Add Record")
+    if len(treeviews) != 0:
         add_record_button = tk.Button(
-            master=frames[7], 
+            master=frames[7],
             text="Apply",
             command=lambda: get_record_data(
                 toplevel,
-                _treeview_,
+                treeviews[0],
                 entries,
                 option_menu,
                 listboxes,
                 list_box,
-                data))
-        add_record_button.grid(row=0, column=0)
+                data=None))
+    else:
+        add_record_button = tk.Button(
+            master=frames[7],
+            text="Apply",
+            command=lambda: get_record_data(
+                toplevel,
+                None,
+                entries,
+                option_menu,
+                listboxes,
+                list_box,
+                data=None))
+    add_record_button.grid(row=0, column=0)
 
-    def edit_record(_treeview_):
-        global add_or_edit
-        add_or_edit = True
-        focused = _treeview_.focus()
-        if not focused:
-            pass
-        else:
-            toplevel, frames, entries, listboxes, list_box, option_menu = \
-                record_panel(text="Edit Record")
-            data = _treeview_.item(focused)["values"]
-            create_panel(entries, data, listboxes, list_box, option_menu, 
-                         frames, toplevel, _treeview_)
-            _record_ = _treeview_.item(focused)["values"][:]
-            for i in database:
-                if _record_[3] == i[1]:
-                    database.remove(i)
 
-    def delete_record(_treeview_):
-        focused = _treeview_.focus()
-        no = _treeview_.item(focused)["values"][0]
-        cursor.execute("DELETE FROM DATA WHERE no = ?", (no,))
+def create_panel(entries, data, listboxes, list_box,
+                 option_menu, frames, toplevel, _treeview_):
+    entries[0].insert("end", data[3])
+    date = dt.strptime(f"{data[6]} {data[7]}", "%d %B %Y %H:%M")
+    date_frmt = date.strftime("%d %m %Y %H %M")
+    for i, j in enumerate(cursor.execute("SELECT * FROM DATA")):
+        if data[0] == j[0]:
+            entries[6].insert("end", j[10])
+            entries[7].insert("end", j[12])
+            master.update()
+    for i, j in enumerate(date_frmt.split(" ")):
+        entries[i + 1].insert("end", j)
+        master.update()
+    if "|" in data[-1]:
+        for i in data[-1].split("|"):
+            listboxes[0].insert("end", i)
+            list_box.append(i)
+            master.update()
+    else:
+        listboxes[0].insert("end", data[-1])
+        list_box.append(data[-1])
+        master.update()
+    option_menu[0].set(data[4])
+    option_menu[1].set(data[5])
+    master.update()
+    add_record_button = tk.Button(
+        master=frames[7],
+        text="Apply",
+        command=lambda: get_record_data(
+            toplevel,
+            _treeview_,
+            entries,
+            option_menu,
+            listboxes,
+            list_box,
+            data))
+    add_record_button.grid(row=0, column=0)
+
+
+def edit_record(_treeview_):
+    global add_or_edit
+    add_or_edit = True
+    focused = _treeview_.focus()
+    if not focused:
+        pass
+    else:
+        toplevel, frames, entries, listboxes, list_box, option_menu = \
+            record_panel(text="Edit Record")
+        data = _treeview_.item(focused)["values"]
+        create_panel(entries, data, listboxes, list_box, option_menu,
+                     frames, toplevel, _treeview_)
         _record_ = _treeview_.item(focused)["values"][:]
         for i in database:
             if _record_[3] == i[1]:
                 database.remove(i)
+
+
+def delete_record(_treeview_):
+    focused = _treeview_.focus()
+    no = _treeview_.item(focused)["values"][0]
+    cursor.execute("DELETE FROM DATA WHERE no = ?", (no,))
+    _record_ = _treeview_.item(focused)["values"][:]
+    for i in database:
+        if _record_[3] == i[1]:
+            database.remove(i)
+    connect.commit()
+    for i in _treeview_.get_children():
+        _treeview_.delete(i)
+    content = [i for i in cursor.execute("SELECT * FROM DATA")]
+    for i, j in enumerate(content):
+        cursor.execute("UPDATE DATA SET no = ? WHERE no = ?",
+                       (i + 1, j[0]))
         connect.commit()
-        for i in _treeview_.get_children():
-            _treeview_.delete(i)
-        content = [i for i in cursor.execute("SELECT * FROM DATA")]
-        for i, j in enumerate(content):
-            cursor.execute("UPDATE DATA SET no = ? WHERE no = ?",
-                           (i + 1, j[0]))
-            connect.commit()
-            modify = [k for k in j]
-            modify[0] = i + 1
-            modify.pop(10)
-            modify.pop(11)
-            _treeview_.insert("", i, values=modify)
-            master.update()
-
-    def button_3_on_treeview_(event, _treeview_):
-        global menu, on_toplevel
-        on_toplevel = True
-        if menu is not None:
-            destroy(event)
-        menu = tk.Menu(master=None, tearoff=False)
-        menu.add_command(
-            label="Edit", command=lambda: edit_record(_treeview_))
-        menu.add_command(
-            label="Delete", command=lambda: delete_record(_treeview_))
-        menu.add_command(
-            label="Open Chart", 
-            command=lambda: button_3_open_chart(_treeview_)
-        )
-        menu.post(event.x_root, event.y_root)
-
-    def search_record(event, search_entry_, _treeview_):
-        global edit_or_search
-        master.update()
-        for _record_ in database:
-            if search_entry_.get() == _record_[1]:
-                for item in _treeview_.get_children():
-                    if _treeview_.item(item)["values"][3] == _record_[1]:
-                        toplevel, frames, entries, listboxes, list_box, \
-                            option_menu = record_panel(text="Edit Record")
-                        data = _treeview_.item(item)["values"]
-                        items.append(item)
-                        edit_or_search = True
-                        create_panel(
-                            entries, data, listboxes, list_box, 
-                            option_menu, frames, toplevel, _treeview_
-                        )
-                        break
-                break
-
-    def edit_and_delete():
-        global add_or_edit, on_toplevel
-        add_or_edit = True
-        master.update()
-        toplevel7 = tk.Toplevel()
-        toplevel7.title("Edit Records")
-        toplevel7.geometry("800x600")
-        toplevel7.resizable(width=False, height=False)
-        search_label_ = tk.Label(master=toplevel7, 
-                                 text="Search A Record By Name", fg="red")
-        search_label_.pack()
-        search_entry_ = tk.Entry(master=toplevel7)
-        search_entry_.pack()
-        columns_2 = ["No", "Add Date"] + columns_1
-        y_scrollbar_2 = tk.Scrollbar(master=toplevel7, orient="vertical")
-        y_scrollbar_2.pack(side="right", fill="y")
-        _treeview_ = create_treeview(_master_=toplevel7, columns=columns_2, 
-                                     height=26)
-        if _treeview_ not in treeviews:
-            treeviews.append(_treeview_)
-        x_scrollbar(y_scrl=y_scrollbar_2, _master_=toplevel7, 
-                    _treeview_=_treeview_)
-        for i, j in enumerate(cursor.execute("SELECT * FROM DATA")):
-            modify = [col for col in j]
-            modify.pop(10)
-            modify.pop(11)
-            _treeview_.insert("", i, values=modify)
-            master.update()
-        _treeview_.bind(
-            "<Button-3>", 
-            lambda event: button_3_on_treeview_(event, _treeview_))
-        _treeview_.bind(
-            "<Button-1>", 
-            lambda event: destroy(event))
-        search_entry_.bind(
-            "<KeyRelease>", 
-            lambda event: search_record(event, search_entry_, _treeview_))
-        master.update()
-        
-    def reload_database():
-        merge_databases()
-        group_categories()
-        msgbox.showinfo(title="Reload Database", 
-                        message="Database is reloaded.")
+        modify = [k for k in j]
+        modify[0] = i + 1
+        modify.pop(10)
+        modify.pop(11)
+        _treeview_.insert("", i, values=modify)
         master.update()
 
-    def about():
-        toplevel8 = tk.Toplevel()
-        toplevel8.title("About TkAstroDb")
-        name = "TkAstroDb"
-        version, _version = "Version:", __version__
-        build_date, _build_date = "Built Date:", "21 December 2018"
-        update_date, _update_date = "Update Date:", "28 April 2019"
-        developed_by, _developed_by = "Developed By:", \
-            "Tanberk Celalettin Kutlu"
-        thanks_to, _thanks_to = "Special Thanks To:", \
-            "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
-        contact, _contact = "Contact:", "tckutlu@gmail.com"
-        github, _github = "GitHub:", \
-            "https://github.com/dildeolupbiten/TkAstroDb"
-        tframe1 = tk.Frame(master=toplevel8, bd="2", relief="groove")
-        tframe1.pack(fill="both")
-        tframe2 = tk.Frame(master=toplevel8)
-        tframe2.pack(fill="both")
-        tlabel_title = tk.Label(master=tframe1, text=name, font="Arial 25")
-        tlabel_title.pack()
-        for i, j in enumerate((version, build_date, update_date, 
-                               developed_by, thanks_to, contact, github)):
-            tlabel_info_1 = tk.Label(master=tframe2, text=j, 
-                                     font="Arial 12", fg="red")
-            tlabel_info_1.grid(row=i, column=0, sticky="w")
-        for i, j in enumerate((_version, _build_date, _update_date, 
-                               _developed_by, _thanks_to, _contact, _github)):
-            if j == _github:
-                tlabel_info_2 = tk.Label(master=tframe2, text=j, 
-                                         font="Arial 12", fg="blue", 
-                                         cursor="hand2")
-                url1 = "https://github.com/dildeolupbiten/TkAstroDb"
-                tlabel_info_2.bind(
-                    "<Button-1>", 
-                    lambda event: callback(event, url1))
-            elif j == _contact:
-                tlabel_info_2 = tk.Label(master=tframe2, text=j, 
-                                         font="Arial 12", fg="blue", 
-                                         cursor="hand2")
-                url2 = "mailto://tckutlu@gmail.com"
-                tlabel_info_2.bind(
-                    "<Button-1>", 
-                    lambda event: callback(event, url2))
-            else:
-                tlabel_info_2 = tk.Label(master=tframe2, text=j, 
-                                         font="Arial 12")
-            tlabel_info_2.grid(row=i, column=1, sticky="w")
 
-    def update():
-        url_1 = "https://raw.githubusercontent.com/dildeolupbiten/"\
-                "TkAstroDb/master/TkAstroDb.py"
-        url_2 = "https://raw.githubusercontent.com/dildeolupbiten/"\
-                "TkAstroDb/master/README.md"
-        data_1 = urllib.urlopen(url=url_1, 
-                                context=ssl.SSLContext(ssl.PROTOCOL_SSLv23))
-        data_2 = urllib.urlopen(url=url_2, 
-                                context=ssl.SSLContext(ssl.PROTOCOL_SSLv23))
-        with open(file="TkAstroDb.py", mode="r", encoding="utf-8") as f:
-            var_1 = [i.decode("utf-8") for i in data_1]
-            var_2 = [i.decode("utf-8") for i in data_2]
-            var_3 = [i for i in f]
-            if var_1 == var_3:
-                msgbox.showinfo(title="Update", 
-                                message="Program is up-to-date.")
-            else:
-                with open(file="README.md", mode="w", encoding="utf-8") \
-                        as g:
-                    for i in var_2:
-                        g.write(i)
-                        g.flush()
-                with open(file="TkAstroDb.py", mode="w", encoding="utf-8") \
-                        as h:
-                    for i in var_1:
-                        h.write(i)
-                        h.flush()
-                    msgbox.showinfo(title="Update", 
-                                    message="Program is updated.")
-                    if os.name == "posix":
-                        import signal
-                        os.kill(os.getpid(), signal.SIGKILL)
-                    elif os.name == "nt":
-                        os.system(f"TASKKILL /F /PID {os.getpid()}")
+def button_3_on_treeview_(event, _treeview_):
+    global menu, on_toplevel
+    on_toplevel = True
+    if menu is not None:
+        destroy(event)
+    menu = tk.Menu(master=None, tearoff=False)
+    menu.add_command(
+        label="Edit", command=lambda: edit_record(_treeview_))
+    menu.add_command(
+        label="Delete", command=lambda: delete_record(_treeview_))
+    menu.add_command(
+        label="Open Chart",
+        command=lambda: button_3_open_chart(_treeview_)
+    )
+    menu.post(event.x_root, event.y_root)
 
-    menubar = tk.Menu(master=master)
-    master.configure(menu=menubar)
 
-    calculations_menu = tk.Menu(master=menubar, tearoff=False)
-    export_menu = tk.Menu(master=menubar, tearoff=False)
-    options_menu = tk.Menu(master=menubar, tearoff=False)
-    records_menu = tk.Menu(master=menubar, tearoff=False)
-    help_menu = tk.Menu(master=menubar, tearoff=False)
+def search_record(event, search_entry_, _treeview_):
+    global edit_or_search
+    master.update()
+    for _record_ in database:
+        if search_entry_.get() == _record_[1]:
+            for item in _treeview_.get_children():
+                if _treeview_.item(item)["values"][3] == _record_[1]:
+                    toplevel, frames, entries, listboxes, list_box, \
+                        option_menu = record_panel(text="Edit Record")
+                    data = _treeview_.item(item)["values"]
+                    items.append(item)
+                    edit_or_search = True
+                    create_panel(
+                        entries, data, listboxes, list_box,
+                        option_menu, frames, toplevel, _treeview_
+                    )
+                    break
+            break
 
-    menubar.add_cascade(label="Calculations", menu=calculations_menu)
-    menubar.add_cascade(label="Export", menu=export_menu)
-    menubar.add_cascade(label="Options", menu=options_menu)
-    menubar.add_cascade(label="Records", menu=records_menu)
-    menubar.add_cascade(label="Help", menu=help_menu)
 
-    method_menu = tk.Menu(master=calculations_menu, tearoff=False)
+def edit_and_delete():
+    global add_or_edit, on_toplevel
+    add_or_edit = True
+    master.update()
+    toplevel7 = tk.Toplevel()
+    toplevel7.title("Edit Records")
+    toplevel7.geometry("800x600")
+    toplevel7.resizable(width=False, height=False)
+    search_label_ = tk.Label(master=toplevel7,
+                             text="Search A Record By Name", fg="red")
+    search_label_.pack()
+    search_entry_ = tk.Entry(master=toplevel7)
+    search_entry_.pack()
+    columns_2 = ["No", "Add Date"] + columns_1
+    y_scrollbar_2 = tk.Scrollbar(master=toplevel7, orient="vertical")
+    y_scrollbar_2.pack(side="right", fill="y")
+    _treeview_ = create_treeview(_master_=toplevel7, columns=columns_2,
+                                 height=26)
+    if _treeview_ not in treeviews:
+        treeviews.append(_treeview_)
+    x_scrollbar(y_scrl=y_scrollbar_2, _master_=toplevel7,
+                _treeview_=_treeview_)
+    for i, j in enumerate(cursor.execute("SELECT * FROM DATA")):
+        modify = [col for col in j]
+        modify.pop(10)
+        modify.pop(11)
+        _treeview_.insert("", i, values=modify)
+        master.update()
+    _treeview_.bind(
+        "<Button-3>",
+        lambda event: button_3_on_treeview_(event, _treeview_))
+    _treeview_.bind(
+        "<Button-1>",
+        lambda event: destroy(event))
+    search_entry_.bind(
+        "<KeyRelease>",
+        lambda event: search_record(event, search_entry_, _treeview_))
+    master.update()
 
-    calculations_menu.add_command(label="Find Observed Values", 
-                                  command=func1)
-    calculations_menu.add_cascade(label="Find Expected Values", 
-                                  menu=method_menu)
-    calculations_menu.add_command(label="Find Chi-Square Values", 
-                                  command=func3)
-    calculations_menu.add_command(label="Find Effect Size Values", 
-                                  command=func4)
 
-    method_menu.add_command(label="Flavia's method", 
-                            command=set_method_to_true)
-    method_menu.add_command(label="Sjoerd's method", 
-                            command=set_method_to_false)
+def reload_database():
+    merge_databases()
+    group_categories()
+    msgbox.showinfo(title="Reload Database",
+                    message="Database is reloaded.")
+    master.update()
 
-    export_menu.add_command(label="Adb Links", 
-                            command=export_link)
-    export_menu.add_command(label="Latitude Frequency", 
-                            command=export_lat_frequency)
-    export_menu.add_command(label="Year Frequency", 
-                            command=export_year_frequency)
 
-    options_menu.add_command(label="House System", 
-                             command=create_hsys_checkbuttons)
-    options_menu.add_command(label="Orb Factor", 
-                             command=choose_orb_factor)
+def about():
+    toplevel8 = tk.Toplevel()
+    toplevel8.title("About TkAstroDb")
+    name = "TkAstroDb"
+    version, _version = "Version:", __version__
+    build_date, _build_date = "Built Date:", "21 December 2018"
+    update_date, _update_date = "Update Date:", "28 April 2019"
+    developed_by, _developed_by = "Developed By:", \
+                                  "Tanberk Celalettin Kutlu"
+    thanks_to, _thanks_to = "Special Thanks To:", \
+                            "Alois Treindl, Flavia Minghetti, Sjoerd Visser"
+    contact, _contact = "Contact:", "tckutlu@gmail.com"
+    github, _github = "GitHub:", \
+                      "https://github.com/dildeolupbiten/TkAstroDb"
+    tframe1 = tk.Frame(master=toplevel8, bd="2", relief="groove")
+    tframe1.pack(fill="both")
+    tframe2 = tk.Frame(master=toplevel8)
+    tframe2.pack(fill="both")
+    tlabel_title = tk.Label(master=tframe1, text=name, font="Arial 25")
+    tlabel_title.pack()
+    for i, j in enumerate((version, build_date, update_date,
+                           developed_by, thanks_to, contact, github)):
+        tlabel_info_1 = tk.Label(master=tframe2, text=j,
+                                 font="Arial 12", fg="red")
+        tlabel_info_1.grid(row=i, column=0, sticky="w")
+    for i, j in enumerate((_version, _build_date, _update_date,
+                           _developed_by, _thanks_to, _contact, _github)):
+        if j == _github:
+            tlabel_info_2 = tk.Label(master=tframe2, text=j,
+                                     font="Arial 12", fg="blue",
+                                     cursor="hand2")
+            url1 = "https://github.com/dildeolupbiten/TkAstroDb"
+            tlabel_info_2.bind(
+                "<Button-1>",
+                lambda event: callback(event, url1))
+        elif j == _contact:
+            tlabel_info_2 = tk.Label(master=tframe2, text=j,
+                                     font="Arial 12", fg="blue",
+                                     cursor="hand2")
+            url2 = "mailto://tckutlu@gmail.com"
+            tlabel_info_2.bind(
+                "<Button-1>",
+                lambda event: callback(event, url2))
+        else:
+            tlabel_info_2 = tk.Label(master=tframe2, text=j,
+                                     font="Arial 12")
+        tlabel_info_2.grid(row=i, column=1, sticky="w")
 
-    records_menu.add_command(label="Add New Record", 
-                             command=add_record)
-    records_menu.add_command(label="Edit & Delete Records", 
-                             command=edit_and_delete)
-    records_menu.add_command(label="Reload Database", 
-                             command=reload_database)
-    help_menu.add_command(label="About", 
-                          command=about)
-    help_menu.add_command(label="Check for Updates", 
-                          command=update)
 
-    t0 = threading.Thread(target=master.mainloop)
-    t0.run()
+def update():
+    url_1 = "https://raw.githubusercontent.com/dildeolupbiten/" \
+            "TkAstroDb/master/TkAstroDb.py"
+    url_2 = "https://raw.githubusercontent.com/dildeolupbiten/" \
+            "TkAstroDb/master/README.md"
+    data_1 = urllib.urlopen(url=url_1,
+                            context=ssl.SSLContext(ssl.PROTOCOL_SSLv23))
+    data_2 = urllib.urlopen(url=url_2,
+                            context=ssl.SSLContext(ssl.PROTOCOL_SSLv23))
+    with open(file="TkAstroDb.py", mode="r", encoding="utf-8") as f:
+        var_1 = [i.decode("utf-8") for i in data_1]
+        var_2 = [i.decode("utf-8") for i in data_2]
+        var_3 = [i for i in f]
+        if var_1 == var_3:
+            msgbox.showinfo(title="Update",
+                            message="Program is up-to-date.")
+        else:
+            with open(file="README.md", mode="w", encoding="utf-8") \
+                    as g:
+                for i in var_2:
+                    g.write(i)
+                    g.flush()
+            with open(file="TkAstroDb.py", mode="w", encoding="utf-8") \
+                    as h:
+                for i in var_1:
+                    h.write(i)
+                    h.flush()
+                msgbox.showinfo(title="Update",
+                                message="Program is updated.")
+                if os.name == "posix":
+                    import signal
+                    os.kill(os.getpid(), signal.SIGKILL)
+                elif os.name == "nt":
+                    os.system(f"TASKKILL /F /PID {os.getpid()}")
 
+
+menubar = tk.Menu(master=master)
+master.configure(menu=menubar)
+
+calculations_menu = tk.Menu(master=menubar, tearoff=False)
+export_menu = tk.Menu(master=menubar, tearoff=False)
+options_menu = tk.Menu(master=menubar, tearoff=False)
+records_menu = tk.Menu(master=menubar, tearoff=False)
+help_menu = tk.Menu(master=menubar, tearoff=False)
+
+menubar.add_cascade(label="Calculations", menu=calculations_menu)
+menubar.add_cascade(label="Export", menu=export_menu)
+menubar.add_cascade(label="Options", menu=options_menu)
+menubar.add_cascade(label="Records", menu=records_menu)
+menubar.add_cascade(label="Help", menu=help_menu)
+
+method_menu = tk.Menu(master=calculations_menu, tearoff=False)
+
+calculations_menu.add_command(label="Find Observed Values",
+                              command=func1)
+calculations_menu.add_cascade(label="Find Expected Values",
+                              menu=method_menu)
+calculations_menu.add_command(label="Find Chi-Square Values",
+                              command=func3)
+calculations_menu.add_command(label="Find Effect Size Values",
+                              command=func4)
+
+method_menu.add_command(label="Flavia's method",
+                        command=set_method_to_true)
+method_menu.add_command(label="Sjoerd's method",
+                        command=set_method_to_false)
+
+export_menu.add_command(label="Adb Links",
+                        command=export_link)
+export_menu.add_command(label="Latitude Frequency",
+                        command=export_lat_frequency)
+export_menu.add_command(label="Year Frequency",
+                        command=export_year_frequency)
+
+options_menu.add_command(label="House System",
+                         command=create_hsys_checkbuttons)
+options_menu.add_command(label="Orb Factor",
+                         command=choose_orb_factor)
+
+records_menu.add_command(label="Add New Record",
+                         command=add_record)
+records_menu.add_command(label="Edit & Delete Records",
+                         command=edit_and_delete)
+records_menu.add_command(label="Reload Database",
+                         command=reload_database)
+
+help_menu.add_command(label="About",
+                      command=about)
+help_menu.add_command(label="Check for Updates",
+                      command=update)
 
 if __name__ == "__main__":
-    main()
+    t0 = threading.Thread(target=master.mainloop)
+    t0.run()
