@@ -3032,34 +3032,7 @@ def calculate(file_name_1, file_name_2, table_name, msg_title):
                         message="Process finished successfully.")
 
 
-def find_expected_values():
-    calculate(
-        file_name_1="control_group",
-        file_name_2="observed_values",
-        table_name="expected_values",
-        msg_title="Expected"
-    )
-
-
-def find_chi_square_values():
-    calculate(
-        file_name_1="observed_values",
-        file_name_2="expected_values",
-        table_name="chi-square",
-        msg_title="Chi-Square"
-    )
-
-
-def find_effect_size_values():
-    calculate(
-        file_name_1="observed_values",
-        file_name_2="expected_values",
-        table_name="effect-size",
-        msg_title="Effect Size"
-    )
-
-
-# --------------------menu variables functions------------------------
+# -------------------------menu variables & functions---------------------------
 
 
 add_or_edit = False
@@ -3082,7 +3055,11 @@ def func2():
     global r1, r2, r3, _r1, _r2, _r3
     r1, r2, r3 = "", "", ""
     _r1, _r2, _r3 = [], [], []
-    t2 = threading.Thread(target=find_expected_values)
+    t2 = threading.Thread(
+        target=calculate,
+        args=("control_group", "observed_values",
+              "expected_values", "Expected")
+    )
     t2.start()
 
 
@@ -3090,7 +3067,11 @@ def func3():
     global r1, r2, r3, _r1, _r2, _r3
     r1, r2, r3 = "", "", ""
     _r1, _r2, _r3 = [], [], []
-    t3 = threading.Thread(target=find_chi_square_values)
+    t3 = threading.Thread(
+        target=calculate,
+        args=("observed_values", "expected_values",
+              "chi-square", "Chi-Square")
+    )
     t3.start()
 
 
@@ -3098,7 +3079,11 @@ def func4():
     global r1, r2, r3, _r1, _r2, _r3
     r1, r2, r3 = "", "", ""
     _r1, _r2, _r3 = [], [], []
-    t4 = threading.Thread(target=find_effect_size_values)
+    t4 = threading.Thread(
+        target=calculate,
+        args=("observed_values", "expected_values",
+              "effect-size", "Effect Size")
+    )
     t4.start()
 
 
@@ -4099,7 +4084,7 @@ def update():
                     os.system(f"TASKKILL /F /PID {os.getpid()}")
 
 
-# ------------------------------menu--------------------------------
+# ------------------------------------menu--------------------------------------
 
 
 menubar = tk.Menu(master=master)
@@ -4158,7 +4143,7 @@ help_menu.add_command(label="Check for Updates",
                       command=update)
 
 
-# -----------------------------run---------------------------
+# ------------------------------------run---------------------------------------
 
 
 if __name__ == "__main__":
