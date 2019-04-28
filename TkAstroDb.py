@@ -4154,6 +4154,5 @@ help_menu.add_command(label="About",
 help_menu.add_command(label="Check for Updates",
                       command=update)
 
-if __name__ == "__main__":
-    t0 = threading.Thread(target=master.mainloop)
-    t0.run()
+t0 = threading.Thread(target=master.mainloop)
+t0.run()
