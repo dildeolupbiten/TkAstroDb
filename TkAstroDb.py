@@ -431,14 +431,20 @@ class Chart:
         self._PLANETS = {i: j for i, j in self.PLANETS.items()}
         self._SIGNS = {j: 30 * i for i, j in enumerate(signs)}
         self.SIGNS = [
-            "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
-            "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]
+            "Aries", "Taurus", "Gemini", "Cancer", 
+            "Leo", "Virgo", "Libra", "Scorpio", 
+            "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+        ]
         self.SIGN_SYMBOLS = [
             "\u2648", "\u2649", "\u264A", "\u264B", "\u264C", "\u264D",
             "\u264E", "\u264F", "\u2650", "\u2651", "\u2652", "\u2653"]
         self.SIGN_COLORS = ["red", "green", "yellow", "blue"] * 3
-        self._SIGN_SYMBOLS = {i: j for i, j in zip(self.SIGNS, self.SIGN_SYMBOLS)}
-        self._SIGN_COLORS = {i: j for i, j in zip(self.SIGNS, self.SIGN_COLORS)}
+        self._SIGN_SYMBOLS = {
+            i: j for i, j in zip(self.SIGNS, self.SIGN_SYMBOLS)
+        }
+        self._SIGN_COLORS = {
+            i: j for i, j in zip(self.SIGNS, self.SIGN_COLORS)
+        }
         self.PLANET_SYMBOLS = {
             "Sun": "\u2299",
             "Moon": "\u263E",
@@ -1935,11 +1941,17 @@ def button_3_on_treeview(event):
         destroy(event)
     menu = tk.Menu(master=None, tearoff=False)
     menu.add_command(
-        label="Remove", command=lambda: button_3_remove(_treeview=treeview))
+        label="Remove", 
+        command=lambda: button_3_remove(_treeview=treeview)
+    )
     menu.add_command(
-        label="Open ADB Page", command=button_3_open_url)
+        label="Open ADB Page", 
+        command=button_3_open_url
+    )
     menu.add_command(
-        label="Open Chart", command=lambda: button_3_open_chart(_treeview_=treeview))
+        label="Open Chart", 
+        command=lambda: button_3_open_chart(_treeview_=treeview)
+    )
     menu.post(event.x_root, event.y_root)
 
 
@@ -3899,7 +3911,8 @@ def main():
         menu.add_command(
             label="Delete", command=lambda: delete_record(_treeview_))
         menu.add_command(
-            label="Open Chart", command=lambda: button_3_open_chart(_treeview_)
+            label="Open Chart", 
+            command=lambda: button_3_open_chart(_treeview_)
         )
         menu.post(event.x_root, event.y_root)
 
@@ -3915,8 +3928,10 @@ def main():
                         data = _treeview_.item(item)["values"]
                         items.append(item)
                         edit_or_search = True
-                        create_panel(entries, data, listboxes, list_box, 
-                                     option_menu, frames, toplevel, _treeview_)
+                        create_panel(
+                            entries, data, listboxes, list_box, 
+                            option_menu, frames, toplevel, _treeview_
+                        )
                         break
                 break
 
