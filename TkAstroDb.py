@@ -430,11 +430,7 @@ class Chart:
         self.PLANETS = PLANETS
         self._PLANETS = {i: j for i, j in self.PLANETS.items()}
         self._SIGNS = {j: 30 * i for i, j in enumerate(signs)}
-        self.SIGNS = [
-            "Aries", "Taurus", "Gemini", "Cancer", 
-            "Leo", "Virgo", "Libra", "Scorpio", 
-            "Sagittarius", "Capricorn", "Aquarius", "Pisces"
-        ]
+        self.SIGNS = [i for i in signs]
         self.SIGN_SYMBOLS = [
             "\u2648", "\u2649", "\u264A", "\u264B", "\u264C", "\u264D",
             "\u264E", "\u264F", "\u2650", "\u2651", "\u2652", "\u2653"]
@@ -446,18 +442,18 @@ class Chart:
             i: j for i, j in zip(self.SIGNS, self.SIGN_COLORS)
         }
         self.PLANET_SYMBOLS = {
-            "Sun": "\u2299",
-            "Moon": "\u263E",
-            "Mercury": "\u263F",
-            "Venus": "\u2640",
-            "Mars": "\u2642",
-            "Jupiter": "\u2643",
-            "Saturn": "\u2644",
-            "Uranus": "\u2645",
-            "Neptune": "\u2646",
-            "Pluto": "\u2647",
-            "North Node": "\u260A",
-            "Chiron": "\u26B7"
+            planets[0]: "\u2299",
+            planets[1]: "\u263E",
+            planets[2]: "\u263F",
+            planets[3]: "\u2640",
+            planets[4]: "\u2642",
+            planets[5]: "\u2643",
+            planets[6]: "\u2644",
+            planets[7]: "\u2645",
+            planets[8]: "\u2646",
+            planets[9]: "\u2647",
+            planets[10]: "\u260A",
+            planets[11]: "\u26B7"
         }
         self.ASPECT_SYMBOLS = ASPECT_SYMBOLS
         self.ASPECT_SYMBOLS["Null"] = " "
