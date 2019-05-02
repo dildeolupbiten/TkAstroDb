@@ -701,7 +701,8 @@ class Chart:
         asc = 0
         angle = []
         for i, j in enumerate(swe.houses(
-                self.julian_date, self.latitude, self.longitude)[0]):
+                self.julian_date, self.latitude, self.longitude,
+                bytes(hsys.encode("utf-8")))[0]):
             if i == 0:
                 asc += j
             angle.append(j)
