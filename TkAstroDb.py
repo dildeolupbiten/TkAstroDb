@@ -3315,7 +3315,7 @@ def year_frequency_command(parent, date_entries, years):
                   encoding="utf-8") as f:
             year_dict = dict()
             count = 0
-            for i in range(min_, max_, step_):
+            for i in range(min_, max_ + 1, step_):
                 year_dict[
                     (min_ + (count * step_),
                      min_ + (count * step_) + step_)
