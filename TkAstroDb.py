@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.4.5"
+__version__ = "1.4.6"
 
 import os
 import sys
@@ -3323,7 +3323,7 @@ def year_frequency_command(parent, date_entries, years):
                 count += 1
             for i in years:
                 for keys, values in year_dict.items():
-                    if keys[0] < i < keys[1]:
+                    if keys[0] <= i < keys[1]:
                         year_dict[keys[0], keys[1]] += i,
             for keys, values in year_dict.items():
                 f.write(f"{keys} = {len(values)}\n")
@@ -4007,7 +4007,7 @@ def about():
     name = "TkAstroDb"
     version, _version = "Version:", __version__
     build_date, _build_date = "Built Date:", "21 December 2018"
-    update_date, _update_date = "Update Date:", "02 May 2019"
+    update_date, _update_date = "Update Date:", "15 May 2019"
     developed_by, _developed_by = "Developed By:", \
                                   "Tanberk Celalettin Kutlu"
     thanks_to, _thanks_to = "Special Thanks To:", \
