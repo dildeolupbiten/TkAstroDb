@@ -4137,7 +4137,7 @@ calculations_menu.add_command(label="Find chi-square values",
                               command=func3)
 calculations_menu.add_command(label="Find effect size values",
                               command=func4)
-calculations_menu.add_command(label="Find Cohen's d effect size for a t-test",
+calculations_menu.add_command(label="Find Cohen's d effect size values",
                               command=func5)
 
 method_menu.add_command(label="Flavia's method",
