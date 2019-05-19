@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.4.6"
+__version__ = "1.4.7"
 
 import os
 import sys
@@ -239,7 +239,7 @@ def merge_databases():
 def group_categories():
     global category_names, all_categories
     category_names, all_categories = [], []
-    for _i_ in range(5000):
+    for _i_ in category_dict.keys():
         _records_ = []
         category_groups = {}
         category_name = ""
@@ -4007,7 +4007,7 @@ def about():
     name = "TkAstroDb"
     version, _version = "Version:", __version__
     build_date, _build_date = "Built Date:", "21 December 2018"
-    update_date, _update_date = "Update Date:", "15 May 2019"
+    update_date, _update_date = "Update Date:", "19 May 2019"
     developed_by, _developed_by = "Developed By:", \
                                   "Tanberk Celalettin Kutlu"
     thanks_to, _thanks_to = "Special Thanks To:", \
