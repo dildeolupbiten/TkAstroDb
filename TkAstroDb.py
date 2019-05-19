@@ -4129,15 +4129,15 @@ menubar.add_cascade(label="Help", menu=help_menu)
 
 method_menu = tk.Menu(master=calculations_menu, tearoff=False)
 
-calculations_menu.add_command(label="Find observed values",
+calculations_menu.add_command(label="Find Observed Values",
                               command=func1)
-calculations_menu.add_cascade(label="Find expected values",
+calculations_menu.add_cascade(label="Find Expected Values",
                               menu=method_menu)
-calculations_menu.add_command(label="Find chi-square values",
+calculations_menu.add_command(label="Find Chi-Square Values",
                               command=func3)
-calculations_menu.add_command(label="Find effect size values",
+calculations_menu.add_command(label="Find Effect Size Values",
                               command=func4)
-calculations_menu.add_command(label="Find Cohen's d effect size values",
+calculations_menu.add_command(label="Find Cohen's D Effect Size Values",
                               command=func5)
 
 method_menu.add_command(label="Flavia's method",
