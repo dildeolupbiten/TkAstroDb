@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.4.7"
+__version__ = "1.4.8"
 
 import os
 import sys
@@ -2055,7 +2055,8 @@ def get_excel_datas(sheet):
                     elif (col == 13 and 216 < row < 398) or \
                             (col == 13 and 429 < row < 789):
                         datas.append(([row, col], sheet.cell_value(row, col)))
-        elif selection == "chi-square" or selection == "effect-size":
+        elif selection == "chi-square" or selection == "effect-size" or \
+                selection == "cohens_d_effect":
             if row == 1:
                 _r1.append(f"{sheet.cell_value(row, 5)}")
                 for i in _r1:
@@ -2258,7 +2259,8 @@ def write_title_of_total(sheet):
         style.font = _font_(bold=False)
         sheet.write_merge(r1=3, r2=3, c1=5, c2=13, 
                           label=f"{r3[:-3]}", style=style)
-    elif selection == "chi-square" or selection == "effect-size":
+    elif selection == "chi-square" or selection == "effect-size" or \
+             selection == "cohens_d_effect":
         sheet.write_merge(r1=1, r2=1, c1=3, c2=4, 
                           label="House System:", style=style)
         style.font = _font_(bold=False)
@@ -3016,6 +3018,15 @@ def calculate(file_name_1, file_name_2, table_name, msg_title):
                                         *i[0],
                                         i[1] / j[1],
                                         style=style)
+                                elif selection == "cohens_d_effect":
+                                    new_sheet.write(
+                                        *i[0], 
+                                        (i[1] - j[1]) / (((i[1] * 
+                                        (1 - (i[1] / sum_of_row(data_1)))) ** 2
+                                         + (j[1] * (1 - 
+                                         (j[1] / sum_of_row(data_2))) ** 2)) 
+                                         / 2) ** 0.5, 
+                                        style=style)                                    
                             except ZeroDivisionError:
                                 new_sheet.write(*i[0], 0, style=style)
                         else:
@@ -3087,6 +3098,18 @@ def func4():
               "effect-size", "Effect Size")
     )
     t4.start()
+    
+    
+def func5():
+    global r1, r2, r3, _r1, _r2, _r3
+    r1, r2, r3 = "", "", ""
+    _r1, _r2, _r3 = [], [], []
+    t5 = threading.Thread(
+        target=calculate,
+        args=("observed_values", "expected_values",
+              "cohens_d_effect", "Cohen's d effect")
+    )
+    t5.start()
 
 
 def set_method_to_false():
@@ -4007,7 +4030,7 @@ def about():
     name = "TkAstroDb"
     version, _version = "Version:", __version__
     build_date, _build_date = "Built Date:", "21 December 2018"
-    update_date, _update_date = "Update Date:", "19 May 2019"
+    update_date, _update_date = "Update Date:", "20 May 2019"
     developed_by, _developed_by = "Developed By:", \
                                   "Tanberk Celalettin Kutlu"
     thanks_to, _thanks_to = "Special Thanks To:", \
@@ -4106,14 +4129,16 @@ menubar.add_cascade(label="Help", menu=help_menu)
 
 method_menu = tk.Menu(master=calculations_menu, tearoff=False)
 
-calculations_menu.add_command(label="Find Observed Values",
+calculations_menu.add_command(label="Find observed values",
                               command=func1)
-calculations_menu.add_cascade(label="Find Expected Values",
+calculations_menu.add_cascade(label="Find expected values",
                               menu=method_menu)
-calculations_menu.add_command(label="Find Chi-Square Values",
+calculations_menu.add_command(label="Find chi-square values",
                               command=func3)
-calculations_menu.add_command(label="Find Effect Size Values",
+calculations_menu.add_command(label="Find effect size values",
                               command=func4)
+calculations_menu.add_command(label="Find Cohen's d effect size for a t-test",
+                              command=func5)
 
 method_menu.add_command(label="Flavia's method",
                         command=set_method_to_true)
