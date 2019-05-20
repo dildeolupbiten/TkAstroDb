@@ -171,7 +171,7 @@ def formula(x: list, y: list):
 
 ![img24](https://user-images.githubusercontent.com/29302909/57989863-aa7ea900-7aa9-11e9-8ae0-be1b525939fe.png)
 
-**27.** In order to calculate the Cohen's d effect size values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to the **TkAstroDb** directory. Then they should select **Calculations** menu button. After that, they should select **Find Cohen's D Effect Size Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** will be deleted and a new excel spreadsheed file will be created as **effect-size.xlsx** in **TkAstroDb** folder. It is recommended that the users cut this file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **effect-size.xlsx** file to the related folder:
+**27.** In order to calculate the Cohen's d effect size values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to the **TkAstroDb** directory. Then they should select **Calculations** menu button. After that, they should select **Find Cohen's D Effect Size Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** will be deleted and a new excel spreadsheed file will be created as **cohens_d_effect.xlsx** in **TkAstroDb** folder. It is recommended that the users cut this file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **cohens_d_effect.xlsx** file to the related folder:
 
 ![img25](https://user-images.githubusercontent.com/29302909/57989865-ace10300-7aa9-11e9-8c07-697cfd2346fe.png)
 
