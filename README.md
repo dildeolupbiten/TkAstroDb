@@ -195,7 +195,7 @@ def formula(x: list, y: list):
 
 [cohens_d_effect.ods](https://www.dropbox.com/s/bu510gdehi9md5e/cohens_d_effect.ods)
 
-![img30](https://user-images.githubusercontent.com/29302909/57989712-96d24300-7aa7-11e9-9424-47be3ba4b8df.png)
+![img30](https://user-images.githubusercontent.com/29302909/58037785-e0b63a00-7b36-11e9-9868-89b6154d3717.png)
 
 ## Notes
 
