@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.4.7"
+__version__ = "1.4.8"
 
 import os
 import sys
@@ -141,11 +141,11 @@ cursor.execute(f"CREATE TABLE IF NOT EXISTS DATA({col_names})")
 
 xml_file = ""
 
-database, all_categories, category_names = [], [], []
+database, category_names = [], []
 
 _count_ = 0
 
-category_dict = dict()
+all_categories, category_dict = dict(), dict()
 
 for _i in os.listdir(os.getcwd()):
     if _i.endswith("xml"):
@@ -235,29 +235,22 @@ def merge_databases():
         edit_data.append(new_category)
         database.append(edit_data)
         
-        
+              
+def _group_categories(database):
+    category_groups = {}
+    for db_row in database:
+        for db_category in db_row[12]:
+            if (db_category[0], db_category[1]) not in category_groups:
+                if db_category[1] is None:
+                    pass
+                category_groups[(db_category[0], db_category[1])] = []
+            category_groups[(db_category[0], db_category[1])].append(db_row)
+    return category_groups
+
 def group_categories():
     global category_names, all_categories
-    category_names, all_categories = [], []
-    for _i_ in category_dict.keys():
-        _records_ = []
-        category_groups = {}
-        category_name = ""
-        for j_ in database:
-            for _k in j_[12]:
-                if _k[0] == f"{_i_}":
-                    _records_.append(j_)
-                    category_name = _k[1]
-                    if category_name is None:
-                        category_name = "No Category Name"
-        category_groups[(_i_, category_name)] = _records_
-        if not _records_:
-            pass
-        else:
-            if category_name not in category_names:
-                category_names.append(category_name)
-            all_categories.append(category_groups)
-    category_names = sorted(category_names)
+    all_categories = _group_categories(database)
+    category_names = sorted([i for i in category_dict.values() if i is not None])
 
 
 merge_databases()
@@ -1473,6 +1466,9 @@ rrating_label = tk.Label(master=entry_button_frame,
 rrating_label.grid(row=3, column=0, padx=5, pady=5, sticky="w")
 
 
+rating_or_category = None
+
+
 def on_frame_configure(event, tcanvas):
     tcanvas.configure(scrollregion=tcanvas.bbox("all"))
 
@@ -1480,6 +1476,7 @@ def on_frame_configure(event, tcanvas):
 def tbutton_command(cvar_list, toplevel, select):
     for item in cvar_list:
         if item[0].get() is True:
+
             select.append(item[1])
     toplevel.destroy()
 
@@ -1496,8 +1493,9 @@ def check_all_command(check_all, cvar_list, checkbutton_list):
 
 
 def select_ratings():
-    global selected_ratings
+    global selected_ratings, rating_or_category
     selected_ratings = []
+    rating_or_category = "rating"
     global toplevel2
     try:
         if not toplevel2.winfo_exists():
@@ -1544,8 +1542,9 @@ def select_ratings():
 
 
 def select_categories():
-    global selected_categories, record_categories, category_names
+    global selected_categories, record_categories, category_names, rating_or_category
     selected_categories, record_categories = [], []
+    rating_or_category = "category"
     global toplevel1
     try:
         if not toplevel1.winfo_exists():
@@ -1695,11 +1694,9 @@ def display_results():
     treeview.delete(*treeview.get_children())
     displayed_results = []
     control_items = []
-    for c in all_categories:
-        _category_ = list(c.keys())[0][1]
-        if _category_ in selected_categories:
-            items_ = list(c.values())[0]
-            for item in items_:
+    for key, value in all_categories.items():
+        if key[1] in selected_categories:
+            for item in value:
                 if item[3] in selected_ratings:
                     if item in control_items:
                         pass
@@ -4030,7 +4027,7 @@ def about():
     name = "TkAstroDb"
     version, _version = "Version:", __version__
     build_date, _build_date = "Built Date:", "21 December 2018"
-    update_date, _update_date = "Update Date:", "20 May 2019"
+    update_date, _update_date = "Update Date:", "25 May 2019"
     developed_by, _developed_by = "Developed By:", \
                                   "Tanberk Celalettin Kutlu"
     thanks_to, _thanks_to = "Special Thanks To:", \
