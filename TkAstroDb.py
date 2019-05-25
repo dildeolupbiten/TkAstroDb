@@ -145,7 +145,7 @@ database, category_names = [], []
 
 _count_ = 0
 
-all_categories, category_dict = dict(), dict()
+all_categories, category_dict = {}, {}
 
 for _i in os.listdir(os.getcwd()):
     if _i.endswith("xml"):
@@ -239,13 +239,13 @@ def merge_databases():
 def group_categories():
     global category_names, all_categories
     category_groups = {}
-    for db_row in database:
-        for db_category in db_row[12]:
-            if (db_category[0], db_category[1]) not in category_groups:
-                if db_category[1] is None:
+    for _record in database:
+        for _category in _record[12]:
+            if (_category[0], _category[1]) not in category_groups:
+                if _category[1] is None:
                     pass
-                category_groups[(db_category[0], db_category[1])] = []
-            category_groups[(db_category[0], db_category[1])].append(db_row)
+                category_groups[(_category[0], _category[1])] = []
+            category_groups[(_category[0], _category[1])].append(_record)
     all_categories = category_groups
     category_names = sorted(
         [i for i in category_dict.values() if i is not None]
@@ -642,7 +642,7 @@ class Chart:
 
     @staticmethod
     def set_lords(ruler_sign):
-        lords = dict()
+        lords = {}
         for keys, values in ruler_sign.items():
             for value in values:
                 for i in range(12):
@@ -1475,7 +1475,6 @@ def on_frame_configure(event, tcanvas):
 def tbutton_command(cvar_list, toplevel, select):
     for item in cvar_list:
         if item[0].get() is True:
-
             select.append(item[1])
     toplevel.destroy()
 
@@ -1492,9 +1491,8 @@ def check_all_command(check_all, cvar_list, checkbutton_list):
 
 
 def select_ratings():
-    global selected_ratings, rating_or_category
+    global selected_ratings
     selected_ratings = []
-    rating_or_category = "rating"
     global toplevel2
     try:
         if not toplevel2.winfo_exists():
@@ -1541,9 +1539,9 @@ def select_ratings():
 
 
 def select_categories():
-    global selected_categories, record_categories, category_names, rating_or_category
+    global selected_categories, record_categories, category_names
+    master.update()
     selected_categories, record_categories = [], []
-    rating_or_category = "category"
     global toplevel1
     try:
         if not toplevel1.winfo_exists():
@@ -1554,6 +1552,7 @@ def select_categories():
         toplevel1 = tk.Toplevel()
         toplevel1.title("Select Categories")
         toplevel1.resizable(width=False, height=False)
+        toplevel1.update()
         canvas_frame = tk.Frame(master=toplevel1)
         canvas_frame.pack(side="top")
         button_frame = tk.Frame(master=toplevel1)
@@ -1581,6 +1580,7 @@ def select_categories():
         check_all.set(False)
         check_uncheck_.grid(row=0, column=0, sticky="nw")
         for num, _category_ in enumerate(category_names, 1):
+            master.update()
             cvar = tk.BooleanVar()
             cvar_list.append([cvar, _category_])
             checkbutton = tk.Checkbutton(master=tframe, 
@@ -1589,7 +1589,6 @@ def select_categories():
             checkbutton_list.append(checkbutton)
             cvar.set(False)
             checkbutton.grid(row=num, column=0, sticky="nw")
-            master.update()
         if record is False:
             tbutton.configure(
                 command=lambda: tbutton_command(cvar_list, 
@@ -2525,7 +2524,7 @@ def detailed_traditional(sheet, row, label, rulership):
 
 def detailed_values(sheet, lords, rulership, _row1=431, _row2=443):
     num = 0
-    modify_rulership = dict()
+    modify_rulership = {}
     for i, j in rulership.items():
         if num % 2 == 0:
             modify_rulership[i] = f"{j} (+)"
@@ -3200,7 +3199,7 @@ def create_hsys_checkbuttons():
     button_frame = tk.Frame(master=toplevel4)
     button_frame.pack(side="bottom")
     _house_systems_ = [values for keys, values in house_systems.items()]
-    checkbuttons = dict()
+    checkbuttons = {}
     for i, j in enumerate(_house_systems_):
         _var_ = tk.StringVar()
         if j == house_systems[hsys]:
@@ -3330,7 +3329,7 @@ def year_frequency_command(parent, date_entries, years):
     if len(displayed_results) > 0:
         with open(file="year-frequency.txt", mode="w",
                   encoding="utf-8") as f:
-            year_dict = dict()
+            year_dict = {}
             count = 0
             for i in range(min_, max_ + 1, step_):
                 year_dict[
