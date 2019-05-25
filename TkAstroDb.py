@@ -236,7 +236,8 @@ def merge_databases():
         database.append(edit_data)
         
               
-def _group_categories(database):
+def group_categories():
+    global category_names, all_categories
     category_groups = {}
     for db_row in database:
         for db_category in db_row[12]:
@@ -245,13 +246,11 @@ def _group_categories(database):
                     pass
                 category_groups[(db_category[0], db_category[1])] = []
             category_groups[(db_category[0], db_category[1])].append(db_row)
-    return category_groups
-
-def group_categories():
-    global category_names, all_categories
-    all_categories = _group_categories(database)
-    category_names = sorted([i for i in category_dict.values() if i is not None])
-
+    all_categories = category_groups
+    category_names = sorted(
+        [i for i in category_dict.values() if i is not None]
+    )
+    
 
 merge_databases()
 group_categories()
