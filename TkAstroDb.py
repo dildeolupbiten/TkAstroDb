@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 __version__ = "1.4.8"
+__date__ = "25 May 2019"
 
 import os
 import sys
@@ -4023,7 +4024,7 @@ def about():
     name = "TkAstroDb"
     version, _version = "Version:", __version__
     build_date, _build_date = "Built Date:", "21 December 2018"
-    update_date, _update_date = "Update Date:", "25 May 2019"
+    update_date, _update_date = "Update Date:", __date__
     developed_by, _developed_by = "Developed By:", \
                                   "Tanberk Celalettin Kutlu"
     thanks_to, _thanks_to = "Special Thanks To:", \
