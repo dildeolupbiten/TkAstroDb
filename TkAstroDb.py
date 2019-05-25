@@ -4095,10 +4095,13 @@ def update():
                     h.flush()
                 msgbox.showinfo(title="Update",
                                 message="Program is updated.")
+                import subprocess                
                 if os.name == "posix":
+                    subprocess.Popen(["python3", "TkAstroDb.py"])
                     import signal
                     os.kill(os.getpid(), signal.SIGKILL)
                 elif os.name == "nt":
+                    subprocess.Popen(["python", "TkAstroDb.py"])
                     os.system(f"TASKKILL /F /PID {os.getpid()}")
 
 
