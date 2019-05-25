@@ -1642,9 +1642,8 @@ var_checkbutton_1, display_checkbutton_1, \
     var_checkbutton_6, display_checkbutton_6 = create_checkbutton()
 
 
-def insert_to_treeview(control_items, item):
+def insert_to_treeview(item):
     global _num_
-    control_items.append(item)
     master.update()
     treeview.insert("", _num_, values=[col for col in item])
     info_var.set(len(displayed_results))
@@ -1652,53 +1651,52 @@ def insert_to_treeview(control_items, item):
     displayed_results.append(item)
 
 
-def south_north_check(control_items, item):
+def south_north_check(item):
     if var_checkbutton_5.get() == "1" and var_checkbutton_6.get() == "0":
         if "n" in item[7]:
             pass
         else:
-            insert_to_treeview(control_items, item)
+            insert_to_treeview(item)
     elif var_checkbutton_5.get() == "0" and var_checkbutton_6.get() == "1":
         if "s" in item[7]:
             pass
         else:
-            insert_to_treeview(control_items, item)
+            insert_to_treeview(item)
     elif var_checkbutton_5.get() == "0" and var_checkbutton_6.get() == "0":
-        insert_to_treeview(control_items, item)
+        insert_to_treeview(item)
     elif var_checkbutton_5.get() == "1" and var_checkbutton_6.get() == "1":
         pass
 
 
-def male_female_check(control_items, item):
+def male_female_check(item):
     if var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "0":
         if item[2] == "M":
             pass
         else:
-            south_north_check(control_items, item)
+            south_north_check(item)
     elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "1":
         if item[2] == "F":
             pass
         else:
-            south_north_check(control_items, item)
+            south_north_check(item)
     elif var_checkbutton_3.get() == "0" and var_checkbutton_4.get() == "0":
-        south_north_check(control_items, item)
+        south_north_check(item)
     elif var_checkbutton_3.get() == "1" and var_checkbutton_4.get() == "1":
         if item[2] == "F" or item[2] == "M":
             pass
         else:
-            south_north_check(control_items, item)
+            south_north_check(item)
 
 
 def display_results():
     global displayed_results
     treeview.delete(*treeview.get_children())
     displayed_results = []
-    control_items = []
     for key, value in all_categories.items():
         if key[1] in selected_categories:
             for item in value:
                 if item[3] in selected_ratings:
-                    if item in control_items:
+                    if item in displayed_results:
                         pass
                     else:
                         if var_checkbutton_1.get() == "0" and \
@@ -1706,7 +1704,7 @@ def display_results():
                             if item[0] == 3546 or item[0] == 68092:
                                 pass
                             else:
-                                male_female_check(control_items, item)
+                                male_female_check(item)
                         elif var_checkbutton_1.get() == "1" and \
                                 var_checkbutton_2.get() == "0":
                             if item[2] == "N/A":
@@ -1714,13 +1712,13 @@ def display_results():
                             elif item[0] == 3546:
                                 pass
                             else:
-                                male_female_check(control_items, item)
+                                male_female_check(item)
                         elif var_checkbutton_1.get() == "0" and \
                                 var_checkbutton_2.get() == "1":
                             if item[2] != "N/A" or item[0] == 68092:
                                 pass
                             else:
-                                south_north_check(control_items, item)
+                                south_north_check(item)
                         elif var_checkbutton_1.get() == "1" and \
                                 var_checkbutton_2.get() == "1":
                             pass
