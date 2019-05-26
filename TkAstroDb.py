@@ -1488,11 +1488,11 @@ def on_frame_configure(event, tcanvas):
     tcanvas.configure(scrollregion=tcanvas.bbox("all"))
 
 
-def tbutton_command(cvar_list, toplevel, select):
+def tbutton_command(cvar_list, tlevel, select):
     for item in cvar_list:
         if item[0].get() is True:
             select.append(item[1])
-    toplevel.destroy()
+    tlevel.destroy()
 
 
 def check_all_command(check_all, cvar_list, checkbutton_list):
