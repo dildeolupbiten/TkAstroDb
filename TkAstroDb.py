@@ -132,8 +132,9 @@ if os.name == "nt":
         "where python", 
         stdout=subprocess.PIPE
     ).communicate()[0].decode("utf-8")[:-2]
+else:
+    icon = None
     
-
 
 # -----------------------------sqlite3 & xml------------------------------------
 
