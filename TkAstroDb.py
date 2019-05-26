@@ -278,7 +278,8 @@ def create_toplevel():
     toplevel = tk.Toplevel()
     toplevel.resizable(width=False, height=False)
     toplevel.title("Open Chart")
-    toplevel.iconbitmap(icon)
+    if os.name == "nt":
+        toplevel.iconbitmap(icon)
     return toplevel
 
 
@@ -1341,7 +1342,8 @@ _num_ = 0
 master = tk.Tk()
 master.title("TkAstroDb")
 master.geometry(f"{master.winfo_screenwidth()}x{master.winfo_screenheight()}")
-master.iconbitmap(icon)
+if os.name == "nt":
+    master.iconbitmap(icon)
 
 info_var = tk.StringVar()
 info_var.set("0")
@@ -4046,7 +4048,8 @@ def reload_database():
 def about():
     toplevel8 = tk.Toplevel()
     toplevel8.title("About TkAstroDb")
-    toplevel8.iconbitmap(icon)
+    if os.name == "nt":
+        toplevel8.iconbitmap(icon)
     name = "TkAstroDb"
     version, _version = "Version:", __version__
     build_date, _build_date = "Built Date:", "21 December 2018"
