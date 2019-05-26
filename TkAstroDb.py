@@ -9,6 +9,7 @@ import ssl
 import time
 import shutil
 import platform
+import subprocess
 import threading
 import webbrowser
 import tkinter as tk
@@ -22,6 +23,11 @@ from tkinter.ttk import Progressbar, Treeview
 from datetime import datetime as dt
 
 try:
+    import numpy as np
+except ModuleNotFoundError:
+    os.system("pip3 install numpy")
+    import numpy as np
+try:
     from dateutil import tz
 except ModuleNotFoundError:
     os.system("pip3 install python-dateutil")
@@ -33,7 +39,7 @@ except ModuleNotFoundError:
     from geopy.geocoders import Nominatim
     
 whl_path = os.path.join(os.getcwd(), "Eph", "Whl")
-    
+
     
 def select_module(module_name, module_files):
     if os.name == "posix":
@@ -111,11 +117,6 @@ except ModuleNotFoundError:
     os.system("pip3 install certifi")
     import certifi
 try:
-    import numpy as np
-except ModuleNotFoundError:
-    os.system("pip3 install numpy")
-    import numpy as np
-try:
     import xlrd
 except ModuleNotFoundError:
     os.system("pip3 install xlrd")
@@ -125,6 +126,13 @@ try:
 except ModuleNotFoundError:
     os.system("pip3 install xlwt")
     import xlwt
+    
+if os.name == "nt":
+    icon = subprocess.Popen(
+        "where python", 
+        stdout=subprocess.PIPE
+    ).communicate()[0].decode("utf-8")[:-2]
+    
 
 
 # -----------------------------sqlite3 & xml------------------------------------
@@ -256,23 +264,22 @@ merge_databases()
 group_categories()
 
 
-# --------------------------------swisseph--------------------------------------
+# ---------------------------------tkinter--------------------------------------
 
-
-swe.set_ephe_path(os.path.join(os.getcwd(), "Eph"))
 
 canvas = None
-_toplevel_ = None
+toplevel = None
 
 
 def create_toplevel():
-    global _toplevel_
-    if _toplevel_ is not None:
-        _toplevel_.destroy()
-    _toplevel_ = tk.Toplevel()
-    _toplevel_.resizable(width=False, height=False)
-    _toplevel_.title("Open Chart")
-    return _toplevel_
+    global toplevel
+    if toplevel is not None:
+        toplevel.destroy()
+    toplevel = tk.Toplevel()
+    toplevel.resizable(width=False, height=False)
+    toplevel.title("Open Chart")
+    toplevel.iconbitmap(icon)
+    return toplevel
 
 
 def create_canvas(master_):
@@ -282,38 +289,8 @@ def create_canvas(master_):
     canvas = tk.Canvas(master=master_, bg="white", width=1270, height=660)
     canvas.grid(row=0, column=1)
     return canvas
-
-
-PLANETS = {
-    "Sun": swe.SUN,
-    "Moon": swe.MOON,
-    "Mercury": swe.MERCURY,
-    "Venus": swe.VENUS,
-    "Mars": swe.MARS,
-    "Jupiter": swe.JUPITER,
-    "Saturn": swe.SATURN,
-    "Uranus": swe.URANUS,
-    "Neptune": swe.NEPTUNE,
-    "Pluto": swe.PLUTO,
-    "North Node": swe.TRUE_NODE,
-    "Chiron": swe.CHIRON
-}
-
-ASPECT_SYMBOLS = {
-    "Conjunction": "\u260C",
-    "Semi-Sextile": "\u26BA",
-    "Semi-Square": "\u2220",
-    "Sextile": "\u26B9",
-    "Quintile": "Q",
-    "Square": "\u25A1",
-    "Trine": "\u25B3",
-    "Sesquiquadrate": "\u26BC",
-    "BiQuintile": "bQ",
-    "Quincunx": "\u26BB",
-    "Opposite": "\u260D",
-}
-
-
+    
+    
 def oval_object(x, y, r, dash=True):
     if dash is True:
         dash = (1, 10)
@@ -343,6 +320,41 @@ def line_object(x1, y1, x2, y2, width=2, fill="black"):
 
 def text_object(x, y, _text, width=0, font="Arial", fill="black"):
     canvas.create_text(x, y, text=_text, width=width, font=font, fill=fill)
+    
+    
+# --------------------------------swisseph--------------------------------------
+
+
+swe.set_ephe_path(os.path.join(os.getcwd(), "Eph"))
+
+PLANETS = {
+    "Sun": swe.SUN,
+    "Moon": swe.MOON,
+    "Mercury": swe.MERCURY,
+    "Venus": swe.VENUS,
+    "Mars": swe.MARS,
+    "Jupiter": swe.JUPITER,
+    "Saturn": swe.SATURN,
+    "Uranus": swe.URANUS,
+    "Neptune": swe.NEPTUNE,
+    "Pluto": swe.PLUTO,
+    "North Node": swe.TRUE_NODE,
+    "Chiron": swe.CHIRON
+}
+
+ASPECT_SYMBOLS = {
+    "Conjunction": "\u260C",
+    "Semi-Sextile": "\u26BA",
+    "Semi-Square": "\u2220",
+    "Sextile": "\u26B9",
+    "Quintile": "Q",
+    "Square": "\u25A1",
+    "Trine": "\u25B3",
+    "Sesquiquadrate": "\u26BC",
+    "BiQuintile": "bQ",
+    "Quincunx": "\u26BB",
+    "Opposite": "\u260D",
+}
 
 
 signs = [
@@ -1329,6 +1341,7 @@ _num_ = 0
 master = tk.Tk()
 master.title("TkAstroDb")
 master.geometry(f"{master.winfo_screenwidth()}x{master.winfo_screenheight()}")
+master.iconbitmap(icon)
 
 info_var = tk.StringVar()
 info_var.set("0")
@@ -1504,6 +1517,8 @@ def select_ratings():
         toplevel2.geometry("300x250")
         toplevel2.resizable(width=False, height=False)
         toplevel2.title("Select Rodden Ratings")
+        if os.name == "nt":
+            toplevel2.iconbitmap(icon)
         rating_frame = tk.Frame(master=toplevel2)
         rating_frame.pack(side="top")
         button_frame = tk.Frame(master=toplevel2)
@@ -1553,6 +1568,8 @@ def select_categories():
         toplevel1.title("Select Categories")
         toplevel1.resizable(width=False, height=False)
         toplevel1.update()
+        if os.name == "nt":
+            toplevel1.iconbitmap(icon)
         canvas_frame = tk.Frame(master=toplevel1)
         canvas_frame.pack(side="top")
         button_frame = tk.Frame(master=toplevel1)
@@ -1759,7 +1776,7 @@ def button_3_open_url():
 
 
 def button_3_open_chart(_treeview_):
-    global open_chart, _toplevel_, canvas
+    global open_chart, toplevel, canvas
     focused = _treeview_.focus()
     master.update()
     if not focused:
@@ -1786,8 +1803,8 @@ def button_3_open_chart(_treeview_):
             longitude = longitude.replace("w", "\u00b0") + "'0\""
             longitude = -1 * dms_to_dd(longitude)
         open_chart = True
-        _toplevel_ = create_toplevel()
-        canvas = create_canvas(master_=_toplevel_)
+        toplevel = create_toplevel()
+        canvas = create_canvas(master_=toplevel)
         aspect_list = [
             f"{key} ({value})"
             for key, value in ASPECT_SYMBOLS.items() if key != "Null"
@@ -3139,6 +3156,8 @@ def choose_orb_factor():
     toplevel3 = tk.Toplevel()
     toplevel3.title("Orb Factor")
     toplevel3.resizable(width=False, height=False)
+    if os.name == "nt":
+        toplevel3.iconbitmap(icon)
     aspects = ["Conjunction", "Semi-Sextile", "Semi-Square",
                "Sextile", "Quintile", "Square", "Trine",
                "Sesquiquadrate", "BiQuintile", "Quincunx", "Opposite"]
@@ -3194,6 +3213,8 @@ def create_hsys_checkbuttons():
     toplevel4.title("House System")
     toplevel4.geometry("200x200")
     toplevel4.resizable(width=False, height=False)
+    if os.name == "nt":
+        toplevel4.iconbitmap(icon)
     hsys_frame = tk.Frame(master=toplevel4)
     hsys_frame.pack(side="top")
     button_frame = tk.Frame(master=toplevel4)
@@ -3362,6 +3383,8 @@ def export_year_frequency():
     toplevel5.title("Year Frequency")
     toplevel5.geometry("200x100")
     toplevel5.resizable(width=False, height=False)
+    if os.name == "nt":
+        toplevel5.iconbitmap(icon)
     t5frame = tk.Frame(master=toplevel5)
     t5frame.pack()
     date_entries = []
@@ -3655,15 +3678,15 @@ def widgets(entries, listboxes, option_menu, list_box, frames):
         "Add Category", 28, row1=0, col1=0, row2=1, col2=0)
 
 
-def create_frames(toplevel):
+def create_frames(toplevel6):
     for i in range(8):
-        frame = tk.Frame(toplevel, bd=1, relief="sunken")
+        frame = tk.Frame(toplevel6, bd=1, relief="sunken")
         frame.grid(row=i, column=0, pady=4, padx=4)
         master.update()
         yield frame
 
 
-def get_record_data(toplevel, _treeview_, entries, option_menu,
+def get_record_data(toplevel6, _treeview_, entries, option_menu,
                     listboxes, list_box, data):
     global add_or_edit, edit_or_search, modify_name
     name = entries[0].get()
@@ -3743,7 +3766,7 @@ def get_record_data(toplevel, _treeview_, entries, option_menu,
                         date.strftime("%d %B %Y"), f"{hour}:{minute}",
                         jd, latitude, _latitude_, longitude, _longitude_,
                         _place, _country_, "-", "".join(lb)]
-                toplevel.destroy()
+                toplevel6.destroy()
                 master.update()
                 if _record_data not in select_from_data:
                     if add_or_edit is True:
@@ -3807,29 +3830,31 @@ def get_record_data(toplevel, _treeview_, entries, option_menu,
 
 
 def record_panel(text):
-    toplevel = tk.Toplevel()
-    toplevel.title(text)
-    toplevel.resizable(width=False, height=False)
-    frames = [i for i in create_frames(toplevel)]
+    toplevel6 = tk.Toplevel()
+    toplevel6.title(text)
+    toplevel6.resizable(width=False, height=False)
+    if os.name == "nt":
+        toplevel6.iconbitmap(icon)
+    frames = [i for i in create_frames(toplevel6)]
     entries = []
     listboxes = []
     list_box = []
     option_menu = []
     widgets(entries, listboxes, option_menu, list_box, frames)
-    return toplevel, frames, entries, listboxes, list_box, option_menu
+    return toplevel6, frames, entries, listboxes, list_box, option_menu
 
 
 def add_record():
     global add_or_edit
     add_or_edit = False
-    toplevel, frames, entries, listboxes, list_box, option_menu = \
+    toplevel6, frames, entries, listboxes, list_box, option_menu = \
         record_panel(text="Add Record")
     if len(treeviews) != 0:
         add_record_button = tk.Button(
             master=frames[7],
             text="Apply",
             command=lambda: get_record_data(
-                toplevel,
+                toplevel6,
                 treeviews[0],
                 entries,
                 option_menu,
@@ -3841,7 +3866,7 @@ def add_record():
             master=frames[7],
             text="Apply",
             command=lambda: get_record_data(
-                toplevel,
+                toplevel6,
                 None,
                 entries,
                 option_menu,
@@ -3852,7 +3877,7 @@ def add_record():
 
 
 def create_panel(entries, data, listboxes, list_box,
-                 option_menu, frames, toplevel, _treeview_):
+                 option_menu, frames, toplevel6, _treeview_):
     entries[0].insert("end", data[3])
     date = dt.strptime(f"{data[6]} {data[7]}", "%d %B %Y %H:%M")
     date_frmt = date.strftime("%d %m %Y %H %M")
@@ -3880,7 +3905,7 @@ def create_panel(entries, data, listboxes, list_box,
         master=frames[7],
         text="Apply",
         command=lambda: get_record_data(
-            toplevel,
+            toplevel6,
             _treeview_,
             entries,
             option_menu,
@@ -3897,11 +3922,11 @@ def edit_record(_treeview_):
     if not focused:
         pass
     else:
-        toplevel, frames, entries, listboxes, list_box, option_menu = \
+        toplevel6, frames, entries, listboxes, list_box, option_menu = \
             record_panel(text="Edit Record")
         data = _treeview_.item(focused)["values"]
         create_panel(entries, data, listboxes, list_box, option_menu,
-                     frames, toplevel, _treeview_)
+                     frames, toplevel6, _treeview_)
         _record_ = _treeview_.item(focused)["values"][:]
         for i in database:
             if _record_[3] == i[1]:
@@ -3956,14 +3981,14 @@ def search_record(event, search_entry_, _treeview_):
         if search_entry_.get() == _record_[1]:
             for item in _treeview_.get_children():
                 if _treeview_.item(item)["values"][3] == _record_[1]:
-                    toplevel, frames, entries, listboxes, list_box, \
+                    toplevel6, frames, entries, listboxes, list_box, \
                         option_menu = record_panel(text="Edit Record")
                     data = _treeview_.item(item)["values"]
                     items.append(item)
                     edit_or_search = True
                     create_panel(
                         entries, data, listboxes, list_box,
-                        option_menu, frames, toplevel, _treeview_
+                        option_menu, frames, toplevel6, _treeview_
                     )
                     break
             break
@@ -3977,6 +4002,7 @@ def edit_and_delete():
     toplevel7.title("Edit Records")
     toplevel7.geometry("800x600")
     toplevel7.resizable(width=False, height=False)
+    toplevel7.iconbitmap(icon)
     search_label_ = tk.Label(master=toplevel7,
                              text="Search A Record By Name", fg="red")
     search_label_.pack()
@@ -4020,6 +4046,7 @@ def reload_database():
 def about():
     toplevel8 = tk.Toplevel()
     toplevel8.title("About TkAstroDb")
+    toplevel8.iconbitmap(icon)
     name = "TkAstroDb"
     version, _version = "Version:", __version__
     build_date, _build_date = "Built Date:", "21 December 2018"
@@ -4094,8 +4121,7 @@ def update():
                     h.write(i)
                     h.flush()
                 msgbox.showinfo(title="Update",
-                                message="Program is updated.")
-                import subprocess                
+                                message="Program is updated.")              
                 if os.name == "posix":
                     subprocess.Popen(["python3", "TkAstroDb.py"])
                     import signal
@@ -4166,7 +4192,7 @@ help_menu.add_command(label="Check for Updates",
                       command=update)
 
 
-# ------------------------------------run---------------------------------------
+# -----------------------------------run----------------------------------------
 
 
 if __name__ == "__main__":
