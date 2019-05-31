@@ -122,13 +122,10 @@ except ModuleNotFoundError:
     os.system("pip3 install xlwt")
     import xlwt
     
-if os.name == "nt":
-    icon = subprocess.Popen(
-        "where python", 
-        stdout=subprocess.PIPE
-    ).communicate()[0].decode("utf-8")[:-2]
-else:
-    icon = None
+icon = subprocess.Popen(
+    "where python", 
+    stdout=subprocess.PIPE
+).communicate()[0].decode("utf-8")[:-2] if os.name == "nt" else None
     
 
 # -----------------------------sqlite3 & xml------------------------------------
