@@ -9,8 +9,8 @@ import ssl
 import time
 import shutil
 import platform
-import threading
 import subprocess
+import threading
 import webbrowser
 import tkinter as tk
 import sqlite3 as sql
@@ -266,9 +266,13 @@ def group_categories():
     )
     
 
-parse_xml()
-merge_databases()
-group_categories()
+def load_database():
+    parse_xml()
+    merge_databases()
+    group_categories()
+    
+    
+load_database()
 
 
 # ---------------------------------tkinter--------------------------------------
@@ -4022,9 +4026,7 @@ def edit_and_delete():
     
     
 def reload_database():
-    parse_xml()
-    merge_databases()
-    group_categories()
+    load_database()
     msgbox.showinfo(title="Reload Database",
                     message="Database is reloaded.")
     master.update()
