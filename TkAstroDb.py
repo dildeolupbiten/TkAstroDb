@@ -14,8 +14,8 @@ import subprocess
 import webbrowser
 import tkinter as tk
 import sqlite3 as sql
-import xml.etree.ElementTree
 import urllib.request as urllib
+import xml.etree.ElementTree as et
 import tkinter.messagebox as msgbox
 
 from math import cos, sin, radians
@@ -166,7 +166,7 @@ def parse_xml():
     database = []
     category_dict = {}
     if xml_file.count("xml") == 1:
-        tree = xml.etree.ElementTree.parse(f"{xml_file}")
+        tree = et.parse(f"{xml_file}")
         root = tree.getroot()
         for _i in range(1000000):
             try:
