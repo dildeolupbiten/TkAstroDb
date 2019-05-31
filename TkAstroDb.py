@@ -158,7 +158,7 @@ def parse_xml():
     database = []
     category_dict = {}
     if xml_file.count("xml") == 1:
-        tree = et.parse(f"{xml_file}")
+        tree = et.parse(xml_file)
         root = tree.getroot()
         for _i in range(1000000):
             try:
