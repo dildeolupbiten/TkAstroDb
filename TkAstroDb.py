@@ -9,8 +9,8 @@ import ssl
 import time
 import shutil
 import platform
-import subprocess
 import threading
+import subprocess
 import webbrowser
 import tkinter as tk
 import sqlite3 as sql
