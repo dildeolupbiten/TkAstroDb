@@ -21,22 +21,6 @@ import tkinter.messagebox as msgbox
 from math import cos, sin, radians
 from tkinter.ttk import Progressbar, Treeview
 from datetime import datetime as dt
-
-try:
-    import numpy as np
-except ModuleNotFoundError:
-    os.system("pip3 install numpy")
-    import numpy as np
-try:
-    from dateutil import tz
-except ModuleNotFoundError:
-    os.system("pip3 install python-dateutil")
-    from dateutil import tz
-try:
-    from geopy.geocoders import Nominatim
-except ModuleNotFoundError:
-    os.system("pip3 install geopy")
-    from geopy.geocoders import Nominatim
     
 whl_path = os.path.join(os.getcwd(), "Eph", "Whl")
 
@@ -59,22 +43,35 @@ def select_module(module_name, module_files):
             elif platform.architecture()[0] == "64bit":
                 new_path = os.path.join(whl_path, module_files[3])
                 os.system(f"pip3 install {new_path}")
-       
-
+                
+                
+try:
+    import numpy as np
+except ModuleNotFoundError:
+    os.system("pip3 install numpy")
+    import numpy as np
+try:
+    from dateutil import tz
+except ModuleNotFoundError:
+    os.system("pip3 install python-dateutil")
+    from dateutil import tz
+try:
+    from geopy.geocoders import Nominatim
+except ModuleNotFoundError:
+    os.system("pip3 install geopy")
+    from geopy.geocoders import Nominatim
 try:
     import shapely
 except ModuleNotFoundError:            
     select_module(
         "shapely", 
         [i for i in os.listdir(whl_path) if "Shapely" in i]
-    )
-    
+    )  
 try:
     from tzwhere import tzwhere
 except ModuleNotFoundError:
     os.system("pip3 install tzwhere")
     from tzwhere import tzwhere
-    
 try:
     import swisseph as swe
 except ModuleNotFoundError:
@@ -82,8 +79,7 @@ except ModuleNotFoundError:
         "pyswisseph", 
         [i for i in os.listdir(whl_path) if "pyswisseph" in i]
     )
-    import swisseph as swe
-    
+    import swisseph as swe    
 try:
     from countryinfo import CountryInfo
 except ModuleNotFoundError:
@@ -109,8 +105,7 @@ except ModuleNotFoundError:
                     as write_file:
                 for line in script_code:
                     write_file.write(line)
-    from countryinfo import CountryInfo
-    
+    from countryinfo import CountryInfo   
 try:
     import certifi
 except ModuleNotFoundError:
