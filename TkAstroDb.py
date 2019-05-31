@@ -3922,10 +3922,6 @@ def delete_record(_treeview_):
     focused = _treeview_.focus()
     no = _treeview_.item(focused)["values"][0]
     cursor.execute("DELETE FROM DATA WHERE no = ?", (no,))
-    _record_ = _treeview_.item(focused)["values"][:]
-    for i in database:
-        if _record_[3] == i[1]:
-            database.remove(i)
     connect.commit()
     for i in _treeview_.get_children():
         _treeview_.delete(i)
