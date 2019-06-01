@@ -89,7 +89,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img11](https://user-images.githubusercontent.com/29302909/50407124-2cf88a80-07e2-11e9-92f4-d51a4f7a6697.png)
 
-**11.** If users click **Records** menu button, they can see three options which names are as **Add New Record**, **Edit & Delete Records** and **Reload Database**. If users select **Add New Record** option, they will see a new window which is as follows:
+**11.** If users click **Records** menu button, they can see two options which names are as **Add New Record** and **Edit & Delete Records**. If users select **Add New Record** option, they will see a new window which is as follows:
 
 ![img12](https://user-images.githubusercontent.com/29302909/55292823-eb3a3a00-53f7-11e9-8051-ffab3d7ce8ce.png)
 
@@ -97,11 +97,11 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img13](https://user-images.githubusercontent.com/29302909/56122350-e8545300-5f7a-11e9-846d-745359da7cfe.png)
 
-**13.** After added new records to an alternative [SQL](https://www.sqlite.org/index.html) database which name is **TkAstroDb.db**, users should restart the main program to make the added records active or they select the **Reload Database** option. After activated the records if users click the **Select** button which is near the **Categories** label, the newly defined category can be seen.
+**13.** After added new records to an alternative [SQL](https://www.sqlite.org/index.html) database which name is **TkAstroDb.db**. After added or edited or deleted the records if users click the **Select** button which is near the **Categories** label, the newly defined category can be seen.
 
 ![img14](https://user-images.githubusercontent.com/29302909/55161277-2fb6a300-5176-11e9-8d0c-db32a4ac623e.png)
 
-**14.** After selected the **Reload Database** button and specified the **Rodden Rating**, the newly added record can be displayed.
+**14.** After selected the newly added category and specified the **Rodden Rating**, the newly added record can be displayed.
 
 ![img15](https://user-images.githubusercontent.com/29302909/55326449-7404b480-5490-11e9-8b4b-4146dd5decb2.png)
 
@@ -123,19 +123,17 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img19](https://user-images.githubusercontent.com/29302909/56081607-d017f300-5e17-11e9-8cba-89e8e0d421c6.png)
 
-**20.** If users select **Reload Database** option, all the added, edited and deleted records are activated and the database is reloaded. The time of reloading the database may vary according to the record number of both databases.
-
-**21.** If users click **Calculations** menu button, they can see options which are as follows: **Find Observed Values**, **Find Expected Values**, **Find Chi-Square Values**, **Find Effect Size Values** and **Find Cohen's D Effect Size Values**. If users want to find the astrological pattern distributions of any category, they should click **Find Observed Values** button. After clicked that menu button, a progress bar should be created as follows:
+**20.** If users click **Calculations** menu button, they can see options which are as follows: **Find Observed Values**, **Find Expected Values**, **Find Chi-Square Values**, **Find Effect Size Values** and **Find Cohen's D Effect Size Values**. If users want to find the astrological pattern distributions of any category, they should click **Find Observed Values** button. After clicked that menu button, a progress bar should be created as follows:
 
 ![img20](https://user-images.githubusercontent.com/29302909/55159732-cc774180-5172-11e9-88b8-14ad17ccd6c2.png)
 
-**22.** After the computation finished, a log file (**output.log**) and an excel spreadsheet file (**observed_values.xlsx**) can be found inside nested directories like **Vocation/Occult_Fields/Astrologer/Rodden_Rating_AA/Orb_Factor_6_2_2_4_2_6_6_2_2_2_6/House_System_Placidus**. The directory names can be different according to the settings selected by the users. The spreadsheet file contains the astrological pattern distributions of displayed records.
+**21.** After the computation finished, a log file (**output.log**) and an excel spreadsheet file (**observed_values.xlsx**) can be found inside nested directories like **Vocation/Occult_Fields/Astrologer/Rodden_Rating_AA/Orb_Factor_6_2_2_4_2_6_6_2_2_2_6/House_System_Placidus**. The directory names can be different according to the settings selected by the users. The spreadsheet file contains the astrological pattern distributions of displayed records.
 
 ![img21](https://user-images.githubusercontent.com/29302909/57989857-a0f54100-7aa9-11e9-9833-2060284bf812.png)
 
-**23.** In order to calculate the expected values, the users must have two tables which include the astrological pattern distributions of two different categories. The expected values are calculated by comparing this two different categories. One category will be used as a *control group*, the other category will be used as a *research group*. While the table which is wanted to use as a *control group* should be renamed as **control_group.xlsx**, there is no need to change the name of *research group*, so it's name should be **observed_values.xlsx**. Note that users should copy the related tables to the **TkAstroDb** folder, then users can click **Calculations** menu button and they should select **Find Expected Values** option. There are two different methods to calculate the expected results.
+**22.** In order to calculate the expected values, the users must have two tables which include the astrological pattern distributions of two different categories. The expected values are calculated by comparing this two different categories. One category will be used as a *control group*, the other category will be used as a *research group*. While the table which is wanted to use as a *control group* should be renamed as **control_group.xlsx**, there is no need to change the name of *research group*, so it's name should be **observed_values.xlsx**. Note that users should copy the related tables to the **TkAstroDb** folder, then users can click **Calculations** menu button and they should select **Find Expected Values** option. There are two different methods to calculate the expected results.
 
-**23.1. Flavia's Method:** When one of the categories is not a sub category of another, using this method is recommended.
+**22.1. Flavia's Method:** When one of the categories is not a sub category of another, using this method is recommended.
     
 ```python3
 #!/usr/bin/env python3
@@ -147,7 +145,7 @@ def formula(x: list, y: list):
         [sum(y) * (x[i] + y[i]) / (sum(x) + sum(y)) for i in range(12)]
 ```
        
-**23.2. Sjoerd's Method:** When one of the categories is a sub category of another, using this method is recommended.
+**22.2. Sjoerd's Method:** When one of the categories is a sub category of another, using this method is recommended.
        
 ```python3
 #!/usr/bin/env python3
@@ -159,19 +157,19 @@ def formula(x: list, y: list):
         [i * sum(y) / sum(x) for i in x] 
 ```
 
-**24.** After the calculation finished, **control_group.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheet file will be created as **expected_values.xlsx**. And it is recommended to move **expected_values.xlsx** file to the related category folder:
+**23.** After the calculation finished, **control_group.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheet file will be created as **expected_values.xlsx**. And it is recommended to move **expected_values.xlsx** file to the related category folder:
 
 ![img22](https://user-images.githubusercontent.com/29302909/57989859-a488c800-7aa9-11e9-9f3f-b4f9bf0952a3.png)
 
-**25.** In order to calculate the chi-square values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to **TkAstroDb** folder. Then they should select **Calculations** menu button. After that, they should click **Find Chi-Square Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheed file will be created as **chi-square.xlsx** in **TkAstroDb** folder. It is recommended that the users cut the file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **chi-square.xlsx** file to the related folder:
+**24.** In order to calculate the chi-square values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to **TkAstroDb** folder. Then they should select **Calculations** menu button. After that, they should click **Find Chi-Square Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** files will be deleted and a new excel spreadsheed file will be created as **chi-square.xlsx** in **TkAstroDb** folder. It is recommended that the users cut the file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **chi-square.xlsx** file to the related folder:
 
 ![img23](https://user-images.githubusercontent.com/29302909/57989862-a783b880-7aa9-11e9-96e9-aac9a15e8c5a.png)
 
-**26.** In order to calculate the effect size values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to the **TkAstroDb** directory. Then they should select **Calculations** menu button. After that, they should select **Find Effect Size Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** will be deleted and a new excel spreadsheed file will be created as **effect-size.xlsx** in **TkAstroDb** folder. It is recommended that the users cut this file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **effect-size.xlsx** file to the related folder:
+**25.** In order to calculate the effect size values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to the **TkAstroDb** directory. Then they should select **Calculations** menu button. After that, they should select **Find Effect Size Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** will be deleted and a new excel spreadsheed file will be created as **effect-size.xlsx** in **TkAstroDb** folder. It is recommended that the users cut this file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **effect-size.xlsx** file to the related folder:
 
 ![img24](https://user-images.githubusercontent.com/29302909/57989863-aa7ea900-7aa9-11e9-8ae0-be1b525939fe.png)
 
-**27.** In order to calculate the Cohen's d effect size values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to the **TkAstroDb** directory. Then they should select **Calculations** menu button. After that, they should select **Find Cohen's D Effect Size Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** will be deleted and a new excel spreadsheed file will be created as **cohens_d_effect.xlsx** in **TkAstroDb** folder. It is recommended that the users cut this file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **cohens_d_effect.xlsx** file to the related folder:
+**26.** In order to calculate the Cohen's d effect size values, users should copy **expected_values.xlsx** and **observed_values.xlsx** files to the **TkAstroDb** directory. Then they should select **Calculations** menu button. After that, they should select **Find Cohen's D Effect Size Values** option. After the compuation finished, **expected_values.xlsx** and **observed_values.xlsx** will be deleted and a new excel spreadsheed file will be created as **cohens_d_effect.xlsx** in **TkAstroDb** folder. It is recommended that the users cut this file from **TkAstroDb** directory then paste it to the related directory. And it is recommended to move **cohens_d_effect.xlsx** file to the related folder:
 
 ![img25](https://user-images.githubusercontent.com/29302909/57989865-ace10300-7aa9-11e9-8c07-697cfd2346fe.png)
 
