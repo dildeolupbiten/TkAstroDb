@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.4.9"
+__version__ = "1.5.0"
 
 import os
 import sys
@@ -142,11 +142,11 @@ cursor.execute(f"CREATE TABLE IF NOT EXISTS DATA({col_names})")
 
 xml_file = ""
 
-database, category_names = [], []
+database, _database, category_names = [], [], []
 
 _count_ = 0
 
-all_categories, category_dict = {}, {}
+all_categories, category_dict, _category_dict = {}, {}, {}
 
 for _i in os.listdir(os.getcwd()):
     if _i.endswith("xml"):
@@ -154,7 +154,7 @@ for _i in os.listdir(os.getcwd()):
 
 
 def parse_xml():
-    global database, category_dict
+    global database, category_dict, _database, _category_dict
     database = []
     category_dict = {}
     if xml_file.count("xml") == 1:
@@ -199,12 +199,14 @@ def parse_xml():
                 database.append(user_data)
             except IndexError:
                 break
+    _database = [i for i in database]
+    _category_dict = {i: j for i, j in category_dict.items()}
             
             
-def merge_databases():
+def merge_databases(db, cat_dict):
     global _count_
     reverse_category_list = {
-        value: key for key, value in category_dict.items()
+        value: key for key, value in cat_dict.items()
     }
     for _i_ in cursor.execute("SELECT * FROM DATA"):
         _data_ = list(_i_)[2:]
@@ -215,37 +217,37 @@ def merge_databases():
         if "|" in _data_[12]:
             edit_category = _data_[12].split("|")
             for _cat_ in edit_category:
-                if _cat_ in category_dict.values():
+                if _cat_ in cat_dict.values():
                     new_category.append(
                         (reverse_category_list[_cat_], _cat_)
                     )
                 else:
                     new_category.append((str(4014 + _count_), _cat_))
-                    category_dict[str(4014 + _count_)] = _cat_
+                    cat_dict[str(4014 + _count_)] = _cat_
                     _count_ += 1
                     reverse_category_list = {
-                        value: key for key, value in category_dict.items()
+                        value: key for key, value in cat_dict.items()
                     }
         else:
-            if _data_[12] in category_dict.values():
+            if _data_[12] in cat_dict.values():
                 new_category.append(
                     (reverse_category_list[_data_[12]], _data_[12])
                 )
             else:
                 new_category.append((str(4014 + _count_), _data_[12]))
-                category_dict[str(4014 + _count_)] = _data_[12]
+                cat_dict[str(4014 + _count_)] = _data_[12]
                 reverse_category_list = {
-                    value: key for key, value in category_dict.items()
+                    value: key for key, value in cat_dict.items()
                 }
                 _count_ += 1
         edit_data.append(new_category)
-        database.append(edit_data)
+        db.append(edit_data)
         
               
-def group_categories():
+def group_categories(db, cat_dict):
     global category_names, all_categories
     category_groups = {}
-    for _record in database:
+    for _record in db:
         for _category in _record[12]:
             if (_category[0], _category[1]) not in category_groups:
                 if _category[1] is None:
@@ -254,17 +256,19 @@ def group_categories():
             category_groups[(_category[0], _category[1])].append(_record)
     all_categories = category_groups
     category_names = sorted(
-        [i for i in category_dict.values() if i is not None]
+        [i for i in cat_dict.values() if i is not None]
     )
     
+    
+parse_xml()
 
-def load_database():
-    parse_xml()
-    merge_databases()
-    group_categories()
+
+def load_database(*args): 
+    merge_databases(*args)
+    group_categories(*args)
     
     
-load_database()
+load_database(database, category_dict)
 
 
 # ---------------------------------tkinter--------------------------------------
@@ -1560,6 +1564,10 @@ def select_ratings():
 
 def select_categories():
     global selected_categories, record_categories, toplevel1
+    global database, category_dict
+    database = [i for i in _database]
+    category_dict = {i:j for i, j in _category_dict.items()}
+    load_database(database, category_dict)
     master.update()
     selected_categories, record_categories = [], []
     try:
@@ -4011,14 +4019,7 @@ def edit_and_delete():
         "<KeyRelease>",
         lambda event: search_record(event, search_entry_, _treeview_))
     master.update()
-    
-    
-def reload_database():
-    load_database()
-    msgbox.showinfo(title="Reload Database",
-                    message="Database is reloaded.")
-    master.update()
-
+       
 
 def about():
     toplevel8 = tk.Toplevel()
@@ -4028,7 +4029,7 @@ def about():
     name = "TkAstroDb"
     version, _version = "Version:", __version__
     build_date, _build_date = "Built Date:", "21 December 2018"
-    update_date, _update_date = "Update Date:", "31 May 2019"
+    update_date, _update_date = "Update Date:", "01 June 2019"
     developed_by, _developed_by = "Developed By:", \
                                   "Tanberk Celalettin Kutlu"
     thanks_to, _thanks_to = "Special Thanks To:", \
@@ -4161,8 +4162,6 @@ records_menu.add_command(label="Add New Record",
                          command=add_record)
 records_menu.add_command(label="Edit & Delete Records",
                          command=edit_and_delete)
-records_menu.add_command(label="Reload Database",
-                         command=reload_database)
 
 help_menu.add_command(label="About",
                       command=about)
