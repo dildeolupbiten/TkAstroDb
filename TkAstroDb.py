@@ -206,7 +206,7 @@ def parse_xml():
 def merge_databases(db, cat_dict):
     global _count_, database, category_dict
     database = [i for i in _database]
-    category_dict = {i:j for i, j in _category_dict.items()}
+    category_dict = {i: j for i, j in _category_dict.items()}
     reverse_category_list = {
         value: key for key, value in cat_dict.items()
     }
