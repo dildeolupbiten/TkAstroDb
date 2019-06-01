@@ -204,7 +204,9 @@ def parse_xml():
             
             
 def merge_databases(db, cat_dict):
-    global _count_
+    global _count_, database, category_dict
+    database = [i for i in _database]
+    category_dict = {i:j for i, j in _category_dict.items()}
     reverse_category_list = {
         value: key for key, value in cat_dict.items()
     }
@@ -1564,9 +1566,6 @@ def select_ratings():
 
 def select_categories():
     global selected_categories, record_categories, toplevel1
-    global database, category_dict
-    database = [i for i in _database]
-    category_dict = {i:j for i, j in _category_dict.items()}
     load_database(database, category_dict)
     master.update()
     selected_categories, record_categories = [], []
