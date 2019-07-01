@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.5.0"
+__version__ = "1.5.1"
 
 import os
 import sys
@@ -773,15 +773,15 @@ class Chart:
 
     @staticmethod
     def line_components(angle, r):
-        x1, y1 = 610, 350
-        x2 = x1 + (r * cos(radians(angle)))
-        y2 = y1 - (r * sin(radians(angle)))
-        return x1, y1, x2, y2
+        x, y = 610, 350
+        x_ = x + (r * cos(radians(angle)))
+        y_ = y - (r * sin(radians(angle)))
+        return x_, y_
 
     def x_y(self, angle, r1_, r2_):
-        x1, y1, x2, y2 = self.line_components(angle=angle, r=r1_)
-        _x1, _y1, _x2, _y2 = self.line_components(angle=angle, r=r2_)
-        return x2, y2, _x2, _y2
+        x1, y1 = self.line_components(angle=angle, r=r1_)
+        x2, y2 = self.line_components(angle=angle, r=r2_)
+        return x1, y1, x2, y2
 
     @staticmethod
     def draw_oval_object(x=610, y=350):
@@ -4028,7 +4028,7 @@ def about():
     name = "TkAstroDb"
     version, _version = "Version:", __version__
     build_date, _build_date = "Built Date:", "21 December 2018"
-    update_date, _update_date = "Update Date:", "01 June 2019"
+    update_date, _update_date = "Update Date:", "01 July 2019"
     developed_by, _developed_by = "Developed By:", \
                                   "Tanberk Celalettin Kutlu"
     thanks_to, _thanks_to = "Special Thanks To:", \
