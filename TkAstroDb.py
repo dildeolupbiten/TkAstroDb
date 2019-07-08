@@ -2831,7 +2831,8 @@ def find_observed_values():
     if len(displayed_results) == 0:
         msgbox.showinfo(
             title="Find Observed Values", 
-            message=f"{len(displayed_results)} records selected.")
+            message="0 records selected."
+        )
     else:
         __size__ = len(displayed_results)
         __received__ = 0
