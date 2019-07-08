@@ -272,9 +272,8 @@ def load_database(*args):
     group_categories(*args)
     
 
-if __name__ == "__main__":
-    parse_xml()    
-    load_database(database, category_dict)
+parse_xml()    
+load_database(database, category_dict)
 
 
 # ---------------------------------tkinter--------------------------------------
