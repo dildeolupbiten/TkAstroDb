@@ -4033,8 +4033,12 @@ def about():
         toplevel8.iconbitmap(icon)
     name = "TkAstroDb"
     version, _version = "Version:", __version__
-    build_date, _build_date = "Built Date:", "21 December 2018"
-    update_date, _update_date = "Update Date:", "08 July 2019"
+    build_date, _build_date = "Built Date:", "21.12.2018"
+    update_date, _update_date = "Update Date:", \
+        dt.strftime(
+            dt.fromtimestamp(os.stat(sys.argv[0]).st_mtime), 
+            "%d.%m.%Y"
+        )
     developed_by, _developed_by = "Developed By:", \
                                   "Tanberk Celalettin Kutlu"
     thanks_to, _thanks_to = "Special Thanks To:", \
