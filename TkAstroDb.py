@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.5.1"
+__version__ = "1.5.2"
 
 import os
 import sys
@@ -140,9 +140,7 @@ col_names = "no, add_date, adb_id, name, gender, rr, date, time, " \
 
 cursor.execute(f"CREATE TABLE IF NOT EXISTS DATA({col_names})")
 
-xml_file = ""
-
-database, _database, category_names = [], [], []
+database, _database, category_names, xml_files = [], [], [], []
 
 _count_ = 0
 
@@ -150,58 +148,62 @@ all_categories, category_dict, _category_dict = {}, {}, {}
 
 for _i in os.listdir(os.getcwd()):
     if _i.endswith("xml"):
-        xml_file += _i
+        xml_files.append(_i)
 
 
 def parse_xml():
     global database, category_dict, _database, _category_dict
     database = []
     category_dict = {}
-    if xml_file.count("xml") == 1:
-        tree = et.parse(xml_file)
-        root = tree.getroot()
-        for _i in range(1000000):
-            try:
-                user_data = []
-                for gender, roddenrating, bdata, adb_link, categories in zip(
+    for xml_file in xml_files:
+        if xml_file.startswith("adb_export"):
+            tree = et.parse(xml_file)
+            root = tree.getroot()
+            for _i in range(1000000):
+                try:
+                    user_data = []
+                    for gender, roddenrating, bdata, adb_link, categories in \
+                    zip(
                         root[_i + 2][1].findall("gender"),
                         root[_i + 2][1].findall("roddenrating"),
                         root[_i + 2][1].findall("bdata"),
                         root[_i + 2][2].findall("adb_link"),
-                        root[_i + 2][3].findall("categories")):
-                    _name = root[_i + 2][1][0].text
-                    sbdate_dmy = bdata[1].text
-                    sbtime = bdata[2].text
-                    jd_ut = bdata[2].get("jd_ut")
-                    lat = bdata[3].get("slati")
-                    lon = bdata[3].get("slong")
-                    place = bdata[3].text
-                    country = bdata[4].text
-                    category = [
-                        (categories[_j].get("cat_id"), categories[_j].text)
-                        for _j in range(len(categories))]
-                    for cate in category:
-                        if cate[0] not in category_dict.keys():
-                            category_dict[cate[0]] = cate[1]
-                    user_data.append(int(root[_i + 2].get("adb_id")))
-                    user_data.append(_name)
-                    user_data.append(gender.text)
-                    user_data.append(roddenrating.text)
-                    user_data.append(sbdate_dmy)
-                    user_data.append(sbtime)
-                    user_data.append(jd_ut)
-                    user_data.append(lat)
-                    user_data.append(lon)
-                    user_data.append(place)
-                    user_data.append(country)
-                    user_data.append(adb_link.text)
-                    user_data.append(category)
-                database.append(user_data)
-            except IndexError:
-                break
-    _database = [i for i in database]
-    _category_dict = {i: j for i, j in category_dict.items()}
-            
+                        root[_i + 2][3].findall("categories")
+                    ):
+                        _name = root[_i + 2][1][0].text
+                        sbdate_dmy = bdata[1].text
+                        sbtime = bdata[2].text
+                        jd_ut = bdata[2].get("jd_ut")
+                        lat = bdata[3].get("slati")
+                        lon = bdata[3].get("slong")
+                        place = bdata[3].text
+                        country = bdata[4].text
+                        category = [
+                            (categories[_j].get("cat_id"), categories[_j].text)
+                            for _j in range(len(categories))
+                        ]
+                        for cate in category:
+                            if cate[0] not in category_dict.keys():
+                                category_dict[cate[0]] = cate[1]
+                        user_data.append(int(root[_i + 2].get("adb_id")))
+                        user_data.append(_name)
+                        user_data.append(gender.text)
+                        user_data.append(roddenrating.text)
+                        user_data.append(sbdate_dmy)
+                        user_data.append(sbtime)
+                        user_data.append(jd_ut)
+                        user_data.append(lat)
+                        user_data.append(lon)
+                        user_data.append(place)
+                        user_data.append(country)
+                        user_data.append(adb_link.text)
+                        user_data.append(category)
+                    database.append(user_data)
+                except IndexError:
+                    break
+        _database = [i for i in database]
+        _category_dict = {i: j for i, j in category_dict.items()}
+                
             
 def merge_databases(db, cat_dict):
     global _count_, database, category_dict
@@ -250,27 +252,29 @@ def group_categories(db, cat_dict):
     global category_names, all_categories
     category_groups = {}
     for _record in db:
-        for _category in _record[12]:
-            if (_category[0], _category[1]) not in category_groups:
-                if _category[1] is None:
-                    pass
-                category_groups[(_category[0], _category[1])] = []
-            category_groups[(_category[0], _category[1])].append(_record)
+        try:
+            for _category in _record[12]:
+                if (_category[0], _category[1]) not in category_groups:
+                    if _category[1] is None:
+                        pass
+                    category_groups[(_category[0], _category[1])] = []
+                category_groups[(_category[0], _category[1])].append(_record)
+        except IndexError:
+            pass
     all_categories = category_groups
     category_names = sorted(
         [i for i in cat_dict.values() if i is not None]
     )
-    
-    
-parse_xml()
 
 
 def load_database(*args): 
     merge_databases(*args)
     group_categories(*args)
     
-    
-load_database(database, category_dict)
+
+if __name__ == "__main__":
+    parse_xml()    
+    load_database(database, category_dict)
 
 
 # ---------------------------------tkinter--------------------------------------
@@ -2204,7 +2208,7 @@ def write_title_of_total(sheet):
                       style=style)
     style.font = _font_(bold=False)
     sheet.write_merge(r1=0, r2=0, c1=5, c2=13, 
-                      label=f"{xml_file.replace('.xml', '')}", 
+                      label=f"{' / '.join(xml_files).replace('.xml', '')}", 
                       style=style)
     write_title(sheet, 0, var_checkbutton_1, "Event")
     write_title(sheet, 1, var_checkbutton_2, "Human")
@@ -2847,7 +2851,9 @@ def find_observed_values():
         ]
         orb_factor = [str(i) for i in orb_factor]
         log = open(file="output.log", mode="w", encoding="utf-8")
-        log.write(f"Adb Version: {xml_file.replace('.xml', '')}\n")
+        log.write(
+            f"Adb Version: {' / '.join(xml_files).replace('.xml', '')}\n"
+        )
         log.write(f"House System: {house_systems[hsys]}\n")
         if len(displayed_results) == 1:
             log.write(f"Rodden Rating: {displayed_results[0][3]}\n")
@@ -4028,7 +4034,7 @@ def about():
     name = "TkAstroDb"
     version, _version = "Version:", __version__
     build_date, _build_date = "Built Date:", "21 December 2018"
-    update_date, _update_date = "Update Date:", "01 July 2019"
+    update_date, _update_date = "Update Date:", "08 July 2019"
     developed_by, _developed_by = "Developed By:", \
                                   "Tanberk Celalettin Kutlu"
     thanks_to, _thanks_to = "Special Thanks To:", \
