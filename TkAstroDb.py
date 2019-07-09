@@ -157,6 +157,7 @@ def parse_xml():
     category_dict = {}
     for xml_file in xml_files:
         xml_database = []
+        ignored = 0
         if xml_file.startswith("adb_export"):            
             print(f"Parsing {xml_file} file...")
             tree = et.parse(xml_file)
@@ -190,6 +191,7 @@ def parse_xml():
                                 category_dict[cate[0]] = cate[1]
                         for _record_ in database:
                             if _name == _record_[1]:
+                                ignored += 1
                                 start_stop = True
                                 break
                         if start_stop:
@@ -213,6 +215,7 @@ def parse_xml():
                 except IndexError:
                     break
         print(f"Parsing completed.")
+        print(f"{ignored} records are ignored.")
         print(f"Total {len(xml_database)} records found.\n")
         database.extend(xml_database)
         _database = [i for i in database]
