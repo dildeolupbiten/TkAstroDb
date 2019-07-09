@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.5.2"
+__version__ = "1.5.3"
 
 import os
 import sys
@@ -156,20 +156,23 @@ def parse_xml():
     database = []
     category_dict = {}
     for xml_file in xml_files:
-        if xml_file.startswith("adb_export"):
+        xml_database = []
+        if xml_file.startswith("adb_export"):            
+            print(f"Parsing {xml_file} file...")
             tree = et.parse(xml_file)
             root = tree.getroot()
             for _i in range(1000000):
                 try:
+                    start_stop = False
                     user_data = []
                     for gender, roddenrating, bdata, adb_link, categories in \
-                    zip(
-                        root[_i + 2][1].findall("gender"),
-                        root[_i + 2][1].findall("roddenrating"),
-                        root[_i + 2][1].findall("bdata"),
-                        root[_i + 2][2].findall("adb_link"),
-                        root[_i + 2][3].findall("categories")
-                    ):
+                        zip(
+                            root[_i + 2][1].findall("gender"),
+                            root[_i + 2][1].findall("roddenrating"),
+                            root[_i + 2][1].findall("bdata"),
+                            root[_i + 2][2].findall("adb_link"),
+                            root[_i + 2][3].findall("categories")
+                        ):
                         _name = root[_i + 2][1][0].text
                         sbdate_dmy = bdata[1].text
                         sbtime = bdata[2].text
@@ -185,22 +188,33 @@ def parse_xml():
                         for cate in category:
                             if cate[0] not in category_dict.keys():
                                 category_dict[cate[0]] = cate[1]
-                        user_data.append(int(root[_i + 2].get("adb_id")))
-                        user_data.append(_name)
-                        user_data.append(gender.text)
-                        user_data.append(roddenrating.text)
-                        user_data.append(sbdate_dmy)
-                        user_data.append(sbtime)
-                        user_data.append(jd_ut)
-                        user_data.append(lat)
-                        user_data.append(lon)
-                        user_data.append(place)
-                        user_data.append(country)
-                        user_data.append(adb_link.text)
-                        user_data.append(category)
-                    database.append(user_data)
+                        for _record_ in database:
+                            if _name == _record_[1]:
+                                start_stop = True
+                                break
+                        if start_stop:
+                            break
+                        else:
+                            user_data.append(int(root[_i + 2].get("adb_id")))
+                            user_data.append(_name)
+                            user_data.append(gender.text)
+                            user_data.append(roddenrating.text)
+                            user_data.append(sbdate_dmy)
+                            user_data.append(sbtime)
+                            user_data.append(jd_ut)
+                            user_data.append(lat)
+                            user_data.append(lon)
+                            user_data.append(place)
+                            user_data.append(country)
+                            user_data.append(adb_link.text)
+                            user_data.append(category)
+                            if len(user_data) != 0:
+                                xml_database.append(user_data)                 
                 except IndexError:
                     break
+        print(f"Parsing completed.")
+        print(f"Total {len(xml_database)} records found.\n")
+        database.extend(xml_database)
         _database = [i for i in database]
         _category_dict = {i: j for i, j in category_dict.items()}
                 
@@ -252,15 +266,13 @@ def group_categories(db, cat_dict):
     global category_names, all_categories
     category_groups = {}
     for _record in db:
-        try:
-            for _category in _record[12]:
+        if len(_record) != 0:
+            for _category in _record[-1]:
                 if (_category[0], _category[1]) not in category_groups:
                     if _category[1] is None:
                         pass
                     category_groups[(_category[0], _category[1])] = []
                 category_groups[(_category[0], _category[1])].append(_record)
-        except IndexError:
-            pass
     all_categories = category_groups
     category_names = sorted(
         [i for i in cat_dict.values() if i is not None]
@@ -1347,7 +1359,7 @@ selected_categories, selected_ratings, displayed_results, \
 toplevel1, toplevel2, menu, search_menu, listbox_menu = None, None, None, \
     None, None
 
-record, on_toplevel = False, False
+record, on_toplevel, = False, False
 
 _num_ = 0
 
