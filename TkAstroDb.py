@@ -183,20 +183,6 @@ def parse_xml():
                             root[_i + 2][3].findall("categories")
                         ):
                         _name = root[_i + 2][1][0].text
-                        sbdate_dmy = bdata[1].text
-                        sbtime = bdata[2].text
-                        jd_ut = bdata[2].get("jd_ut")
-                        lat = bdata[3].get("slati")
-                        lon = bdata[3].get("slong")
-                        place = bdata[3].text
-                        country = bdata[4].text
-                        category = [
-                            (categories[_j].get("cat_id"), categories[_j].text)
-                            for _j in range(len(categories))
-                        ]
-                        for cate in category:
-                            if cate[0] not in category_dict.keys():
-                                category_dict[cate[0]] = cate[1]
                         for _record_ in database:
                             if _name == _record_[1]:
                                 ignored += 1
@@ -205,6 +191,23 @@ def parse_xml():
                         if start_stop:
                             break
                         else:
+                            sbdate_dmy = bdata[1].text
+                            sbtime = bdata[2].text
+                            jd_ut = bdata[2].get("jd_ut")
+                            lat = bdata[3].get("slati")
+                            lon = bdata[3].get("slong")
+                            place = bdata[3].text
+                            country = bdata[4].text
+                            category = [
+                                (
+                                    categories[_j].get("cat_id"),
+                                    categories[_j].text
+                                )
+                                for _j in range(len(categories))
+                            ]
+                            for cate in category:
+                                if cate[0] not in category_dict.keys():
+                                    category_dict[cate[0]] = cate[1]
                             user_data.append(int(root[_i + 2].get("adb_id")))
                             user_data.append(_name)
                             user_data.append(gender.text)
