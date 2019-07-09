@@ -8,6 +8,7 @@ import sys
 import ssl
 import time
 import shutil
+import logging
 import platform
 import threading
 import subprocess
@@ -149,6 +150,13 @@ all_categories, category_dict, _category_dict = {}, {}, {}
 for _i in os.listdir(os.getcwd()):
     if _i.endswith("xml"):
         xml_files.append(_i)
+        
+        
+logging.basicConfig(
+    format="- %(levelname)s - %(asctime)s - %(message)s", 
+    level=logging.INFO,
+    datefmt="%d.%m.%Y %H:%M:%S"
+    )
 
 
 def parse_xml():
@@ -158,8 +166,8 @@ def parse_xml():
     for xml_file in xml_files:
         xml_database = []
         ignored = 0
-        if xml_file.startswith("adb_export"):            
-            print(f"Parsing {xml_file} file...")
+        if xml_file.startswith("adb_export"):
+            logging.info(f"Parsing {xml_file} file...")          
             tree = et.parse(xml_file)
             root = tree.getroot()
             for _i in range(1000000):
@@ -214,12 +222,13 @@ def parse_xml():
                                 xml_database.append(user_data)                 
                 except IndexError:
                     break
-        print(f"Parsing completed.")
-        print(f"{ignored} records are ignored.")
-        print(f"Total {len(xml_database)} records found.\n")
+        logging.info("Parsing completed.")
+        logging.info(f"{ignored} records are ignored.")
+        logging.info(f"{len(xml_database)} records are inserted.")
         database.extend(xml_database)
         _database = [i for i in database]
         _category_dict = {i: j for i, j in category_dict.items()}
+    logging.info(f"{len(database)} records are available.")
                 
             
 def merge_databases(db, cat_dict):
