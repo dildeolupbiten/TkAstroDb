@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.5.3"
+__version__ = "1.5.4"
 
 import os
 import sys
@@ -146,85 +146,91 @@ database, _database, category_names, xml_files = [], [], [], []
 _count_ = 0
 
 all_categories, category_dict, _category_dict = {}, {}, {}
-
-for _i in os.listdir(os.getcwd()):
-    if _i.endswith("xml"):
-        xml_files.append(_i)
         
+name_order = {
+    j: i for i, j in enumerate(
+        ["adb_export_update_190506_1154.xml",
+         "adb_export_update_190309_1118.xml",
+         "adb_export_update_190113_1936.xml",
+         "adb_export_181128_2309.xml"])        
+}
+
+for xml in os.listdir(os.getcwd()):
+    if xml.endswith("xml"):
+        xml_files.append(xml)
         
 logging.basicConfig(
     format="- %(levelname)s - %(asctime)s - %(message)s", 
     level=logging.INFO,
     datefmt="%d.%m.%Y %H:%M:%S"
-    )
+    )    
 
 
 def parse_xml():
     global database, category_dict, _database, _category_dict
     database = []
     category_dict = {}
-    for xml_file in xml_files:
+    for xml_file in sorted(xml_files, key=name_order.get):
         xml_database = []
         ignored = 0
-        if xml_file.startswith("adb_export"):
-            logging.info(f"Parsing {xml_file} file...")          
-            tree = et.parse(xml_file)
-            root = tree.getroot()
-            for _i in range(1000000):
-                try:
-                    start_stop = False
-                    user_data = []
-                    for gender, roddenrating, bdata, adb_link, categories in \
-                        zip(
-                            root[_i + 2][1].findall("gender"),
-                            root[_i + 2][1].findall("roddenrating"),
-                            root[_i + 2][1].findall("bdata"),
-                            root[_i + 2][2].findall("adb_link"),
-                            root[_i + 2][3].findall("categories")
-                        ):
-                        _name = root[_i + 2][1][0].text
-                        for _record_ in database:
-                            if _name == _record_[1]:
-                                ignored += 1
-                                start_stop = True
-                                break
-                        if start_stop:
+        logging.info(f"Parsing {xml_file} file...")         
+        tree = et.parse(xml_file)
+        root = tree.getroot()
+        for _i in range(1000000):
+            try:
+                start_stop = False
+                user_data = []
+                for gender, roddenrating, bdata, adb_link, categories in \
+                    zip(
+                        root[_i + 2][1].findall("gender"),
+                        root[_i + 2][1].findall("roddenrating"),
+                        root[_i + 2][1].findall("bdata"),
+                        root[_i + 2][2].findall("adb_link"),
+                        root[_i + 2][3].findall("categories")
+                    ):
+                    _name = root[_i + 2][1][0].text
+                    for _record_ in database:
+                        if _name == _record_[1]:
+                            ignored += 1
+                            start_stop = True
                             break
-                        else:
-                            sbdate_dmy = bdata[1].text
-                            sbtime = bdata[2].text
-                            jd_ut = bdata[2].get("jd_ut")
-                            lat = bdata[3].get("slati")
-                            lon = bdata[3].get("slong")
-                            place = bdata[3].text
-                            country = bdata[4].text
-                            category = [
-                                (
-                                    categories[_j].get("cat_id"),
-                                    categories[_j].text
-                                )
-                                for _j in range(len(categories))
-                            ]
-                            for cate in category:
-                                if cate[0] not in category_dict.keys():
-                                    category_dict[cate[0]] = cate[1]
-                            user_data.append(int(root[_i + 2].get("adb_id")))
-                            user_data.append(_name)
-                            user_data.append(gender.text)
-                            user_data.append(roddenrating.text)
-                            user_data.append(sbdate_dmy)
-                            user_data.append(sbtime)
-                            user_data.append(jd_ut)
-                            user_data.append(lat)
-                            user_data.append(lon)
-                            user_data.append(place)
-                            user_data.append(country)
-                            user_data.append(adb_link.text)
-                            user_data.append(category)
-                            if len(user_data) != 0:
-                                xml_database.append(user_data)                 
-                except IndexError:
-                    break
+                    if start_stop:
+                        break
+                    else:
+                        sbdate_dmy = bdata[1].text
+                        sbtime = bdata[2].text
+                        jd_ut = bdata[2].get("jd_ut")
+                        lat = bdata[3].get("slati")
+                        lon = bdata[3].get("slong")
+                        place = bdata[3].text
+                        country = bdata[4].text
+                        category = [
+                            (
+                                categories[_j].get("cat_id"),
+                                categories[_j].text
+                            )
+                            for _j in range(len(categories))
+                        ]
+                        for cate in category:
+                            if cate[0] not in category_dict.keys():
+                                category_dict[cate[0]] = cate[1]
+                        user_data.append(int(root[_i + 2].get("adb_id")))
+                        user_data.append(_name)
+                        user_data.append(gender.text)
+                        user_data.append(roddenrating.text)
+                        user_data.append(sbdate_dmy)
+                        user_data.append(sbtime)
+                        user_data.append(jd_ut)
+                        user_data.append(lat)
+                        user_data.append(lon)
+                        user_data.append(place)
+                        user_data.append(country)
+                        user_data.append(adb_link.text)
+                        user_data.append(category)
+                        if len(user_data) != 0:                            
+                            xml_database.append(user_data)                 
+            except IndexError:
+                break
         logging.info("Parsing completed.")
         logging.info(f"{ignored} records are ignored.")
         logging.info(f"{len(xml_database)} records are inserted.")
@@ -280,14 +286,14 @@ def merge_databases(db, cat_dict):
 def group_categories(db, cat_dict):
     global category_names, all_categories
     category_groups = {}
+    count = 0
     for _record in db:
-        if len(_record) != 0:
-            for _category in _record[-1]:
-                if (_category[0], _category[1]) not in category_groups:
-                    if _category[1] is None:
-                        pass
-                    category_groups[(_category[0], _category[1])] = []
-                category_groups[(_category[0], _category[1])].append(_record)
+        for _category in _record[-1]:
+            if (_category[0], _category[1]) not in category_groups:
+                if _category[1] is None:
+                    pass
+                category_groups[(_category[0], _category[1])] = []
+            category_groups[(_category[0], _category[1])].append(_record)
     all_categories = category_groups
     category_names = sorted(
         [i for i in cat_dict.values() if i is not None]
@@ -1700,11 +1706,11 @@ var_checkbutton_1, display_checkbutton_1, \
 
 def insert_to_treeview(item):
     global _num_
-    master.update()
     treeview.insert("", _num_, values=[col for col in item])
     info_var.set(len(displayed_results))
     _num_ += 1
     displayed_results.append(item)
+    master.update()
 
 
 def south_north_check(item):
@@ -1748,6 +1754,7 @@ def display_results():
     global displayed_results
     treeview.delete(*treeview.get_children())
     displayed_results = []
+    count = 0
     for key, value in all_categories.items():
         if key[1] in selected_categories:
             for item in value:
@@ -1777,7 +1784,7 @@ def display_results():
                                 south_north_check(item)
                         elif var_checkbutton_1.get() == "1" and \
                                 var_checkbutton_2.get() == "1":
-                            pass
+                            pass              
     info_var.set(len(displayed_results))
     master.update()
     if len(displayed_results) == 0:
