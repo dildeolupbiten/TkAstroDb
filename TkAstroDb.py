@@ -2990,10 +2990,14 @@ def find_observed_values():
                                 split_new_name = i.split(" : ")
                                 new_name = ""
                                 for j, k in enumerate(split_new_name):
-                                    if j != len(split_new_name) - 1:
+                                    if j == 0:
                                         new_name += f"{k[0]}_"
-                                    else:
-                                        new_name += k 
+                                    elif 0 < j < len(split_new_name) - 1:
+                                        for m in k.split(" "):
+                                            new_name += f"{m[0]}"
+                                        new_name += "_"                                      
+                                    else:                                       
+                                        new_name += k.replace(" ", "_")
                                 cats.append(new_name)                              
                             cat = ["_+_".join(cats)]
                         else:
