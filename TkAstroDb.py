@@ -2984,7 +2984,7 @@ def find_observed_values():
                             cat = modify_category_names()
                         dir2 = dir_names(cat, dir1, orb_factor)
                     elif len(selected_categories) > 1:
-                        if len(selected_categories) < 5:
+                        if len(selected_categories) < 10:
                             cats = []
                             for i in selected_categories:
                                 split_new_name = i.split(" : ")
