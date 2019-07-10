@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.5.4"
+__version__ = "1.5.5"
 
 import os
 import sys
@@ -170,6 +170,7 @@ def parse_xml():
     global database, category_dict, _database, _category_dict
     database = []
     category_dict = {}
+    a = open(file="65657 records.txt", mode="w", encoding="utf-8")
     for xml_file in sorted(xml_files, key=name_order.get):
         xml_database = []
         ignored = 0
@@ -228,7 +229,9 @@ def parse_xml():
                         user_data.append(adb_link.text)
                         user_data.append(category)
                         if len(user_data) != 0:                            
-                            xml_database.append(user_data)                 
+                            xml_database.append(user_data)
+                            a.write(f"{user_data}\n\n")
+                            a.flush()                 
             except IndexError:
                 break
         logging.info("Parsing completed.")
@@ -238,6 +241,7 @@ def parse_xml():
         _database = [i for i in database]
         _category_dict = {i: j for i, j in category_dict.items()}
     logging.info(f"{len(database)} records are available.")
+    a.close()
                 
             
 def merge_databases(db, cat_dict):
@@ -1755,6 +1759,7 @@ def display_results():
     treeview.delete(*treeview.get_children())
     displayed_results = []
     count = 0
+    b = open(file="65181 records.txt", mode="w", encoding="utf-8")
     for key, value in all_categories.items():
         if key[1] in selected_categories:
             for item in value:
@@ -1784,7 +1789,11 @@ def display_results():
                                 south_north_check(item)
                         elif var_checkbutton_1.get() == "1" and \
                                 var_checkbutton_2.get() == "1":
-                            pass              
+                            pass
+    for i in displayed_results:
+        b.write(f"{i}\n\n")
+        b.flush()
+    b.close()              
     info_var.set(len(displayed_results))
     master.update()
     if len(displayed_results) == 0:
@@ -2291,8 +2300,13 @@ def write_title_of_total(sheet):
             sheet.write_merge(r1=3, r2=3, c1=3, c2=4, 
                               label="Category:", style=style)
             style.font = _font_(bold=False)
-            sheet.write_merge(r1=3, r2=3, c1=5, c2=13, 
-                              label="Control_Group", style=style)
+            if len(selected_categories) < 100:
+                sheet.write_merge(r1=3, r2=3, c1=5, c2=13, 
+                                  label=" + ".join(selected_categories), 
+                                  style=style)
+            else:
+                sheet.write_merge(r1=3, r2=3, c1=5, c2=13, 
+                                  label="Control_Group", style=style)
     elif selection == "expected_values":
         sheet.write_merge(r1=1, r2=1, c1=3, c2=4, 
                           label="House System:", style=style)
@@ -2904,7 +2918,10 @@ def find_observed_values():
                 mod_cat_names = '/'.join(modify_category_names())
                 log.write(f"Category: {mod_cat_names}\n\n")
         elif len(selected_categories) > 1:
-            log.write(f"Category: Control_Group\n\n")
+            if len(selected_categories) < 100:
+                log.write(f"Category: {' + '.join(selected_categories)}\n\n")
+            else:                
+                log.write("Category: Control_Group\n\n")
             criterias = ["Event", "Human", "Male", "Female",
                          "North Hemisphere", "South Hemisphere"]
             checkbuttons = [var_checkbutton_1, var_checkbutton_2,
@@ -2967,7 +2984,20 @@ def find_observed_values():
                             cat = modify_category_names()
                         dir2 = dir_names(cat, dir1, orb_factor)
                     elif len(selected_categories) > 1:
-                        cat = ["Control_Group"]
+                        if len(selected_categories) < 5:
+                            cats = []
+                            for i in selected_categories:
+                                split_new_name = i.split(" : ")
+                                new_name = ""
+                                for j, k in enumerate(split_new_name):
+                                    if j != len(split_new_name) - 1:
+                                        new_name += f"{k[0]}_"
+                                    else:
+                                        new_name += k 
+                                cats.append(new_name)                              
+                            cat = ["_+_".join(cats)]
+                        else:
+                            cat = ["Control_Group"]
                         dir2 = dir_names(cat, dir1, orb_factor)
                     try:
                         os.makedirs(dir2)
