@@ -170,7 +170,6 @@ def parse_xml():
     global database, category_dict, _database, _category_dict
     database = []
     category_dict = {}
-    a = open(file="65657 records.txt", mode="w", encoding="utf-8")
     for xml_file in sorted(xml_files, key=name_order.get):
         xml_database = []
         ignored = 0
@@ -229,9 +228,7 @@ def parse_xml():
                         user_data.append(adb_link.text)
                         user_data.append(category)
                         if len(user_data) != 0:                            
-                            xml_database.append(user_data)
-                            a.write(f"{user_data}\n\n")
-                            a.flush()                 
+                            xml_database.append(user_data)              
             except IndexError:
                 break
         logging.info("Parsing completed.")
@@ -241,7 +238,6 @@ def parse_xml():
         _database = [i for i in database]
         _category_dict = {i: j for i, j in category_dict.items()}
     logging.info(f"{len(database)} records are available.")
-    a.close()
                 
             
 def merge_databases(db, cat_dict):
@@ -290,7 +286,6 @@ def merge_databases(db, cat_dict):
 def group_categories(db, cat_dict):
     global category_names, all_categories
     category_groups = {}
-    count = 0
     for _record in db:
         for _category in _record[-1]:
             if (_category[0], _category[1]) not in category_groups:
@@ -1758,8 +1753,6 @@ def display_results():
     global displayed_results
     treeview.delete(*treeview.get_children())
     displayed_results = []
-    count = 0
-    b = open(file="65181 records.txt", mode="w", encoding="utf-8")
     for key, value in all_categories.items():
         if key[1] in selected_categories:
             for item in value:
@@ -1789,11 +1782,7 @@ def display_results():
                                 south_north_check(item)
                         elif var_checkbutton_1.get() == "1" and \
                                 var_checkbutton_2.get() == "1":
-                            pass
-    for i in displayed_results:
-        b.write(f"{i}\n\n")
-        b.flush()
-    b.close()              
+                            pass            
     info_var.set(len(displayed_results))
     master.update()
     if len(displayed_results) == 0:
