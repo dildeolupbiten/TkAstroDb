@@ -155,9 +155,9 @@ name_order = {
          "adb_export_181128_2309.xml"])        
 }
 
-for xml in os.listdir(os.getcwd()):
-    if xml.endswith("xml"):
-        xml_files.append(xml)
+for file in os.listdir(os.getcwd()):
+    if file.endswith("xml"):
+        xml_files.append(file)
         
 logging.basicConfig(
     format="- %(levelname)s - %(asctime)s - %(message)s", 
