@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.5.5"
+__version__ = "1.5.6"
 
 import os
 import sys
@@ -141,23 +141,19 @@ col_names = "no, add_date, adb_id, name, gender, rr, date, time, " \
 
 cursor.execute(f"CREATE TABLE IF NOT EXISTS DATA({col_names})")
 
-database, _database, category_names, xml_files = [], [], [], []
+database, _database, category_names = [], [], []
 
 _count_ = 0
 
-all_categories, category_dict, _category_dict = {}, {}, {}
-        
-name_order = {
-    j: i for i, j in enumerate(
-        ["adb_export_update_190506_1154.xml",
-         "adb_export_update_190309_1118.xml",
-         "adb_export_update_190113_1936.xml",
-         "adb_export_181128_2309.xml"])        
-}
+all_categories, category_dict, _category_dict, xml_files = {}, {}, {}, {}
 
-for file in os.listdir(os.getcwd()):
-    if file.endswith("xml"):
-        xml_files.append(file)
+for xml in os.listdir(os.getcwd()):
+    if xml.endswith("xml"):
+        xml_files[
+            dt.strftime(dt.fromtimestamp(os.stat(xml).st_mtime), "%d.%m.%Y")
+        ] = xml 
+            
+xml_files = {key: xml_files[key] for key in sorted(xml_files.keys())}
         
 logging.basicConfig(
     format="- %(levelname)s - %(asctime)s - %(message)s", 
@@ -170,7 +166,7 @@ def parse_xml():
     global database, category_dict, _database, _category_dict
     database = []
     category_dict = {}
-    for xml_file in sorted(xml_files, key=name_order.get):
+    for xml_file in xml_files.values():
         xml_database = []
         ignored = 0
         logging.info(f"Parsing {xml_file} file...")         
