@@ -153,8 +153,8 @@ for xml in os.listdir(os.getcwd()):
             dt.strftime(dt.fromtimestamp(os.stat(xml).st_mtime), "%d.%m.%Y")
         ] = xml 
             
-xml_files = {key: xml_files[key] for key in sorted(xml_files.keys())}
-        
+xml_files = {key: xml_files[key] for key in sorted(xml_files)}
+
 logging.basicConfig(
     format="- %(levelname)s - %(asctime)s - %(message)s", 
     level=logging.INFO,
