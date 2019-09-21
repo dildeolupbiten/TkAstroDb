@@ -1104,32 +1104,24 @@ class Chart:
         for key, value in self.ASPECTS.items():
             if i[0] == key:
                 value.append(i)
+                
+    def __select_planet__(self, aspect):
+        for i in aspect:
+            self.select_planet(i)
 
     def parse_aspects(self):
-        for i in self.CONJUNCTION:
-            self.select_planet(i)
-        for i in self.SEMI_SEXTILE:
-            self.select_planet(i)
-        for i in self.SEMI_SQUARE:
-            self.select_planet(i)
-        for i in self.SEXTILE:
-            self.select_planet(i)
-        for i in self.QUINTILE:
-            self.select_planet(i)
-        for i in self.SQUARE:
-            self.select_planet(i)
-        for i in self.TRINE:
-            self.select_planet(i)
-        for i in self.SESQUIQUADRATE:
-            self.select_planet(i)
-        for i in self.BIQUINTILE:
-            self.select_planet(i)
-        for i in self.QUINCUNX:
-            self.select_planet(i)
-        for i in self.OPPOSITE:
-            self.select_planet(i)
-        for i in self.NULL:
-            self.select_planet(i)
+        self.__select_planet__(self.CONJUNCTION)
+        self.__select_planet__(self.SEMI_SEXTILE)
+        self.__select_planet__(self.SEMI_SQUARE)
+        self.__select_planet__(self.SEXTILE)
+        self.__select_planet__(self.QUINTILE)
+        self.__select_planet__(self.SQUARE)
+        self.__select_planet__(self.TRINE)
+        self.__select_planet__(self.SESQUIQUADRATE)
+        self.__select_planet__(self.BIQUINTILE)
+        self.__select_planet__(self.QUINCUNX)
+        self.__select_planet__(self.OPPOSITE)
+        self.__select_planet__(self.NULL)
 
     def order_aspects(self):
         for planet in self.ASPECTS:
@@ -2235,8 +2227,8 @@ def write_title_of_total(sheet):
                       style=style)
     style.font = _font_(bold=False)
     sheet.write_merge(r1=0, r2=0, c1=5, c2=13, 
-                      label=f"{' / '.join(xml_files.values()).replace('.xml', '')}", 
-                      style=style)
+        label=f"{' / '.join(xml_files.values()).replace('.xml', '')}", 
+        style=style)
     write_title(sheet, 0, var_checkbutton_1, "Event")
     write_title(sheet, 1, var_checkbutton_2, "Human")
     write_title(sheet, 2, var_checkbutton_3, "Male")
