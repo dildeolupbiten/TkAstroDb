@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.5.6"
+__version__ = "1.5.7"
 
 import os
 import sys
@@ -2235,7 +2235,7 @@ def write_title_of_total(sheet):
                       style=style)
     style.font = _font_(bold=False)
     sheet.write_merge(r1=0, r2=0, c1=5, c2=13, 
-                      label=f"{' / '.join(xml_files).replace('.xml', '')}", 
+                      label=f"{' / '.join(xml_files.values()).replace('.xml', '')}", 
                       style=style)
     write_title(sheet, 0, var_checkbutton_1, "Event")
     write_title(sheet, 1, var_checkbutton_2, "Human")
@@ -2885,7 +2885,7 @@ def find_observed_values():
         orb_factor = [str(i) for i in orb_factor]
         log = open(file="output.log", mode="w", encoding="utf-8")
         log.write(
-            f"Adb Version: {' / '.join(xml_files).replace('.xml', '')}\n"
+            f"Adb Version: {' / '.join(xml_files.values()).replace('.xml', '')}\n"
         )
         log.write(f"House System: {house_systems[hsys]}\n")
         if len(displayed_results) == 1:
