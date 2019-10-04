@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.5.7"
+__version__ = "1.5.8"
 
 import os
 import sys
@@ -20,6 +20,7 @@ import xml.etree.ElementTree as et
 import tkinter.messagebox as msgbox
 
 from math import cos, sin, radians
+from statistics import variance
 from tkinter.ttk import Progressbar, Treeview
 from datetime import datetime as dt
     
@@ -3043,57 +3044,70 @@ def calculate(file_name_1, file_name_2, table_name, msg_title):
         ratio = sum_of_row(data_2) / sum_of_row(data_1)
         sum_of_all = sum_of_row(data_2) + sum_of_row(data_1)
         write_title_of_total(new_sheet)
-        for i in data_1:
-            for j in data_2:
-                if i[0] == j[0]:
-                    if i[1] != "" and j[1] != "":
-                        if type(i[1]) == float or type(j[1]) == float:
-                            try:
-                                if selection == "expected_values":
-                                    if method is False:
-                                        # Sjoerd's method
-                                        new_sheet.write(
-                                            *i[0],
-                                            i[1] * ratio,
-                                            style=style)
-                                    elif method is True:
-                                        # Flavia's method
-                                        new_sheet.write(
-                                            *i[0],
-                                            sum_of_row(data_2) *
-                                            (i[1] + j[1]) / sum_of_all,
-                                            style=style)
-                                elif selection == "chi-square":
-                                    new_sheet.write(
-                                        *i[0], 
-                                        (i[1] - j[1]) ** 2 / j[1], 
-                                        style=style)
-                                elif selection == "effect-size":
+        for i, j in zip(data_1, data_2):
+            if i[0] == j[0]:
+                if i[1] != "" and j[1] != "":
+                    if type(i[1]) == float or type(j[1]) == float:
+                        try:
+                            if selection == "expected_values":
+                                if method is False:
+                                    # Sjoerd's method
                                     new_sheet.write(
                                         *i[0],
-                                        i[1] / j[1],
+                                        i[1] * ratio,
                                         style=style)
-                                elif selection == "cohens_d_effect":
+                                elif method is True:
+                                    # Flavia's method
+                                    new_sheet.write(
+                                        *i[0],
+                                        sum_of_row(data_2) *
+                                        (i[1] + j[1]) / sum_of_all,
+                                        style=style)
+                            elif selection == "chi-square":
+                                new_sheet.write(
+                                    *i[0], 
+                                    (i[1] - j[1]) ** 2 / j[1], 
+                                    style=style)
+                            elif selection == "effect-size":
+                                new_sheet.write(
+                                    *i[0],
+                                    i[1] / j[1],
+                                    style=style)
+                            elif selection == "cohens_d_effect":
+                                row_1 = [
+                                    k[1] for k in data_1 if i[0][0] == k[0][0]
+                                ]
+                                row_2 = [
+                                    k[1] for k in data_2 if j[0][0] == k[0][0]
+                                ]
+                                if isinstance(row_1[0], str) and \
+                                        isinstance(row_1[1], float):
                                     new_sheet.write(
                                         *i[0], 
-                                        (i[1] - j[1]) / (((i[1] * 
-                                        (1 - (i[1] / sum_of_row(data_1)))) ** 2
-                                         + (j[1] * (1 - 
-                                         (j[1] / sum_of_row(data_2))) ** 2)) 
-                                         / 2) ** 0.5, 
-                                        style=style)                                    
-                            except ZeroDivisionError:
-                                new_sheet.write(*i[0], 0, style=style)
-                        else:
-                            special_cells(new_sheet, i)
-                    elif i[1] != "" and j[1] == "":
-                        new_sheet.write(*i[0], i[1], style=style)
-                    elif i[1] == "" and j[1] != "":
-                        new_sheet.write(*j[0], j[1], style=style)
-                    if i[0] not in control_list:
-                        control_list.append(i[0])
-                    if j[0] not in control_list:
-                        control_list.append(j[0])
+                                        (i[1] - j[1]) / ((
+                                            variance(row_1[1:]) + \
+                                            variance(row_2[1:])) / 2) ** 0.5, 
+                                        style=style)
+                                elif isinstance(row_1[0], str) and \
+                                        isinstance(row_1[1], str):
+                                    new_sheet.write(
+                                        *i[0], 
+                                        (i[1] - j[1]) / ((
+                                            variance(row_1[2:]) + \
+                                            variance(row_2[2:])) / 2) ** 0.5, 
+                                        style=style)                          
+                        except ZeroDivisionError:
+                            new_sheet.write(*i[0], 0, style=style)
+                    else:
+                        special_cells(new_sheet, i)
+                elif i[1] != "" and j[1] == "":
+                    new_sheet.write(*i[0], i[1], style=style)
+                elif i[1] == "" and j[1] != "":
+                    new_sheet.write(*j[0], j[1], style=style)
+                if i[0] not in control_list:
+                    control_list.append(i[0])
+                if j[0] not in control_list:
+                    control_list.append(j[0])
         save_file(new_file, new_sheet, table_name, file_name_1, file_name_2)
         master.update()
         msgbox.showinfo(title=f"Find {msg_title} Values", 
