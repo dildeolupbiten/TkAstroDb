@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.5.8"
+__version__ = "1.5.9"
 
 import os
 import sys
@@ -1393,7 +1393,30 @@ y_scrollbar.pack(side="right", fill="y")
 columns_1 = ["Adb ID", "Name", "Gender", "Rodden Rating", "Date",
              "Hour", "Julian Date", "Latitude", "Longitude", "Place",
              "Country", "Adb Link", "Category"]
+             
+             
+def sort_column(tv, col, reverse):
+    l = [(tv.set(k, col), k) for k in tv.get_children("")]
+    l.sort(reverse=reverse)
+    for index, (val, k) in enumerate(l):
+        tv.move(k, "", index)    
+    tv.heading(
+        col, 
+        command=lambda: sort_column(tv, col, not reverse)
+    )
+    
+    
+def heading(treeview_, _i_, _j_):
 
+    def inner():
+        treeview_.heading(
+            f"#{_i_ + 1}", 
+            text=_j_, 
+            command=lambda: sort_column(treeview_, _i_, False)
+        )
+        
+    return inner()  
+    
 
 def create_treeview(_master_, columns, height=18):
     treeview_ = Treeview(
@@ -1402,9 +1425,9 @@ def create_treeview(_master_, columns, height=18):
         columns=[f"#{_i_ + 1}" for _i_ in range(len(columns))],
         height=height
     )
+    treeview_.pack()    
     for _i_, _j_ in enumerate(columns):
-        treeview_.heading(f"#{_i_ + 1}", text=_j_)
-    treeview_.pack()
+        heading(treeview_, _i_, _j_)
     return treeview_
 
 
