@@ -1397,7 +1397,10 @@ columns_1 = ["Adb ID", "Name", "Gender", "Rodden Rating", "Date",
              
 def sort_column(tv, col, reverse):
     l = [(tv.set(k, col), k) for k in tv.get_children("")]
-    l.sort(reverse=reverse)
+    try:
+        l.sort(key=lambda t: int(t[0]), reverse=reverse)
+    except ValueError:
+        l.sort(reverse=reverse)
     for index, (val, k) in enumerate(l):
         tv.move(k, "", index)    
     tv.heading(
