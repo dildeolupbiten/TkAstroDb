@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.5.9"
+__version__ = "1.6.0"
 
 import os
 import sys
@@ -1070,7 +1070,7 @@ class Chart:
             )
             self.create_aspect(planet_degrees, value, color="orange")
         elif 144 - biquintile < aspect < 144 + biquintile or \
-                204 - biquintile < aspect < 204 + biquintile:
+                216 - biquintile < aspect < 216 + biquintile:
             self.BIQUINTILE.append(
                 (key, self.ASPECT_SYMBOLS["BiQuintile"], _key)
             )
