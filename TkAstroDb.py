@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.6.0"
+__version__ = "1.6.1"
 
 import os
 import sys
@@ -44,6 +44,13 @@ def select_module(module_name, module_files):
                 os.system(f"pip3 install {new_path}")
             elif platform.architecture()[0] == "64bit":
                 new_path = os.path.join(whl_path, module_files[3])
+                os.system(f"pip3 install {new_path}")
+        elif sys.version_info.minor == 8:
+            if platform.architecture()[0] == "32bit":
+                new_path = os.path.join(whl_path, module_files[4])
+                os.system(f"pip3 install {new_path}")
+            elif platform.architecture()[0] == "64bit":
+                new_path = os.path.join(whl_path, module_files[5])
                 os.system(f"pip3 install {new_path}")
                 
                 
