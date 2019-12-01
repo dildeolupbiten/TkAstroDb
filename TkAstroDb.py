@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.6.1"
+__version__ = "1.6.2"
 
 import os
 import sys
@@ -2113,7 +2113,7 @@ def get_excel_datas(sheet):
     if r1.count("/") == 2 and r2.count("/") == 2 and r3.count("/") == 2:
         r1, r2, r3 = "", "", ""
     for row in range(sheet.nrows):
-        if selection == "expected_values":
+        if selection == "expected_values" or selection == "binomial_limit":
             if row == 1:
                 r1 += f"{sheet.cell_value(row, 5)} / "
             elif row == 2:
@@ -2318,7 +2318,7 @@ def write_title_of_total(sheet):
             else:
                 sheet.write_merge(r1=3, r2=3, c1=5, c2=13, 
                                   label="Control_Group", style=style)
-    elif selection == "expected_values":
+    elif selection == "expected_values" or selection == "binomial_limit":
         sheet.write_merge(r1=1, r2=1, c1=3, c2=4, 
                           label="House System:", style=style)
         style.font = _font_(bold=False)
@@ -3045,6 +3045,37 @@ def sum_of_row(table):
         if item[0][0] == 8 and type(item[1]) == float:
             total += item[1]
     return total
+    
+    
+def factorial(n: int):
+    result = 1
+    for i in range(1, n + 1):
+        result *= i
+    return result
+
+
+def permutation(n: int, k: int):
+    result, variable = 1, 0
+    while variable != k:
+        variable += 1
+        result *= n
+        n -= 1
+    return result
+
+
+def combination(n: int, k: int):
+    return permutation(n, k) / factorial(k)
+
+
+def probability(n: int, k: int, p: float): return \
+    f"{round(combination(n, k) * (p ** k) * ((1 - p) ** (n - k)), 6) * 100}"
+
+
+def probability_mass_function(n: int, k: int, p: float):
+    result = 0
+    for i in range(k + 1):
+        result += float(probability(n=n, k=i, p=p).split(" ")[0])
+    return round(result, 6)
 
 
 def calculate(file_name_1, file_name_2, table_name, msg_title):
@@ -3128,7 +3159,21 @@ def calculate(file_name_1, file_name_2, table_name, msg_title):
                                         (i[1] - j[1]) / ((
                                             variance(row_1[2:]) + \
                                             variance(row_2[2:])) / 2) ** 0.5, 
-                                        style=style)                          
+                                        style=style)
+                            elif selection == "binomial_limit":
+                                n = sum_of_row(data_2)
+                                p = i[1] / sum_of_row(data_1)
+                                k = int(j[1])
+                                p1 = probability_mass_function(
+                                    n=n, k=k, p=p
+                                )
+                                p2 = 100 - probability_mass_function(
+                                    n=n, k=k - 1, p=p
+                                )
+                                if p1 < p2:
+                                    new_sheet.write(*i[0], -p1, style=style)
+                                elif p2 < p1:
+                                    new_sheet.write(*i[0], p2, style=style)    
                         except ZeroDivisionError:
                             new_sheet.write(*i[0], 0, style=style)
                     else:
@@ -3212,6 +3257,18 @@ def func5():
               "cohens_d_effect", "Cohen's d effect")
     )
     t5.start()
+    
+    
+def func6():
+    global r1, r2, r3, _r1, _r2, _r3
+    r1, r2, r3 = "", "", ""
+    _r1, _r2, _r3 = [], [], []
+    t2 = threading.Thread(
+        target=calculate,
+        args=("control_group", "observed_values",
+              "binomial_limit", "Binomial Limit")
+    )
+    t2.start()
 
 
 def set_method_to_false():
@@ -4241,7 +4298,9 @@ calculations_menu.add_command(label="Find Effect Size Values",
                               command=func4)
 calculations_menu.add_command(label="Find Cohen's D Effect Size Values",
                               command=func5)
-
+calculations_menu.add_command(label="Find Binomial Limit Values",
+                              command=func6)                           
+ 
 method_menu.add_command(label="Flavia's method",
                         command=set_method_to_true)
 method_menu.add_command(label="Sjoerd's method",
