@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.6.2"
+__version__ = "1.6.3"
 
 import os
 import sys
@@ -59,6 +59,11 @@ try:
 except ModuleNotFoundError:
     os.system("pip3 install numpy")
     import numpy as np
+try:
+    from scipy.stats import binom
+except ModuleNotFoundError:
+    os.system("pip3 install scipy")
+    from scipy.stats import binom
 try:
     from dateutil import tz
 except ModuleNotFoundError:
@@ -3067,14 +3072,10 @@ def combination(n: int, k: int):
     return permutation(n, k) / factorial(k)
 
 
-def probability(n: int, k: int, p: float): return \
-    f"{round(combination(n, k) * (p ** k) * ((1 - p) ** (n - k)), 6) * 100}"
-
-
 def probability_mass_function(n: int, k: int, p: float):
     result = 0
     for i in range(k + 1):
-        result += float(probability(n=n, k=i, p=p).split(" ")[0])
+        result += binom.pmf(n=n, k=i, p=p) * 100
     return round(result, 6)
 
 
