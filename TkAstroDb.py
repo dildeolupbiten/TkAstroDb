@@ -4192,7 +4192,7 @@ def about():
     developed_by, _developed_by = "Developed By:", \
                                   "Tanberk Celalettin Kutlu"
     thanks_to, _thanks_to = "Special Thanks To:", \
-                            "Alois Treindl, Flavia Alonso, Sjoerd Visser"
+                            "Alois Treindl, Flavia Alonzo, Sjoerd Visser"
     contact, _contact = "Contact:", "tckutlu@gmail.com"
     github, _github = "GitHub:", \
                       "https://github.com/dildeolupbiten/TkAstroDb"
