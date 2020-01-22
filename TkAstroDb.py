@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.6.3"
+__version__ = "1.6.4"
 
 import os
 import sys
@@ -135,11 +135,6 @@ try:
 except ModuleNotFoundError:
     os.system("pip3 install xlwt")
     import xlwt
-    
-icon = subprocess.Popen(
-    "where python", 
-    stdout=subprocess.PIPE
-).communicate()[0].decode("utf-8")[:-2] if os.name == "nt" else None
     
 
 # -----------------------------sqlite3 & xml------------------------------------
@@ -331,8 +326,6 @@ def create_toplevel():
     toplevel = tk.Toplevel()
     toplevel.resizable(width=False, height=False)
     toplevel.title("Open Chart")
-    if os.name == "nt":
-        toplevel.iconbitmap(icon)
     return toplevel
 
 
@@ -1387,8 +1380,6 @@ _num_ = 0
 master = tk.Tk()
 master.title("TkAstroDb")
 master.geometry(f"{master.winfo_screenwidth()}x{master.winfo_screenheight()}")
-if os.name == "nt":
-    master.iconbitmap(icon)
 
 info_var = tk.StringVar()
 info_var.set("0")
@@ -1590,8 +1581,6 @@ def select_ratings():
         toplevel2.geometry("300x250")
         toplevel2.resizable(width=False, height=False)
         toplevel2.title("Select Rodden Ratings")
-        if os.name == "nt":
-            toplevel2.iconbitmap(icon)
         rating_frame = tk.Frame(master=toplevel2)
         rating_frame.pack(side="top")
         button_frame = tk.Frame(master=toplevel2)
@@ -1641,8 +1630,6 @@ def select_categories():
         toplevel1.title("Select Categories")
         toplevel1.resizable(width=False, height=False)
         toplevel1.update()
-        if os.name == "nt":
-            toplevel1.iconbitmap(icon)
         canvas_frame = tk.Frame(master=toplevel1)
         canvas_frame.pack(side="top")
         button_frame = tk.Frame(master=toplevel1)
@@ -3306,8 +3293,6 @@ def choose_orb_factor():
     toplevel3 = tk.Toplevel()
     toplevel3.title("Orb Factor")
     toplevel3.resizable(width=False, height=False)
-    if os.name == "nt":
-        toplevel3.iconbitmap(icon)
     aspects = ["Conjunction", "Semi-Sextile", "Semi-Square",
                "Sextile", "Quintile", "Square", "Trine",
                "Sesquiquadrate", "BiQuintile", "Quincunx", "Opposite"]
@@ -3363,8 +3348,6 @@ def create_hsys_checkbuttons():
     toplevel4.title("House System")
     toplevel4.geometry("200x200")
     toplevel4.resizable(width=False, height=False)
-    if os.name == "nt":
-        toplevel4.iconbitmap(icon)
     hsys_frame = tk.Frame(master=toplevel4)
     hsys_frame.pack(side="top")
     button_frame = tk.Frame(master=toplevel4)
@@ -3533,8 +3516,6 @@ def export_year_frequency():
     toplevel5.title("Year Frequency")
     toplevel5.geometry("200x100")
     toplevel5.resizable(width=False, height=False)
-    if os.name == "nt":
-        toplevel5.iconbitmap(icon)
     t5frame = tk.Frame(master=toplevel5)
     t5frame.pack()
     date_entries = []
@@ -3982,8 +3963,6 @@ def record_panel(text):
     toplevel6 = tk.Toplevel()
     toplevel6.title(text)
     toplevel6.resizable(width=False, height=False)
-    if os.name == "nt":
-        toplevel6.iconbitmap(icon)
     frames = [i for i in create_frames(toplevel6)]
     entries = []
     listboxes = []
@@ -4143,7 +4122,6 @@ def edit_and_delete():
     toplevel7.title("Edit Records")
     toplevel7.geometry("800x600")
     toplevel7.resizable(width=False, height=False)
-    toplevel7.iconbitmap(icon)
     search_label_ = tk.Label(master=toplevel7,
                              text="Search A Record By Name", fg="red")
     search_label_.pack()
@@ -4179,8 +4157,6 @@ def edit_and_delete():
 def about():
     toplevel8 = tk.Toplevel()
     toplevel8.title("About TkAstroDb")
-    if os.name == "nt":
-        toplevel8.iconbitmap(icon)
     name = "TkAstroDb"
     version, _version = "Version:", __version__
     build_date, _build_date = "Built Date:", "21.12.2018"
