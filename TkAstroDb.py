@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.6.4"
+__version__ = "1.6.5"
 
 import os
 import sys
@@ -562,11 +562,11 @@ class Chart:
                 return angle - (30 * i), signs[i]
 
     def planet_pos(self, planet):
-        calc = self.convert_angle(swe.calc_ut(self.julian_date, planet)[0])
+        calc = self.convert_angle(swe.calc(self.julian_date, planet)[0])
         return calc[0], calc[1]
 
     def planet_pos_(self, planet):
-        calc = self.convert_angle(swe.calc_ut(self.julian_date, planet)[0])
+        calc = self.convert_angle(swe.calc(self.julian_date, planet)[0])
         return dd_to_dms(calc[0]), calc[1]
 
     def house_cusps(self):
