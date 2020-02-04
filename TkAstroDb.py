@@ -562,11 +562,11 @@ class Chart:
                 return angle - (30 * i), signs[i]
 
     def planet_pos(self, planet):
-        calc = self.convert_angle(swe.calc(self.julian_date, planet)[0])
+        calc = self.convert_angle(swe.calc_ut(self.julian_date, planet)[0])
         return calc[0], calc[1]
 
     def planet_pos_(self, planet):
-        calc = self.convert_angle(swe.calc(self.julian_date, planet)[0])
+        calc = self.convert_angle(swe.calc_ut(self.julian_date, planet)[0])
         return dd_to_dms(calc[0]), calc[1]
 
     def house_cusps(self):
@@ -3567,7 +3567,7 @@ def from_local_to_utc(year, month, day, hour, minute,
         loc = location.split(", ")[2]
     else:
         loc = location.split(", ")[0]
-    return utc_time.hour, utc_time.minute, utc_time.second, \
+    return utc_time.day, utc_time.hour, utc_time.minute, utc_time.second, \
            loc, location.split(", ")[-1]
 
 
@@ -3839,10 +3839,10 @@ def get_record_data(toplevel6, _treeview_, entries, option_menu,
         date = dt.strptime(f"{year} {month} {day}", "%Y %m %d")
         _country_ = ""
         try:
-            utc_hour, utc_minute, utc_second, _place, country_ = \
+            utc_day, utc_hour, utc_minute, utc_second, _place, country_ = \
                 from_local_to_utc(year, month, day, hour, minute,
                                   _latitude_, _longitude_)
-            jd = julday(int(year), int(month), int(day), int(utc_hour),
+            jd = julday(int(year), int(month), int(utc_day), int(utc_hour),
                         int(utc_minute), int(utc_second))["JD"]
             latitude, longitude = "", ""
             if _latitude_ < 0:
