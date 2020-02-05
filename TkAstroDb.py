@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__version__ = "1.6.5"
+__version__ = "1.6.6"
 
 import os
 import sys
@@ -3567,7 +3567,8 @@ def from_local_to_utc(year, month, day, hour, minute,
         loc = location.split(", ")[2]
     else:
         loc = location.split(", ")[0]
-    return utc_time.day, utc_time.hour, utc_time.minute, utc_time.second, \
+    return utc_time.year, utc_time.month, utc_time.day, \
+           utc_time.hour, utc_time.minute, utc_time.second, \
            loc, location.split(", ")[-1]
 
 
@@ -3839,11 +3840,13 @@ def get_record_data(toplevel6, _treeview_, entries, option_menu,
         date = dt.strptime(f"{year} {month} {day}", "%Y %m %d")
         _country_ = ""
         try:
-            utc_day, utc_hour, utc_minute, utc_second, _place, country_ = \
+            utc_year, utc_month, utc_day, utc_hour, \
+                utc_minute, utc_second, _place, country_ = \
                 from_local_to_utc(year, month, day, hour, minute,
                                   _latitude_, _longitude_)
-            jd = julday(int(year), int(month), int(utc_day), int(utc_hour),
-                        int(utc_minute), int(utc_second))["JD"]
+            jd = julday(int(utc_year), int(utc_month), int(utc_day), 
+                        int(utc_hour), int(utc_minute), int(utc_second)
+            )["JD"]
             latitude, longitude = "", ""
             if _latitude_ < 0:
                 _latitude_ *= -1
