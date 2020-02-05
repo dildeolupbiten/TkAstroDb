@@ -185,13 +185,13 @@ def parse_xml():
                 start_stop = False
                 user_data = []
                 for gender, roddenrating, bdata, adb_link, categories in \
-                    zip(
-                        root[_i + 2][1].findall("gender"),
-                        root[_i + 2][1].findall("roddenrating"),
-                        root[_i + 2][1].findall("bdata"),
-                        root[_i + 2][2].findall("adb_link"),
-                        root[_i + 2][3].findall("categories")
-                    ):
+                        zip(
+                            root[_i + 2][1].findall("gender"),
+                            root[_i + 2][1].findall("roddenrating"),
+                            root[_i + 2][1].findall("bdata"),
+                            root[_i + 2][2].findall("adb_link"),
+                            root[_i + 2][3].findall("categories")
+                        ):
                     _name = root[_i + 2][1][0].text
                     for _record_ in database:
                         if _name == _record_[1]:
@@ -1469,7 +1469,7 @@ def add_command(_record_):
     search_entry.delete("0", "end")
 
 
-def search_func(event, _search_entry):
+def search_func(_search_entry):
     master.update()
     save_record = ""
     count = 0
@@ -1488,7 +1488,7 @@ def search_func(event, _search_entry):
         add_button.grid_forget()
 
 
-def destroy_menu(event, _menu_):
+def destroy_menu(_menu_):
     if _menu_ is not None:
         _menu_.destroy()
 
@@ -1496,7 +1496,7 @@ def destroy_menu(event, _menu_):
 def button_3_on_entry(event):
     global search_menu
     if search_menu is not None:
-        destroy_menu(event, search_menu)
+        destroy_menu(search_menu)
     search_menu = tk.Menu(master=None, tearoff=False)
     search_menu.add_command(
         label="Copy", 
@@ -1525,13 +1525,13 @@ search_entry.bind(
     lambda event: select_range(event))
 search_entry.bind(
     "<Button-1>", 
-    lambda event: destroy_menu(event, search_menu))
+    lambda event: destroy_menu(search_menu))
 search_entry.bind(
     "<Button-3>", 
     lambda event: button_3_on_entry(event))
 search_entry.bind(
     "<KeyRelease>", 
-    lambda event: search_func(event, search_entry))
+    lambda event: search_func(search_entry))
 
 category_label = tk.Label(master=entry_button_frame, 
                           text="Categories:", fg="red")
@@ -1545,7 +1545,7 @@ rrating_label.grid(row=3, column=0, padx=5, pady=5, sticky="w")
 rating_or_category = None
 
 
-def on_frame_configure(event, tcanvas):
+def on_frame_configure(tcanvas):
     tcanvas.configure(scrollregion=tcanvas.bbox("all"))
 
 
@@ -1645,7 +1645,8 @@ def select_categories():
         tcanvas.create_window((4, 4), window=tframe, anchor="nw")
         tframe.bind(
             "<Configure>", 
-            lambda event: on_frame_configure(event, tcanvas))
+            lambda event: on_frame_configure(tcanvas)
+        )
         tbutton = tk.Button(master=button_frame, text="Apply")
         tbutton.pack()
         cvar_list = []
@@ -1997,7 +1998,7 @@ def button_3_open_chart(_treeview_):
         master.update()
 
 
-def destroy(event):
+def destroy():
     if menu is not None:
         menu.destroy()
 
@@ -2006,7 +2007,7 @@ def button_3_on_treeview(event):
     global menu, on_toplevel
     on_toplevel = False
     if menu is not None:
-        destroy(event)
+        destroy()
     menu = tk.Menu(master=None, tearoff=False)
     menu.add_command(
         label="Remove", 
@@ -2023,19 +2024,19 @@ def button_3_on_treeview(event):
     menu.post(event.x_root, event.y_root)
 
 
-def select_all_tree(event):
+def select_all_tree():
     children = treeview.get_children()
     treeview.selection_set(children)
 
 
-def delete_all_tree(event, _treeview_):
+def delete_all_tree(_treeview_):
     button_3_remove(_treeview_)
 
 
-treeview.bind("<Delete>", lambda event: delete_all_tree(event, treeview))
-treeview.bind("<Control-a>", lambda event: select_all_tree(event))
-treeview.bind("<Button-1>", lambda event: destroy(event))
-treeview.bind("<Button-3>", lambda event: button_3_on_treeview(event))
+treeview.bind("<Delete>", lambda event: delete_all_tree(treeview))
+treeview.bind("<Control-a>", lambda event: select_all_tree())
+treeview.bind("<Button-1>", lambda event: destroy())
+treeview.bind("<Button-3>", lambda event: button_3_on_treeview(event=event))
 
 display_button = tk.Button(master=top_frame, text="Display Records", 
                            command=display_results)
@@ -2252,9 +2253,14 @@ def write_title_of_total(sheet):
     sheet.write_merge(r1=0, r2=0, c1=3, c2=4, label="Adb Version:", 
                       style=style)
     style.font = _font_(bold=False)
-    sheet.write_merge(r1=0, r2=0, c1=5, c2=13, 
+    sheet.write_merge(
+        r1=0,
+        r2=0,
+        c1=5,
+        c2=13,
         label=f"{' / '.join(xml_files.values()).replace('.xml', '')}", 
-        style=style)
+        style=style
+    )
     write_title(sheet, 0, var_checkbutton_1, "Event")
     write_title(sheet, 1, var_checkbutton_2, "Human")
     write_title(sheet, 2, var_checkbutton_3, "Male")
@@ -2328,8 +2334,8 @@ def write_title_of_total(sheet):
         style.font = _font_(bold=False)
         sheet.write_merge(r1=3, r2=3, c1=5, c2=13, 
                           label=f"{r3[:-3]}", style=style)
-    elif selection == "chi-square" or selection == "effect-size" or \
-             selection == "cohens_d_effect":
+    elif selection == "chi-square" or selection == "effect-size" \
+            or selection == "cohens_d_effect":
         sheet.write_merge(r1=1, r2=1, c1=3, c2=4, 
                           label="House System:", style=style)
         style.font = _font_(bold=False)
@@ -3137,7 +3143,7 @@ def calculate(file_name_1, file_name_2, table_name, msg_title):
                                     new_sheet.write(
                                         *i[0], 
                                         (i[1] - j[1]) / ((
-                                            variance(row_1[1:]) + \
+                                            variance(row_1[1:]) +
                                             variance(row_2[1:])) / 2) ** 0.5, 
                                         style=style)
                                 elif isinstance(row_1[0], str) and \
@@ -3145,7 +3151,7 @@ def calculate(file_name_1, file_name_2, table_name, msg_title):
                                     new_sheet.write(
                                         *i[0], 
                                         (i[1] - j[1]) / ((
-                                            variance(row_1[2:]) + \
+                                            variance(row_1[2:]) +
                                             variance(row_2[2:])) / 2) ** 0.5, 
                                         style=style)
                             elif selection == "binomial_limit":
@@ -3478,7 +3484,7 @@ def export_lat_frequency():
 def year_frequency_command(parent, date_entries, years):
     min_, max_, step_ = date_entries[:]
     min_, max_, step_ = int(min_.get()), int(max_.get()), \
-                        int(step_.get())
+        int(step_.get())
     freq_frmt[0], freq_frmt[1], freq_frmt[2] = min_, max_, step_
     if len(displayed_results) > 0:
         with open(file="year-frequency.txt", mode="w",
@@ -3541,7 +3547,7 @@ def export_year_frequency():
     apply_button.grid(row=3, column=0, columnspan=3)
 
 
-def callback(event, url):
+def callback(url):
     webbrowser.open_new(url)
 
 
@@ -3568,8 +3574,8 @@ def from_local_to_utc(year, month, day, hour, minute,
     else:
         loc = location.split(", ")[0]
     return utc_time.year, utc_time.month, utc_time.day, \
-           utc_time.hour, utc_time.minute, utc_time.second, \
-           loc, location.split(", ")[-1]
+        utc_time.hour, utc_time.minute, utc_time.second, \
+        loc, location.split(", ")[-1]
 
 
 def julday(year, month, day, hour, minute, second):
@@ -3627,7 +3633,7 @@ def delete(lb):
 def button_3_on_listbox(event, lb):
     global listbox_menu
     if listbox_menu is not None:
-        destroy_menu(event, listbox_menu)
+        destroy_menu(listbox_menu)
     listbox_menu = tk.Menu(master=None, tearoff=False)
     listbox_menu.add_command(
         label="Remove", command=lambda: delete(lb))
@@ -3638,7 +3644,7 @@ def select_set(event):
     event.widget.select_set("0", "end")
 
 
-def delete_(event, lb):
+def delete_(lb):
     delete(lb)
 
 
@@ -3664,7 +3670,7 @@ def widget(_entries_, _listboxes_, _option_menu_, list_box,
             lambda event: select_range(event))
         cat_entry.bind(
             "<Button-1>",
-            lambda event: destroy_menu(event, search_menu))
+            lambda event: destroy_menu(search_menu))
         cat_entry.bind(
             "<Button-3>",
             lambda event: button_3_on_entry(event))
@@ -3676,13 +3682,13 @@ def widget(_entries_, _listboxes_, _option_menu_, list_box,
         listbox.pack(side="left")
         listbox.bind(
             "<Delete>",
-            lambda event: delete_(event, listbox))
+            lambda event: delete_(listbox))
         listbox.bind(
             "<Control-a>",
             lambda event: select_set(event))
         listbox.bind(
             "<Button-1>",
-            lambda event: destroy_menu(event, listbox_menu))
+            lambda event: destroy_menu(listbox_menu))
         listbox.bind(
             "<Button-3>",
             lambda event: button_3_on_listbox(event, listbox))
@@ -3721,7 +3727,7 @@ def widget(_entries_, _listboxes_, _option_menu_, list_box,
             lambda event: select_range(event))
         entry.bind(
             "<Button-1>",
-            lambda event: destroy_menu(event, search_menu))
+            lambda event: destroy_menu(search_menu))
         entry.bind(
             "<Button-3>",
             lambda event: button_3_on_entry(event))
@@ -3844,8 +3850,13 @@ def get_record_data(toplevel6, _treeview_, entries, option_menu,
                 utc_minute, utc_second, _place, country_ = \
                 from_local_to_utc(year, month, day, hour, minute,
                                   _latitude_, _longitude_)
-            jd = julday(int(utc_year), int(utc_month), int(utc_day), 
-                        int(utc_hour), int(utc_minute), int(utc_second)
+            jd = julday(
+                int(utc_year),
+                int(utc_month),
+                int(utc_day),
+                int(utc_hour),
+                int(utc_minute),
+                int(utc_second)
             )["JD"]
             latitude, longitude = "", ""
             if _latitude_ < 0:
@@ -3919,7 +3930,7 @@ def get_record_data(toplevel6, _treeview_, entries, option_menu,
                                     f"WHERE no = ?",
                                     (_record_data[j], no))
                         modify = _record_data[:10] + \
-                                 [_record_data[11]] + _record_data[13:]
+                            [_record_data[11]] + _record_data[13:]
                         for i in cursor.execute("SELECT * FROM DATA"):
                             if modify[0] == i[0]:
                                 modify[1] = i[1]
@@ -4084,7 +4095,7 @@ def button_3_on_treeview_(event, _treeview_):
     global menu, on_toplevel
     on_toplevel = True
     if menu is not None:
-        destroy(event)
+        destroy()
     menu = tk.Menu(master=None, tearoff=False)
     menu.add_command(
         label="Edit", command=lambda: edit_record(_treeview_))
@@ -4097,7 +4108,7 @@ def button_3_on_treeview_(event, _treeview_):
     menu.post(event.x_root, event.y_root)
 
 
-def search_record(event, search_entry_, _treeview_):
+def search_record(search_entry_, _treeview_):
     global edit_or_search
     master.update()
     for _record_ in database:
@@ -4150,10 +4161,10 @@ def edit_and_delete():
         lambda event: button_3_on_treeview_(event, _treeview_))
     _treeview_.bind(
         "<Button-1>",
-        lambda event: destroy(event))
+        lambda event: destroy())
     search_entry_.bind(
         "<KeyRelease>",
-        lambda event: search_record(event, search_entry_, _treeview_))
+        lambda event: search_record(search_entry_, _treeview_))
     master.update()
        
 
@@ -4195,7 +4206,7 @@ def about():
             url1 = "https://github.com/dildeolupbiten/TkAstroDb"
             tlabel_info_2.bind(
                 "<Button-1>",
-                lambda event: callback(event, url1))
+                lambda event: callback(url1))
         elif j == _contact:
             tlabel_info_2 = tk.Label(master=tframe2, text=j,
                                      font="Arial 12", fg="blue",
@@ -4203,7 +4214,7 @@ def about():
             url2 = "mailto://tckutlu@gmail.com"
             tlabel_info_2.bind(
                 "<Button-1>",
-                lambda event: callback(event, url2))
+                lambda event: callback(url2))
         else:
             tlabel_info_2 = tk.Label(master=tframe2, text=j,
                                      font="Arial 12")
