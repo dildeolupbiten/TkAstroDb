@@ -75,7 +75,7 @@ class About(tk.Toplevel):
                 )
                 if j == self.contact:
                     url = "mailto://tckutlu@gmail.com"
-                elif j == self.github:
+                else:
                     url = self.github
                 info.bind(
                     "<Button-1>",
