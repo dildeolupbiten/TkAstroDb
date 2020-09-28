@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from .constants import SIGNS
 from .messagebox import MsgBox
-from .constants import PLANETS, SIGNS
 from .modules import (
     dt, os, json, time, Popen, ImageTk, urlopen, URLError, ConfigParser
 )
@@ -94,13 +94,6 @@ def load_defaults():
             "BiQuintile": 2,
             "Quincunx": 2,
             "Opposite": 6
-        }
-        config["PLANETS"] = {
-            "selected":
-                ", ".join(
-                    planet
-                    for planet in PLANETS
-                )
         }
         config["DATABASE"] = {"selected": "None"}
         config["METHOD"] = {"selected": "Subcategory"}
