@@ -73,25 +73,33 @@ def find_observed_values(widget, icons):
         f"ORB_{'_'.join(config['ORB FACTORS'].values())}",
         config["HOUSE SYSTEM"]["selected"]
     )
-    if info["Event"] == "1" and info["Human"] == "0":
-        if info["Male"] == "1" and info["Female"] == "0":
+    if info["Event"] == "False" and info["Human"] == "True":
+        if info["Male"] == "False" and info["Female"] == "True":
             path = os.path.join(path, "Female")
-        elif info["Male"] == "0" and info["Female"] == "1":
+        elif info["Male"] == "True" and info["Female"] == "False":
             path = os.path.join(path, "Male")
         else:
             path = os.path.join(path, "Human")
-    elif info["Event"] == "0" and info["Human"] == "1":
+    elif info["Event"] == "True" and info["Human"] == "False":
         path = os.path.join(path, "Event")
     else:
-        if info["Male"] == "1" and info["Female"] == "0":
+        if info["Male"] == "False" and info["Female"] == "True":
             path = os.path.join(path, "Event+Female")
-        elif info["Male"] == "0" and info["Female"] == "1":
+        elif info["Male"] == "True" and info["Female"] == "False":
             path = os.path.join(path, "Event+Male")
         else:
             path = os.path.join(path, "Event+Human")
-    if info["South Hemisphere"] == "1" and info["North Hemisphere"] == "0":
+    if (
+            info["South Hemisphere"] == "False" 
+            and 
+            info["North Hemisphere"] == "True"
+    ):
         path = os.path.join(path, "North")
-    elif info["South Hemisphere"] == "0" and info["North Hemisphere"] == "1":
+    elif (
+            info["South Hemisphere"] == "True" 
+            and 
+            info["North Hemisphere"] == "False"
+    ):
         path = os.path.join(path, "South")
     else:
         path = path
