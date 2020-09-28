@@ -599,6 +599,22 @@ def select_detailed(
     
     
 def select_calculation(icons, calculation_type, input1, input2, output):
+    if not os.path.exists(input1):
+        MsgBox(
+            icons=icons,
+            title="Warning",
+            level="warning",
+            message=f"{input1} is not found."
+        )
+        return
+    if not os.path.exists(input2):
+        MsgBox(
+            icons=icons,
+            title="Warning",
+            level="warning",
+            message=f"{input2} is not found."
+        )
+        return
     x = get_values(filename=input1)
     y = get_values(filename=input2)
     x_info = x[-1]
