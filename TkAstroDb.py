@@ -3164,6 +3164,7 @@ def calculate(file_name_1, file_name_2, table_name, msg_title):
                                 p2 = 100 - probability_mass_function(
                                     n=n, k=k - 1, p=p
                                 )
+                                print(n)
                                 if p1 < p2:
                                     new_sheet.write(*i[0], -p1, style=style)
                                 elif p2 < p1:

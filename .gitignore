@@ -1,3 +1,9 @@
-Categories
+Database
+venv
+.idea
 *.xml
+*.db
+*.json
+*.xlsx
+*.log
 
