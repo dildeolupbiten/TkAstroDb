@@ -1,4 +1,5 @@
 Database
+__pychache__
 venv
 .idea
 *.xml
