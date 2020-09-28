@@ -437,48 +437,51 @@ class DatabaseFrame(tk.Frame):
             event.set("0")
             human = tk.StringVar()
             human.set("0")
-        for key, value in self.all_categories.items():
-            if key[1] in self.selected_categories:
-                for item in value:
-                    if item[3] in self.selected_ratings:
-                        if item in self.displayed_results:
-                            pass
-                        else:
-                            if (
-                                    event.get() == "0"
-                                    and
-                                    human.get() == "0"
-                            ):
-                                if item[0] == 3546 or item[0] == 68092:
-                                    pass
-                                else:
-                                    self.male_female_check(item)
-                            elif (
-                                    event.get() == "1"
-                                    and
-                                    human.get() == "0"
-                            ):
-                                if item[2] == "N/A":
-                                    pass
-                                elif item[0] == 3546:
-                                    pass
-                                else:
-                                    self.male_female_check(item)
-                            elif (
-                                    event.get() == "0"
-                                    and
-                                    human.get() == "1"
-                            ):
-                                if item[2] != "N/A" or item[0] == 68092:
-                                    pass
-                                else:
-                                    self.south_north_check(item)
-                            elif (
-                                    event.get() == "1"
-                                    and
-                                    human.get() == "1"
-                            ):
+        try:
+            for key, value in self.all_categories.items():
+                if key[1] in self.selected_categories:
+                    for item in value:
+                        if item[3] in self.selected_ratings:
+                            if item in self.displayed_results:
                                 pass
+                            else:
+                                if (
+                                        event.get() == "0"
+                                        and
+                                        human.get() == "0"
+                                ):
+                                    if item[0] == 3546 or item[0] == 68092:
+                                        pass
+                                    else:
+                                        self.male_female_check(item)
+                                elif (
+                                        event.get() == "1"
+                                        and
+                                        human.get() == "0"
+                                ):
+                                    if item[2] == "N/A":
+                                        pass
+                                    elif item[0] == 3546:
+                                        pass
+                                    else:
+                                        self.male_female_check(item)
+                                elif (
+                                        event.get() == "0"
+                                        and
+                                        human.get() == "1"
+                                ):
+                                    if item[2] != "N/A" or item[0] == 68092:
+                                        pass
+                                    else:
+                                        self.south_north_check(item)
+                                elif (
+                                        event.get() == "1"
+                                        and
+                                        human.get() == "1"
+                                ):
+                                    pass
+        except tk.TclError:
+            return
         self.info_var.set(len(self.displayed_results))
         self.update()
         if len(self.displayed_results) == 0:
