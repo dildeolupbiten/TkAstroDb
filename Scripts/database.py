@@ -653,7 +653,8 @@ class DatabaseFrame(tk.Frame):
                 values = self.treeview.item(selected)["values"]
             except tk.TclError:
                 return
-            open_new(values[11])
+            if values[11] != "None":
+                open_new(values[11])
 
     def button_3_on_treeview(self, event):
         self.destroy_menu(self.treeview_menu)
