@@ -600,7 +600,14 @@ def select_detailed(
                     d1[key][k][_k] = 0
     
     
-def select_calculation(icons, calculation_type, input1, input2, output, widget):
+def select_calculation(
+        icons, 
+        calculation_type, 
+        input1, 
+        input2, 
+        output, 
+        widget
+):
     if not os.path.exists(input1):
         MsgBox(
             icons=icons,
@@ -621,8 +628,10 @@ def select_calculation(icons, calculation_type, input1, input2, output, widget):
     y = get_values(filename=input2)
     x_info = x[-1]
     y_info = y[-1]
-    for k in x_info:
-        x_info[k] = x_info[k] + " & " + y_info[k]
+    if calculation_type in ["expected", "binomial limit"]:
+        for k in x_info:
+            x_info[k] = x_info[k] + " & " + y_info[k]
+    
     config = ConfigParser()
     config.read("defaults.ini")
     method = config["METHOD"]["selected"]
