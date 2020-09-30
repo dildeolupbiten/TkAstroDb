@@ -47,7 +47,8 @@ class Menu(tk.Menu):
                     calculation_type="expected",
                     input1="observed_values.xlsx",
                     input2="control_group.xlsx",
-                    output="expected_values.xlsx"
+                    output="expected_values.xlsx",
+                    widget=self.master
                 )
             ).start()
         )
@@ -59,7 +60,8 @@ class Menu(tk.Menu):
                     calculation_type="chi-square",
                     input1="observed_values.xlsx",
                     input2="expected_values.xlsx",
-                    output="chi-square.xlsx"
+                    output="chi-square.xlsx",
+                    widget=self.master
                 )
             ).start()
         )
@@ -71,7 +73,8 @@ class Menu(tk.Menu):
                     calculation_type="effect-size",
                     input1="observed_values.xlsx",
                     input2="expected_values.xlsx",
-                    output="effect-size.xlsx"
+                    output="effect-size.xlsx",
+                    widget=self.master
                 )
             ).start()
         )
@@ -83,7 +86,8 @@ class Menu(tk.Menu):
                     calculation_type="cohen's d",
                     input1="observed_values.xlsx",
                     input2="expected_values.xlsx",
-                    output="cohens_d_effect.xlsx"
+                    output="cohens_d_effect.xlsx",
+                    widget=self.master
                 )
             ).start()
         )
@@ -95,7 +99,8 @@ class Menu(tk.Menu):
                     calculation_type="binomial limit",
                     input1="observed_values.xlsx",
                     input2="control_group.xlsx",
-                    output="binomial_limit.xlsx"
+                    output="binomial_limit.xlsx",
+                    widget=self.master
                 )
             ).start()
         )

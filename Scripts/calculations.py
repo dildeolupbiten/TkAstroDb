@@ -600,7 +600,7 @@ def select_detailed(
                     d1[key][k][_k] = 0
     
     
-def select_calculation(icons, calculation_type, input1, input2, output):
+def select_calculation(icons, calculation_type, input1, input2, output, widget):
     if not os.path.exists(input1):
         MsgBox(
             icons=icons,
