@@ -297,11 +297,14 @@ def find_observed_values(widget, icons):
         src=os.path.join(os.getcwd(), "output.log"),
         dst=os.path.join(path, "output.log")
     )
-    MsgBox(
-        icons=icons,
-        title="Info",
-        level="info",
-        message="Calculation process is completed!"
+    widget.after(
+        0, 
+        lambda: MsgBox(
+            icons=icons,
+            title="Info",
+            level="info",
+            message="Calculation process is completed!"
+        )
     )
 
 
@@ -668,9 +671,13 @@ def select_calculation(icons, calculation_type, input1, input2, output):
         traditional_rulership=x[9],
         modern_rulership=x[10]
     )
-    MsgBox(
-        icons=icons,
-        title="Info",
-        level="info",
-        message="Calculation process is completed!"
+    widget.after(
+        0, 
+        lambda: MsgBox(
+            icons=icons,
+            title="Info",
+            level="info",
+            message="Calculation process is completed!"
+        )
     )
+
