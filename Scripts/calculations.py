@@ -631,7 +631,8 @@ def select_calculation(
     if calculation_type in ["expected", "binomial limit"]:
         for k in x_info:
             x_info[k] = x_info[k] + " & " + y_info[k]
-    
+    else:
+        x_info = y_info
     config = ConfigParser()
     config.read("defaults.ini")
     method = config["METHOD"]["selected"]
