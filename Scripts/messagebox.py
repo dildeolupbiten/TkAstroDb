@@ -36,5 +36,5 @@ class MsgBox(tk.Toplevel):
         )
         self.button.pack(side="bottom")
         self.msgbox.append(self)
-        self.update()
         self.wait_window()
+        

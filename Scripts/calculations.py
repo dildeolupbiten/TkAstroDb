@@ -297,7 +297,6 @@ def find_observed_values(widget, icons):
         src=os.path.join(os.getcwd(), "output.log"),
         dst=os.path.join(path, "output.log")
     )
-    widget.update()
     MsgBox(
         icons=icons,
         title="Info",
