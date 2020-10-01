@@ -4,7 +4,7 @@ from .messagebox import MsgBox
 from .treeview import Treeview
 from .selection import SingleSelection
 from .utilities import tbutton_command, check_all_command
-from .modules import os, tk, ET, json, open_new, logging, ConfigParser
+from .modules import os, tk, ET, json, open_new, logging, ConfigParser, Thread
 
 
 class Database:
@@ -16,6 +16,20 @@ class Database:
         self.all_categories = {}
         self.category_names = []
         self.choose_operation(root=root)
+        
+    def load_database(self, root, filename):
+        if filename.endswith(".xml"):
+            self.load_adb(filename=filename)
+        else:
+            self.load_json(filename=filename)
+        DatabaseFrame(
+            master=root,
+            database=self.database,
+            all_categories=self.all_categories,
+            category_names=self.category_names,
+            icons=self.icons,
+            mode=self.mode
+        )
 
     def choose_operation(self, root):
         if not os.path.exists("Database"):
@@ -31,18 +45,8 @@ class Database:
             config.read("defaults.ini")
             filename = config["DATABASE"]["selected"]
             filename = os.path.join(".", "Database", filename)
-            if filename.endswith(".xml"):
-                self.load_adb(filename=filename)
-            else:
-                self.load_json(filename=filename)
-            DatabaseFrame(
-                master=root,
-                database=self.database,
-                all_categories=self.all_categories,
-                category_names=self.category_names,
-                icons=self.icons,
-                mode=self.mode
-            )
+            Thread(target=lambda: self.load_database(root, filename)).start()
+
 
     def load_adb(self, filename):
         self.mode = "adb"
