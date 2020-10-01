@@ -4,7 +4,9 @@ from .messagebox import MsgBox
 from .treeview import Treeview
 from .selection import SingleSelection
 from .utilities import tbutton_command, check_all_command
-from .modules import os, tk, ET, json, open_new, logging, ConfigParser, Thread
+from .modules import (
+    os, tk, ET, json, open_new, logging, ConfigParser, Thread
+)
 
 
 class Database:
@@ -46,7 +48,6 @@ class Database:
             filename = config["DATABASE"]["selected"]
             filename = os.path.join(".", "Database", filename)
             Thread(target=lambda: self.load_database(root, filename)).start()
-
 
     def load_adb(self, filename):
         self.mode = "adb"

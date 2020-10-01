@@ -4,7 +4,6 @@ from .about import About
 from .database import Database
 from .modules import tk, Thread
 from .orb_factor import OrbFactor
-from .utilities import check_update
 from .constants import HOUSE_SYSTEMS
 from .selection import SingleSelection
 from .calculations import find_observed_values, select_calculation
@@ -146,8 +145,4 @@ class Menu(tk.Menu):
         self.help_menu.add_command(
             label="About",
             command=About
-        )
-        self.help_menu.add_command(
-            label="Check for Updates",
-            command=lambda: check_update(icons=icons)
         )

@@ -5,10 +5,12 @@ from .modules import tk, logging
 from .utilities import create_image_files, load_defaults
 
 logging.basicConfig(
+    filename="log.log",
     format="- %(levelname)s - %(asctime)s - %(message)s",
     level=logging.INFO,
     datefmt="%d.%m.%Y %H:%M:%S"
 )
+logging.info("Session started")
 
 
 def main():
