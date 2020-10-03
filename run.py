@@ -23,7 +23,7 @@ def call(p, n):
     
 
 if os.name == "posix":
-    packages += ["pyswisseph"]
+    packages += ["pyswisseph==2.0.0.post2"]
 elif os.name == "nt":
     if "pyswisseph" not in installed_packages:
         path = os.path.join(".", "Eph", "Whl")
