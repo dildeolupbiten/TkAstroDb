@@ -45,8 +45,12 @@ elif os.name == "nt":
                 call(p=path, n=5)
 
 for package in packages:
-    if package not in installed_packages:
-        os.system(f"{sys.executable} -m pip install {package}")
+    if package.startswith("pyswisseph"):
+        if "pyswisseph" not in installed_packages:
+            os.system(f"{sys.executable} -m pip install {package}")
+    else:
+        if package not in installed_packages:
+            os.system(f"{sys.executable} -m pip install {package}")
            
 if __name__ == "__main__":
     import Scripts
