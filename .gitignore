@@ -7,4 +7,5 @@ venv
 *.json
 *.xlsx
 *.log
+*.ini
 
