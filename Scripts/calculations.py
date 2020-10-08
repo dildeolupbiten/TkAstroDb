@@ -5,14 +5,14 @@ from .messagebox import MsgBox
 from .spreadsheet import Spreadsheet
 from .utilities import convert_coordinates, progressbar
 from .modules import (
-    os, dt, pd, tk, ttk, time, binom, shutil, variance, ConfigParser
+    os, dt, pd, tk, ttk, time, binom, shutil, Thread, variance, ConfigParser
 )
 from .constants import (
     HOUSE_SYSTEMS, PLANETS, SIGNS, TRADITIONAL_RULERSHIP, MODERN_RULERSHIP
 )
 
 
-def find_observed_values(widget, icons):
+def find_observed_values(widget, icons, menu):
     displayed_results = []
     selected_categories = []
     selected_ratings = []
@@ -186,6 +186,7 @@ def find_observed_values(widget, icons):
         f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| Process started.\n\n"
     )
     log.flush()
+    menu.entryconfigure(0, command=lambda: None)
     for i in displayed_results:
         if mode == "adb":
             jd = float(i[6])
@@ -305,6 +306,16 @@ def find_observed_values(widget, icons):
             level="info",
             message="Calculation process is completed!"
         )
+    )
+    menu.entryconfigure(
+        0,
+        command=lambda: Thread(
+            target=lambda: find_observed_values(
+                widget=widget,
+                icons=icons,
+                menu=menu
+            )
+        ).start()
     )
 
 
@@ -690,4 +701,3 @@ def select_calculation(
             message="Calculation process is completed!"
         )
     )
-

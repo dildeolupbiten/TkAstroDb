@@ -34,7 +34,8 @@ class Menu(tk.Menu):
             command=lambda: Thread(
                 target=lambda: find_observed_values(
                     widget=self.master,
-                    icons=icons
+                    icons=icons,
+                    menu=self.calculations_menu
                 )
             ).start()
         )
