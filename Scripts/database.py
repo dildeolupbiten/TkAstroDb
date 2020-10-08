@@ -113,7 +113,10 @@ class Database:
         logging.info(f"Started grouping categories.")
         self.all_categories = {}
         if self.mode == "adb":
-            index = -1
+            if self.database[0][-1].startswith("Type"):
+                index = -3
+            else:
+                index = -1
         else:
             index = -3
         for record in self.database:
@@ -136,38 +139,47 @@ class Database:
         self.mode = "normal"
         logging.info(f"Parsing {filename} file...")
         with open(filename, encoding="utf-8") as file:
-            database = json.load(file)
-        count = 1
-        for key, value in database.items():
-            if not value["Categories"]:
-                cat = "None"
-                if cat not in self.category_dict.values():
-                    self.category_dict[count] = cat
-                    count += 1
-            else:
-                for cat in value["Categories"]:
+            self.database = json.load(file)
+        self.category_dict = {}
+        if not isinstance(self.database, dict):
+            self.mode = "adb"
+            for record in self.database:
+                for cate in record[-3]:
+                    if cate[0] not in self.category_dict:
+                        self.category_dict[cate[0]] = cate[1]
+        else:
+            self.mode = "normal"
+            count = 1
+            for key, value in self.database.items():
+                if not value["Categories"]:
+                    cat = "None"
                     if cat not in self.category_dict.values():
                         self.category_dict[count] = cat
                         count += 1
-        r = {v: k for k, v in self.category_dict.items()}
-        db = []
-        for key, value in database.items():
-            if value["Categories"]:
-                cate = [[r[cat], cat] for cat in value["Categories"]]
-            else:
-                cate = [[r["None"], "None"]]
-            info = [
-                v for k, v in value.items()
-                if k not in [
-                    "Access Time", "Update Time", "Categories"
+                else:
+                    for cat in value["Categories"]:
+                        if cat not in self.category_dict.values():
+                            self.category_dict[count] = cat
+                            count += 1
+            r = {v: k for k, v in self.category_dict.items()}
+            db = []
+            for key, value in self.database.items():
+                if value["Categories"]:
+                    cate = [[r[cat], cat] for cat in value["Categories"]]
+                else:
+                    cate = [[r["None"], "None"]]
+                info = [
+                    v for k, v in value.items()
+                    if k not in [
+                        "Access Time", "Update Time", "Categories"
+                    ]
                 ]
-            ]
-            record = [key] + \
-                info + \
-                [cate] + \
-                [value["Access Time"], value["Update Time"]]
-            db.append(record)
-        self.database = db
+                record = [key] + \
+                    info + \
+                    [cate] + \
+                    [value["Access Time"], value["Update Time"]]
+                db.append(record)
+            self.database = db
         logging.info("Completed parsing.")
         logging.info(f"{len(self.database)} records are available.")
         self.group_categories()
