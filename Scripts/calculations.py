@@ -12,6 +12,15 @@ from .constants import (
 )
 
 
+def send_warning_message(icons):
+    MsgBox(
+        title="Warning",
+        level="warning",
+        message="You can't run many processes \nat the same time.",
+        icons=icons
+    )
+
+
 def find_observed_values(widget, icons, menu):
     displayed_results = []
     selected_categories = []
@@ -186,7 +195,7 @@ def find_observed_values(widget, icons, menu):
         f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| Process started.\n\n"
     )
     log.flush()
-    menu.entryconfigure(0, command=lambda: None)
+    menu.entryconfigure(0, command=lambda: send_warning_message(icons=icons))
     for i in displayed_results:
         if mode == "adb":
             jd = float(i[6])
@@ -612,8 +621,8 @@ def select_detailed(
     
     
 def select_calculation(
-        icons, 
-        calculation_type, 
+        icons,
+        calculation_type,
         input1, 
         input2, 
         output, 
