@@ -2,10 +2,11 @@
 
 from .messagebox import MsgBox
 from .treeview import Treeview
+from .search import SearchFrame
 from .selection import SingleSelection
-from .utilities import tbutton_command, check_all_command
+from .utilities import tbutton_command, check_all_command, load_database
 from .modules import (
-    os, tk, ET, json, open_new, logging, ConfigParser, Thread
+    os, tk, ET, open_new, logging, ConfigParser, Thread
 )
 
 
@@ -26,6 +27,7 @@ class Database:
             self.load_json(filename=filename)
         DatabaseFrame(
             master=root,
+            filename=filename,
             database=self.database,
             all_categories=self.all_categories,
             category_names=self.category_names,
@@ -138,8 +140,7 @@ class Database:
             return
         self.mode = "normal"
         logging.info(f"Parsing {filename} file...")
-        with open(filename, encoding="utf-8") as file:
-            self.database = json.load(file)
+        self.database = load_database(filename=filename)
         self.category_dict = {}
         if not isinstance(self.database, dict):
             self.mode = "adb"
@@ -148,6 +149,11 @@ class Database:
                     if cate[0] not in self.category_dict:
                         self.category_dict[cate[0]] = cate[1]
         else:
+            self.database = {
+                key: {k: v for k, v in value.items() if k != "Notes"}
+                for index, (key, value) in enumerate(self.database.items())
+                if index > 1
+            }
             self.mode = "normal"
             count = 1
             for key, value in self.database.items():
@@ -254,61 +260,42 @@ class DatabaseFrame(tk.Frame):
         )
         self.entry_button_frame = tk.Frame(master=self.topframe)
         self.entry_button_frame.grid(row=0, column=0)
-        self.search_label = tk.Label(
+        self.search = SearchFrame(
             master=self.entry_button_frame,
-            text="Search A Record By Name: ",
-            fg="red"
+            treeview=self.treeview,
+            database=self.database,
+            displayed_results=self.displayed_results,
+            info_var=self.info_var
         )
-        self.search_label.grid(row=0, column=0, padx=5, sticky="w", pady=5)
-        self.search_entry = tk.Entry(master=self.entry_button_frame)
-        self.search_entry.grid(row=0, column=1, padx=5, pady=5)
-        self.search_entry.bind(
-            sequence="<KeyRelease>",
-            func=lambda event: self.search_func()
-        )
-        self.search_entry.bind(
-            sequence="<Button-1>",
-            func=lambda event: self.destroy_menu(self.entry_menu))
-        self.search_entry.bind(
-            sequence="<Button-3>",
-            func=self.button_3_on_entry
-        )
-        self.search_entry.bind(
-            sequence="<Control-KeyRelease-a>",
-            func=lambda event: self.search_entry.select_range("0", "end")
-        )
-        self.found_record = tk.Label(master=self.entry_button_frame, text="")
-        self.found_record.grid(row=1, column=0, padx=5, pady=5)
-        self.add_button = tk.Button(master=self.entry_button_frame, text="Add")
         self.category_label = tk.Label(
             master=self.entry_button_frame,
             text="Categories:",
             fg="red"
         )
-        self.category_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+        self.category_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
         self.rrating_label = tk.Label(
             master=self.entry_button_frame,
             text="Rodden Rating:",
             fg="red"
         )
-        self.rrating_label.grid(row=3, column=0, padx=5, pady=5, sticky="w")
+        self.rrating_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
         self.category_button = tk.Button(
             master=self.entry_button_frame,
             text="Select",
             command=self.select_categories
         )
-        self.category_button.grid(row=2, column=1, padx=5, pady=5)
+        self.category_button.grid(row=1, column=1, padx=5, pady=5)
         self.rating_button = tk.Button(
             master=self.entry_button_frame,
             text="Select",
             command=self.select_ratings
         )
-        self.rating_button.grid(row=3, column=1, padx=5, pady=5)
+        self.rating_button.grid(row=2, column=1, padx=5, pady=5)
         self.create_checkbutton()
         self.display_button = tk.Button(
             master=self.topframe,
             text="Display Records",
-            command=self.display_results
+            command=self.display_results,
         )
         self.display_button.grid(row=10, column=0, columnspan=4, pady=10)
         self.total_msgbox_info = tk.Label(
@@ -323,42 +310,9 @@ class DatabaseFrame(tk.Frame):
         self.msgbox_info.grid(row=0, column=1)
         self.widgets.append(self)
 
-    def add_command(self, record):
-        if record in self.displayed_results:
-            pass
-        else:
-            num = len(self.treeview.get_children()) + 1
-            self.treeview.insert("", num, values=[col for col in record])
-            self.displayed_results.append(record)
-            self.info_var.set(len(self.displayed_results))
-        self.add_button.grid_forget()
-        self.found_record.configure(text="")
-        self.search_entry.delete("0", "end")
-
-    def search_func(self):
-        self.update()
-        save_record = ""
-        count = 0
-        for record in self.database:
-            if self.search_entry.get() == record[1]:
-                index = self.database.index(record)
-                count += 1
-                self.found_record.configure(text=f"Record Found = {count}")
-                self.add_button.grid(row=1, column=1, padx=5, pady=5)
-                self.add_button.configure(
-                    command=lambda: self.add_command(
-                        record=self.database[index]
-                    )
-                )
-                save_record += self.database[index][1]
-        if save_record != self.search_entry.get() or \
-                save_record == self.search_entry.get() == "":
-            self.found_record.configure(text="")
-            self.add_button.grid_forget()
-
     def create_checkbutton(self):
-        check_frame = tk.Frame(master=self.topframe)
-        check_frame.grid(row=0, column=2)
+        check_frame = tk.Frame(master=self.entry_button_frame)
+        check_frame.grid(row=1, column=2, pady=10, rowspan=2)
         if self.mode == "adb":
             names = (
                 "event",

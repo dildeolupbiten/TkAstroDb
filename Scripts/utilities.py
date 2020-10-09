@@ -1,7 +1,20 @@
 # -*- coding: utf-8 -*-
 
 from .constants import SIGNS
-from .modules import dt, os, time, PhotoImage, ConfigParser
+from .modules import dt, os, json, time, PhotoImage, ConfigParser
+
+
+def load_database(filename, i=0):
+    with open(filename, encoding="utf-8") as f:
+        data = json.load(f)
+        if isinstance(data, dict):
+            return {
+                k: v
+                for index, (k, v) in enumerate(data.items())
+                if index >= i
+            }
+        else:
+            return data
 
 
 def create_image_files(path):
@@ -140,3 +153,17 @@ def progressbar(s, r, n, pframe, pbar, plabel, pstring):
         pframe.destroy()
         pbar.destroy()
         plabel.destroy()
+
+
+def key_value(key, value):
+    v1 = [key]
+    v2 = [
+        v for k, v in value.items()
+        if k not in ["Categories", "Notes", "Access Time", "Update Time"]
+    ]
+    v3 = [
+        {i: j for i, j in enumerate(value["Categories"], 1)}
+        if value["Categories"] else None
+    ]
+    v4 = [value["Access Time"], value["Update Time"]]
+    return v1 + v2 + v3 + v4

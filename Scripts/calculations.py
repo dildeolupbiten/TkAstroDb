@@ -44,14 +44,15 @@ def find_observed_values(widget, icons, menu):
             selected_categories = selected_categories[0]\
                 .replace(" : ", "/").replace(" ", "_")
     else:
-        MsgBox(
-            title="Warning",
-            level="warning",
-            icons=icons,
-            message="Select a category and a rotten rating."
-        )
+        if len(displayed_results) == 1:
+            selected_categories = displayed_results[0][1]\
+                .replace(", ", "_-_")
+        else:
+            selected_categories = "Special"
     if selected_ratings:
         selected_ratings = "+".join(selected_ratings)
+    else:
+        selected_ratings = "None"
     config = ConfigParser()
     config.read("defaults.ini")
     if "event" in checkbuttons:
