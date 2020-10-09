@@ -27,7 +27,6 @@ class Database:
             self.load_json(filename=filename)
         DatabaseFrame(
             master=root,
-            filename=filename,
             database=self.database,
             all_categories=self.all_categories,
             category_names=self.category_names,
