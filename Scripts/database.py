@@ -113,10 +113,10 @@ class Database:
         logging.info(f"Started grouping categories.")
         self.all_categories = {}
         if self.mode == "adb":
-            if self.database[0][-1].startswith("Type"):
-                index = -3
-            else:
+            if isinstance(self.database[0][-1], list):
                 index = -1
+            else:
+                index = -3
         else:
             index = -3
         for record in self.database:
