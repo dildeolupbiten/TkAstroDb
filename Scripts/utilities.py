@@ -189,6 +189,7 @@ def check_update(icons):
             icons=icons
         )
         return
+    update = False
     for i in scripts:
         try:
             file = urlopen(i["download_url"]).read().decode()
