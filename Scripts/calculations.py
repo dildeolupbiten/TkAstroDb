@@ -250,14 +250,16 @@ def find_observed_values(widget, icons, menu):
             lord_traditional = TRADITIONAL_RULERSHIP[h[1]]
             lord_modern = MODERN_RULERSHIP[h[1]]
             for p in patterns[0]:
-                if lord_traditional[:-4] == p[0]:
-                    traditional_rulership[
-                        f"Lord-{index}"
-                    ][lord_traditional][p[3]] += 1
-                if lord_modern[:-4] == p[0]:
-                    modern_rulership[
-                        f"Lord-{index}"
-                    ][lord_modern][p[3]] += 1
+                for lord, rulership in [
+                        [lord_traditional, traditional_rulership],
+                        [lord_modern, modern_rulership]
+                ]:
+                    select_rulership(
+                        lord=lord,
+                        rulership=rulership,
+                        p=p,
+                        index=index
+                    )
         received += 1
         progressbar(
             s=size,
@@ -327,6 +329,13 @@ def find_observed_values(widget, icons, menu):
             )
         ).start()
     )
+
+
+def select_rulership(lord, rulership, index, p):
+    if lord[:-4] == p[0]:
+        rulership[
+            f"Lord-{index}"
+        ][lord][p[3]] += 1
 
 
 def get_total_of_rulership(constant, rulership, total):
