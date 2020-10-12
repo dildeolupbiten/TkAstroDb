@@ -6,7 +6,7 @@ from .search import SearchFrame
 from .selection import SingleSelection
 from .utilities import tbutton_command, check_all_command, load_database
 from .modules import (
-    os, tk, ET, open_new, logging, ConfigParser, Thread
+    os, tk, ET, ttk, open_new, logging, ConfigParser, Thread
 )
 
 
@@ -215,9 +215,11 @@ class DatabaseFrame(tk.Frame):
         self.displayed_results = []
         self.selected_categories = []
         self.selected_ratings = []
+        self.found_categories = []
         self.checkbuttons = {}
         self.treeview_menu = None
         self.entry_menu = None
+        self.pressed_return = 0
         self.info_var = tk.StringVar()
         self.info_var.set("0")
         self.topframe = tk.Frame(master=self)
@@ -538,69 +540,93 @@ class DatabaseFrame(tk.Frame):
         toplevel.title("Select Categories")
         toplevel.resizable(width=False, height=False)
         toplevel.update()
-        canvas_frame = tk.Frame(master=toplevel)
-        canvas_frame.pack(side="top")
-        button_frame = tk.Frame(master=toplevel)
-        button_frame.pack(side="bottom")
-        tcanvas = tk.Canvas(master=canvas_frame)
-        tframe = tk.Frame(master=tcanvas)
-        tscrollbar = tk.Scrollbar(
-            master=canvas_frame,
-            orient="vertical",
-            command=tcanvas.yview
+        label = tk.Label(
+            master=toplevel,
+            text="Search a category",
+            font="Default 9 bold"
         )
-        tcanvas.configure(yscrollcommand=tscrollbar.set)
-        tscrollbar.pack(side="right", fill="y")
-        tcanvas.pack()
-        tcanvas.create_window((4, 4), window=tframe, anchor="nw")
-        tframe.bind(
-            "<Configure>",
-            lambda event: tcanvas.configure(
-                scrollregion=tcanvas.bbox("all")
+        label.pack()
+        entry = ttk.Entry(master=toplevel)
+        entry.pack()
+        entry.bind(
+            sequence="<KeyRelease>",
+            func=lambda event: self.search_category(
+                event=event,
+                treeview=treeview
             )
         )
-        tbutton = tk.Button(master=button_frame, text="Apply")
-        tbutton.pack()
-        cvar_list = []
-        checkbutton_list = []
-        check_all = tk.BooleanVar()
-        check_uncheck_ = tk.Checkbutton(
-            master=tframe,
-            text="Check/Uncheck All",
-            variable=check_all
+        entry.bind(
+            sequence="<Return>",
+            func=lambda event: self.goto_next_category(
+                treeview=treeview,
+                event=event
+            )
         )
-        check_all.set(False)
-        check_uncheck_.grid(row=0, column=0, sticky="nw")
-        for num, category in enumerate(self.category_names, 1):
-            try:
-                self.update()
-                cvar = tk.BooleanVar()
-                cvar_list.append([cvar, category])
-                checkbutton = tk.Checkbutton(
-                    master=tframe,
-                    text=category,
-                    variable=cvar
+        frame = tk.Frame(master=toplevel)
+        frame.pack()
+        treeview = Treeview(
+            master=frame,
+            columns=["Categories"],
+            width=400,
+            anchor="w"
+        )
+        treeview.pack()
+        for index, i in enumerate(self.category_names):
+            treeview.insert(
+                index=index,
+                parent="",
+                values=i.replace(" ", "\ ")
+            )
+        button = tk.Button(
+            master=toplevel,
+            text="Apply",
+            command=lambda: self.apply_selection(
+                treeview=treeview,
+                toplevel=toplevel
+            )
+        )
+        button.pack()
+
+    def goto_next_category(self, event, treeview):
+        if event.widget.get():
+            if self.pressed_return + 1 == len(self.found_categories):
+                self.pressed_return = 0
+            else:
+                self.pressed_return += 1
+            key = self.found_categories[self.pressed_return]
+            treeview.yview_moveto(
+                key / len(treeview.get_children())
+            )
+
+    def search_category(self, event, treeview):
+        if event.widget.get().lower() and event.keysym != "Return":
+            self.pressed_return = 0
+            self.found_categories = [
+                i for i, j in enumerate(treeview.get_children())
+                if (
+                        event.widget.get().lower()
+                        in
+                        treeview.item(j)["values"][0].lower()
                 )
-                checkbutton_list.append(checkbutton)
-                cvar.set(False)
-                checkbutton.grid(row=num, column=0, sticky="nw")
+            ]
+            for i in self.found_categories:
+                treeview.yview_moveto(
+                    i / len(treeview.get_children())
+                )
+                break
+
+    def apply_selection(self, treeview, toplevel):
+        selected = treeview.selection()
+        if not selected:
+            pass
+        else:
+            try:
+                for i in selected:
+                    values = treeview.item(i)["values"]
+                    self.selected_categories += values
+                toplevel.destroy()
             except tk.TclError:
                 return
-        tbutton.configure(
-            command=lambda: tbutton_command(
-                cvar_list,
-                toplevel,
-                self.selected_categories
-            )
-        )
-        check_uncheck_.configure(
-            command=lambda: check_all_command(
-                check_all,
-                cvar_list,
-                checkbutton_list
-            )
-        )
-        self.update()
 
     def button_3_remove(self):
         selected = self.treeview.selection()
