@@ -244,7 +244,8 @@ class DatabaseFrame(tk.Frame):
         self.treeview = Treeview(
             master=self.midframe,
             columns=self.columns,
-            height=5
+            height=5,
+            x_scrollbar=True
         )
         self.treeview.bind(
             sequence="<Button-1>",
