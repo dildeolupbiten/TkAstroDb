@@ -217,6 +217,7 @@ class DatabaseFrame(tk.Frame):
         self.selected_ratings = []
         self.found_categories = []
         self.checkbuttons = {}
+        self.category_menu = None
         self.treeview_menu = None
         self.entry_menu = None
         self.pressed_return = 0
@@ -536,16 +537,17 @@ class DatabaseFrame(tk.Frame):
 
     def select_categories(self):
         self.selected_categories = []
+        added = []
         toplevel = tk.Toplevel()
         toplevel.title("Select Categories")
         toplevel.resizable(width=False, height=False)
         toplevel.update()
-        label = tk.Label(
+        search_label = tk.Label(
             master=toplevel,
             text="Search a category",
             font="Default 9 bold"
         )
-        label.pack()
+        search_label.pack()
         entry = ttk.Entry(master=toplevel)
         entry.pack()
         entry.bind(
@@ -575,17 +577,74 @@ class DatabaseFrame(tk.Frame):
             treeview.insert(
                 index=index,
                 parent="",
-                values=i.replace(" ", "\ ")
+                values=i.replace(" ", "\ "),
+                tag=index
             )
+        var = tk.StringVar()
+        var.set("Selected = 0")
+        info_label = tk.Label(
+            master=toplevel,
+            textvariable=var
+        )
+        info_label.pack()
+        treeview.bind(
+            sequence="<Button-3>",
+            func=lambda event: self.button_3_on_cat_treeview(
+                event=event,
+                var=var,
+                added=added
+            )
+        )
+        treeview.bind(
+            sequence="<Button-1>",
+            func=lambda event: self.destroy_menu(menu=self.category_menu)
+        )
         button = tk.Button(
             master=toplevel,
             text="Apply",
             command=lambda: self.apply_selection(
-                treeview=treeview,
+                added=added,
                 toplevel=toplevel
             )
         )
-        button.pack()
+        button.pack(side="bottom")
+
+    @staticmethod
+    def change_status_of_selected(var, added, widget, mode):
+        selection = widget.selection()
+        for i in selection:
+            item = widget.item(i)["values"][0]
+            tag = widget.item(i)["tags"][0]
+            if mode == "add" and item not in added:
+                widget.tag_configure(tag, foreground="red")
+                added.append(item)
+            elif mode == "remove" and item in added:
+                widget.tag_configure(tag, foreground="black")
+                added.remove(item)
+        var.set(f"Selected = {len(added)}")
+
+    def button_3_on_cat_treeview(self, event, var, added):
+        self.destroy_menu(self.category_menu)
+        self.category_menu = tk.Menu(master=None, tearoff=False)
+        self.category_menu.add_command(
+            label="Add",
+            command=lambda: self.change_status_of_selected(
+                var=var,
+                added=added,
+                widget=event.widget,
+                mode="add"
+            )
+        )
+        self.category_menu.post(event.x_root, event.y_root)
+        self.category_menu.add_command(
+            label="Remove",
+            command=lambda: self.change_status_of_selected(
+                var=var,
+                added=added,
+                widget=event.widget,
+                mode="remove"
+            )
+        )
 
     def goto_next_category(self, event, treeview):
         if event.widget.get():
@@ -593,40 +652,34 @@ class DatabaseFrame(tk.Frame):
                 self.pressed_return = 0
             else:
                 self.pressed_return += 1
-            key = self.found_categories[self.pressed_return]
+            key = list(self.found_categories)[self.pressed_return]
+            value = self.found_categories[key]
             treeview.yview_moveto(
                 key / len(treeview.get_children())
             )
+            treeview.selection_set(value)
 
     def search_category(self, event, treeview):
         if event.widget.get().lower() and event.keysym != "Return":
             self.pressed_return = 0
-            self.found_categories = [
-                i for i, j in enumerate(treeview.get_children())
+            self.found_categories = {
+                i: j for i, j in enumerate(treeview.get_children())
                 if (
                         event.widget.get().lower()
                         in
                         treeview.item(j)["values"][0].lower()
                 )
-            ]
-            for i in self.found_categories:
+            }
+            for i, j in self.found_categories.items():
                 treeview.yview_moveto(
                     i / len(treeview.get_children())
                 )
+                treeview.selection_set(j)
                 break
 
-    def apply_selection(self, treeview, toplevel):
-        selected = treeview.selection()
-        if not selected:
-            pass
-        else:
-            try:
-                for i in selected:
-                    values = treeview.item(i)["values"]
-                    self.selected_categories += values
-                toplevel.destroy()
-            except tk.TclError:
-                return
+    def apply_selection(self, added, toplevel):
+        self.selected_categories = added
+        toplevel.destroy()
 
     def button_3_remove(self):
         selected = self.treeview.selection()
