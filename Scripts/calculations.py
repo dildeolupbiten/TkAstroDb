@@ -21,6 +21,32 @@ def send_warning_message(icons):
     )
 
 
+def create_normal_dict(lists, keys):
+    return {
+        f"{keys[0]}{i}": create_normal_dict(lists=lists[1:], keys=keys[1:])
+        if len(lists[1:]) != 0 else 0
+        for i in lists[0]
+    }
+
+
+def create_enumerate_dict(lists, keys):
+    if len(lists) == 2:
+        return {
+            f"{keys[0]}{i}": {
+                f"{keys[1]}{j}": 0 for j in list(lists[1])[index:]
+            } for index, i in enumerate(lists[0], 1)
+        }
+    elif len(lists) == 3:
+        return {
+            f"{keys[0]}{i}": {
+                f"{keys[1]}{j}": {
+                    f"{keys[2]}{k}": 0
+                    for k in list(lists[2])[index:]
+                } for index, j in enumerate(lists[1], 1)
+            } for i in lists[0]
+        }
+
+
 def find_observed_values(widget, icons, menu):
     displayed_results = []
     selected_categories = []
@@ -113,62 +139,46 @@ def find_observed_values(widget, icons, menu):
         path = os.path.join(path, "South")
     else:
         path = path
-    planets_in_signs = {
-        planet: {sign: 0 for sign in SIGNS}
-        for planet in PLANETS
-    }
-    houses_in_signs = {
-        f"House-{i}": {sign: 0 for sign in SIGNS}
-        for i in range(1, 13)
-    }
-    planets_in_houses = {
-        planet: {f"House-{i}": 0 for i in range(1, 13)}
-        for planet in PLANETS
-    }
-    planets_in_houses_in_signs = {
-        planet: {
-            f"House-{i}": {sign: 0 for sign in SIGNS}
-            for i in range(1, 13)
-        }
-        for planet in PLANETS
-    }
-    aspects = {
-        aspect: {
-            planet: {
-                _planet: 0
-                for _planet in list(PLANETS)[index:]
-            } for index, planet in enumerate(PLANETS, 1)
-        } for aspect in list(config["ORB FACTORS"])
-    }
-    total_aspects = {
-        planet: {
-            _planet: 0 for _planet in list(PLANETS)[index:]
-        } for index, planet in enumerate(PLANETS, 1)
-    }
-    traditional_rulership = {
-        f"Lord-{j}": {
-            ruler: {
-                f"House-{i}": 0 for i in range(1, 13)
-            } for ruler in TRADITIONAL_RULERSHIP.values()
-        } for j in range(1, 13)
-    }
-    modern_rulership = {
-        f"Lord-{j}": {
-            ruler: {
-                f"House-{i}": 0 for i in range(1, 13)
-            } for ruler in MODERN_RULERSHIP.values()
-        } for j in range(1, 13)
-    }
-    total_traditional_rulership = {
-        f"Lord-{j}": {
-            f"House-{i}": 0 for i in range(1, 13)
-        } for j in range(1, 13)
-    }
-    total_modern_rulership = {
-        f"Lord-{j}": {
-            f"House-{i}": 0 for i in range(1, 13)
-        } for j in range(1, 13)
-    }
+    planets_in_signs = create_normal_dict(
+        lists=[PLANETS, SIGNS],
+        keys=["", ""]
+    )
+    houses_in_signs = create_normal_dict(
+        lists=[range(1, 13), SIGNS],
+        keys=["House-", ""]
+    )
+    planets_in_houses = create_normal_dict(
+        lists=[PLANETS, range(1, 13)],
+        keys=["", "House-"]
+    )
+    planets_in_houses_in_signs = create_normal_dict(
+        lists=[PLANETS, range(1, 13), SIGNS],
+        keys=["", "House-", ""]
+    )
+    aspects = create_enumerate_dict(
+        lists=[list(config["ORB FACTORS"]), PLANETS, PLANETS],
+        keys=["", "", ""],
+    )
+    total_aspects = create_enumerate_dict(
+        lists=[PLANETS, PLANETS],
+        keys=["", ""]
+    )
+    traditional_rulership = create_normal_dict(
+        lists=[range(1, 13), TRADITIONAL_RULERSHIP.values(), range(1, 13)],
+        keys=["Lord-", "", "House-"]
+    )
+    modern_rulership = create_normal_dict(
+        lists=[range(1, 13), MODERN_RULERSHIP.values(), range(1, 13)],
+        keys=["Lord-", "", "House-"]
+    )
+    total_traditional_rulership = create_normal_dict(
+        lists=[range(1, 13), range(1, 13)],
+        keys=["Lord-", "House-"]
+    )
+    total_modern_rulership = create_normal_dict(
+        lists=[range(1, 13), range(1, 13)],
+        keys=["Lord-", "House-"]
+    )
     size = len(displayed_results)
     received = 0
     now = time.time()
