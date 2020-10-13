@@ -55,27 +55,43 @@ class Zodiac:
             house = 0
             for i in range(12):
                 if i != 11:
-                    if hp[i] < planet[1] < hp[i + 1]:
+                    if (
+                            hp[i] < hp[i + 1]
+                            and
+                            hp[i] < planet[1] < hp[i + 1]
+                    ):
                         house = i + 1
                         break
-                    elif hp[i] < planet[1] > hp[i + 1] \
-                            and hp[i] - hp[i + 1] > 240:
+                    elif (
+                            hp[i] > hp[i + 1] 
+                            and 
+                            hp[i] < planet[1] > hp[i + 1]
+                    ):
                         house = i + 1
                         break
-                    elif hp[i] > planet[1] < hp[i + 1] \
-                            and hp[i] - hp[i + 1] > 240:
+                    elif (
+                            hp[i] > hp[i + 1] > planet[1] < hp[i]
+                    ):
                         house = i + 1
                         break
                 else:
-                    if hp[i] < planet[1] < hp[0]:
+                    if (
+                            hp[11] < hp[0]
+                            and
+                            hp[11] < planet[1] < hp[0]
+                    ):
                         house = i + 1
                         break
-                    elif hp[i] < planet[1] > hp[0] \
-                            and hp[i] - hp[0] > 240:
+                    elif (
+                            hp[11] > hp[0] 
+                            and 
+                            hp[11] < planet[1] > hp[0]
+                    ):
                         house = i + 1
                         break
-                    elif hp[i] > planet[1] < hp[0] \
-                            and hp[i] - hp[0] > 240:
+                    elif (
+                            hp[11] > hp[0] > planet[1] < hp[11]
+                    ):
                         house = i + 1
                         break
             planet_info = [

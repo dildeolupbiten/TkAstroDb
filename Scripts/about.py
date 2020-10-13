@@ -7,7 +7,7 @@ class About(tk.Toplevel):
     def __init__(self):
         super().__init__()
         self.resizable(width=False, height=False)
-        self.version = "2.1.2"
+        self.version = "2.1.3"
         self.name = "TkAstroDb"
         self.date_built = "21.12.2018"
         self.date_updated = "12.10.2020"
