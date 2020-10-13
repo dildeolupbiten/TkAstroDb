@@ -648,7 +648,7 @@ class DatabaseFrame(tk.Frame):
         )
 
     def goto_next_category(self, event, treeview):
-        if event.widget.get():
+        if event.widget.get() and self.found_categories:
             if self.pressed_return + 1 == len(self.found_categories):
                 self.pressed_return = 0
             else:
