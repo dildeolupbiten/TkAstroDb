@@ -10,7 +10,7 @@ class About(tk.Toplevel):
         self.version = "2.1.3"
         self.name = "TkAstroDb"
         self.date_built = "21.12.2018"
-        self.date_updated = "12.10.2020"
+        self.date_updated = "13.10.2020"
         self.thanks = "Alois Trendl, Flavia Alonzo, Sjoerd Visser"
         self.developed_by = "Tanberk Celalettin Kutlu"
         self.contact = "tckutlu@gmail.com"
