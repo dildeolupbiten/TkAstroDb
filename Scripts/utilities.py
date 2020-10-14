@@ -24,7 +24,6 @@ def load_database(filename, i=0):
 def create_image_files(path):
     return {
         i[:-4]: {
-            "path": os.path.join(os.getcwd(), path, i),
             "img": PhotoImage(
                 file=os.path.join(os.getcwd(), path, i)
             )
