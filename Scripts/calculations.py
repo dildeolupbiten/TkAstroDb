@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from .zodiac import Zodiac
-from .messagebox import MsgBox
 from .spreadsheet import Spreadsheet
+from .messagebox import MsgBox, ChoiceBox
 from .utilities import convert_coordinates, progressbar
 from .modules import (
     os, dt, pd, tk, ttk, time, binom, shutil, Thread, variance, ConfigParser
@@ -63,6 +63,7 @@ def find_observed_values(widget, icons, menu):
             break
     if not displayed_results:
         return
+    save_categories = [i for i in selected_categories]
     if selected_categories:
         if len(selected_categories) > 1:
             selected_categories = "Control_Group"
@@ -74,7 +75,7 @@ def find_observed_values(widget, icons, menu):
             selected_categories = displayed_results[0][1]\
                 .replace(", ", "_-_")
         else:
-            selected_categories = "Special"
+            selected_categories = "Gathered Manually"
     if selected_ratings:
         selected_ratings = "+".join(selected_ratings)
     else:
@@ -139,6 +140,33 @@ def find_observed_values(widget, icons, menu):
         path = os.path.join(path, "South")
     else:
         path = path
+    if os.path.exists(os.path.join(path, "observed_values.xlsx")):
+        msg = "The file already exists.\n Do you want to continue?\n" \
+              " If you press 'Yes', \nthe file will be overwritten. \n" \
+              "If you press 'Cancel',\n you will return to the main " \
+              "window. \nIt is recommended that you " \
+              "\nreconsider your choices."
+        choice = tk.StringVar()
+        choice.set("")
+        widget.after(
+            0,
+            lambda: ChoiceBox(
+                title="Warning",
+                level="warning",
+                message=msg,
+                icons=icons,
+                width=400,
+                height=200,
+                choice=choice,
+            )
+        )
+        while not choice.get():
+            time.sleep(1)
+            continue
+        if choice.get() == "1":
+            pass
+        else:
+            return
     planets_in_signs = create_normal_dict(
         lists=[PLANETS, SIGNS],
         keys=["", ""]
@@ -195,13 +223,26 @@ def find_observed_values(widget, icons, menu):
     pbar.pack(side="left")
     plabel.pack(side="left")
     log = open("output.log", "w", encoding="utf-8")
-    log.write(
-        f"Database: {info['Database']}\n"
-        f"House System: {info['House System']}\n"
-        f"Rodden Rating: {info['Rodden Rating']}\n"
-        f"Orb Factor: {'_'.join(config['ORB FACTORS'].values())}\n"
-        f"Category: {info['Category']}\n\n"
-    )
+    if selected_categories != "Control_Group":
+        log.write(
+            f"Database: {info['Database']}\n"
+            f"House System: {info['House System']}\n"
+            f"Rodden Rating: {info['Rodden Rating']}\n"
+            f"Orb Factor: {'_'.join(config['ORB FACTORS'].values())}\n"
+            f"Category: {info['Category']}\n\n"
+        )
+    else:
+        log.write(
+            f"Database: {info['Database']}\n"
+            f"House System: {info['House System']}\n"
+            f"Rodden Rating: {info['Rodden Rating']}\n"
+            f"Orb Factor: {'_'.join(config['ORB FACTORS'].values())}\n"
+            f"Category: {info['Category']}\n"
+            f"Selected Categories:\n"
+        )        
+        for index, i in enumerate(save_categories, 1):
+            log.write(f"\t{index}. {i}\n".expandtabs(20))
+        log.write("\n")
     log.write(
         f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| Process started.\n\n"
     )
