@@ -13,7 +13,7 @@ installed_packages = [
     ).split()
 ]
 
-packages = ["numpy", "scipy", "pandas", "XlsxWriter"]
+packages = ["numpy", "scipy", "pandas", "XlsxWriter", "xlrd"]
 
 
 def call(p, n):
