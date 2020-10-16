@@ -171,6 +171,21 @@ def find_observed_values(widget, icons, menu):
             ).start()
         else:
             return
+    else:
+        Thread(
+            target=lambda: start_calculation(
+                displayed_results=displayed_results,
+                info=info,
+                config=config,
+                widget=widget,
+                icons=icons,
+                path=path,
+                selected_categories=selected_categories,
+                mode=mode,
+                menu=menu,
+                save_categories=save_categories
+            )
+        ).start()
 
 
 def start_calculation(
