@@ -57,7 +57,6 @@ class ChoiceBox(MsgBox):
             wait=False, 
             width=350, 
             height=100,
-            choice=None,
             *args,
             **kwargs
     ):
@@ -68,23 +67,24 @@ class ChoiceBox(MsgBox):
             *args, 
             **kwargs
         )
-        self.button["command"] = lambda: self.ok(choice)
+        self.choice = False
+        self.button["command"] = self.ok
         self.button["width"] = 7
         self.button.pack_forget()
         self.button.pack(side="left", padx=10)
         self.cancel_button = tk.Button(
             master=self.button_frame,
             text="Cancel",
-            command=lambda: self.cancel(choice),
+            command=self.cancel,
             width=7
         )
         self.cancel_button.pack(side="right", padx=10)
         self.wait_window()
 
-    def ok(self, choice):
-        choice.set("1")
+    def ok(self):
+        self.choice = True
         self.destroy()
 
-    def cancel(self, choice):
-        choice.set("0")
+    def cancel(self):
+        self.choice = False
         self.destroy()

@@ -32,13 +32,11 @@ class Menu(tk.Menu):
         self.add_cascade(label="Help", menu=self.help_menu)
         self.calculations_menu.add_command(
             label="Find Observed Values",
-            command=lambda: Thread(
-                target=lambda: find_observed_values(
+            command=lambda: find_observed_values(
                     widget=self.master,
                     icons=icons,
                     menu=self.calculations_menu
-                )
-            ).start()
+            )
         )
         self.calculations_menu.add_command(
             label="Find Expected Values",

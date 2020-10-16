@@ -146,27 +146,45 @@ def find_observed_values(widget, icons, menu):
               "If you press 'Cancel',\n you will return to the main " \
               "window. \nIt is recommended that you " \
               "\nreconsider your choices."
-        choice = tk.StringVar()
-        choice.set("")
-        widget.after(
-            0,
-            lambda: ChoiceBox(
-                title="Warning",
-                level="warning",
-                message=msg,
-                icons=icons,
-                width=400,
-                height=200,
-                choice=choice,
-            )
+        choicebox = ChoiceBox(
+            title="Warning",
+            level="warning",
+            message=msg,
+            icons=icons,
+            width=400,
+            height=200,
         )
-        while not choice.get():
-            time.sleep(1)
-            continue
-        if choice.get() == "1":
-            pass
+        if choicebox.choice:
+            Thread(
+                target=lambda: start_calculation(
+                    displayed_results=displayed_results,
+                    info=info,
+                    config=config,
+                    widget=widget,
+                    icons=icons,
+                    path=path,
+                    selected_categories=selected_categories,
+                    mode=mode,
+                    menu=menu,
+                    save_categories=save_categories
+                )
+            ).start()
         else:
             return
+
+
+def start_calculation(
+        displayed_results,
+        info,
+        config,
+        widget,
+        icons,
+        path,
+        selected_categories,
+        mode,
+        menu,
+        save_categories
+):
     planets_in_signs = create_normal_dict(
         lists=[PLANETS, SIGNS],
         keys=["", ""]
