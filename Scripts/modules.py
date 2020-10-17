@@ -11,7 +11,6 @@ import tkinter as tk
 import swisseph as swe
 import xml.etree.ElementTree as ET
 
-from signal import SIGKILL
 from subprocess import Popen
 from threading import Thread
 from scipy.stats import binom
