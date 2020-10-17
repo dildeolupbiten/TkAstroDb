@@ -53,6 +53,15 @@ for package in packages:
     if package.startswith("pyswisseph"):
         if "pyswisseph" not in installed_packages:
             os.system(f"{sys.executable} -m pip install {package}")
+    elif package.startswith("numpy"):
+        if package not in installed_packages:
+            os.system(f"{sys.executable} -m pip install {package}==1.19.2")
+    elif package.startswith("scipy"):
+        if package not in installed_packages:
+            os.system(f"{sys.executable} -m pip install {package}==1.4.1")
+    elif package.startswith("pandas"):
+        if package not in installed_packages:
+            os.system(f"{sys.executable} -m pip install {package}==1.1.2")
     else:
         if package not in installed_packages:
             os.system(f"{sys.executable} -m pip install {package}")
