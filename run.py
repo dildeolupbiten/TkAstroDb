@@ -13,7 +13,7 @@ installed_packages = [
     ).split()
 ]
 
-packages = ["numpy", "scipy", "pandas", "XlsxWriter", "xlrd"]
+packages = ["numpy==1.19.2", "scipy==1.4.1", "pandas==1.1.2", "XlsxWriter", "xlrd"]
 
 
 def call(p, n):
@@ -43,6 +43,11 @@ elif os.name == "nt":
                 call(p=path, n=4)
             elif platform.architecture()[0] == "64bit":
                 call(p=path, n=5)
+        elif sys.version_info.minor == 9:
+            if platform.architecture()[0] == "32bit":
+                call(p=path, n=6)
+            elif platform.architecture()[0] == "64bit":
+                call(p=path, n=7)
 
 for package in packages:
     if package.startswith("pyswisseph"):
