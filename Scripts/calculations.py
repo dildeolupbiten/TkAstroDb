@@ -285,7 +285,7 @@ def start_calculation(
     log.flush()
     menu.entryconfigure(0, command=lambda: send_warning_message(icons=icons))
     for i in displayed_results:
-        if mode == "adb":
+        if mode in ["adb_xml", "adb_json"]:
             jd = float(i[6])
             lat = convert_coordinates(i[7])
             lon = convert_coordinates(i[8])
@@ -301,6 +301,7 @@ def start_calculation(
                 hsys=HOUSE_SYSTEMS[config["HOUSE SYSTEM"]["selected"]]
             ).patterns()
         except BaseException as err:
+            print(jd, lat, lon)
             log.write(
                 f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| "
                 f"Error Type: '{err}'\n"
