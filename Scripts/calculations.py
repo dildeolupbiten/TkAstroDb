@@ -301,7 +301,6 @@ def start_calculation(
                 hsys=HOUSE_SYSTEMS[config["HOUSE SYSTEM"]["selected"]]
             ).patterns()
         except BaseException as err:
-            print(jd, lat, lon)
             log.write(
                 f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| "
                 f"Error Type: '{err}'\n"

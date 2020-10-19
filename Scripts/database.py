@@ -115,7 +115,7 @@ class Database:
         self.all_categories = {}
         if self.mode == "adb_xml":
             index = -1
-        elif self.mode in ["adb_json", "normal"]:
+        else:
             index = -3
         for record in self.database:
             for category in record[index]:
