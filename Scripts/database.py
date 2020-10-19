@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .messagebox import MsgBox
 from .treeview import Treeview
 from .search import SearchFrame
 from .selection import SingleSelection
+from .messagebox import MsgBox, ChoiceBox
 from .utilities import tbutton_command, check_all_command, load_database
 from .modules import (
     os, tk, ET, ttk, open_new, logging, ConfigParser, Thread
@@ -396,6 +396,23 @@ class DatabaseFrame(tk.Frame):
         self.update()
 
     def display_results(self):
+        if self.treeview.get_children():
+            msg = "There are records in treeview.\n" \
+                  "Are you sure you want to insert \nthe records?\n" \
+                  "If you press 'OK', \nthe records in treeview would be\n" \
+                  "deleted."
+            choicebox = ChoiceBox(
+                title="Warning",
+                level="warning",
+                message=msg,
+                icons=self.icons,
+                width=400,
+                height=200,
+            )
+            if choicebox.choice:
+                pass
+            else:
+                return
         self.treeview.delete(*self.treeview.get_children())
         self.displayed_results = []
         if self.mode in ["adb_xml", "adb_json"]:
