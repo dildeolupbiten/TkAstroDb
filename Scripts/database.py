@@ -635,7 +635,6 @@ class DatabaseFrame(tk.Frame):
                 mode="add"
             )
         )
-        self.category_menu.post(event.x_root, event.y_root)
         self.category_menu.add_command(
             label="Remove",
             command=lambda: self.change_status_of_selected(
@@ -645,6 +644,7 @@ class DatabaseFrame(tk.Frame):
                 mode="remove"
             )
         )
+        self.category_menu.post(event.x_root, event.y_root)
 
     def goto_next_category(self, event, treeview):
         if event.widget.get() and self.found_categories:
