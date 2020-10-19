@@ -9,7 +9,6 @@ class SearchFrame(tk.Frame):
             self,
             database,
             treeview,
-            displayed_results,
             info_var,
             *args,
             **kwargs
@@ -31,7 +30,6 @@ class SearchFrame(tk.Frame):
             master=self.frame,
             text="Add",
             command=lambda: self.command(
-                displayed_results=displayed_results,
                 info_var=info_var
             )
         )
@@ -64,7 +62,7 @@ class SearchFrame(tk.Frame):
                 added = True
         return added
 
-    def command(self, displayed_results, info_var):
+    def command(self, info_var):
         if not self.is_added():
             if isinstance(self.found[self.id], dict):
                 values = key_value(key=self.id, value=self.found[self.id])
@@ -75,8 +73,7 @@ class SearchFrame(tk.Frame):
                 parent="",
                 values=values
             )
-            displayed_results.append(values)
-            info_var.set(len(displayed_results))
+            info_var.set(len(self.treeview.get_children()))
             self.button.pack_forget()
 
     def change_item(self):

@@ -51,7 +51,7 @@ class Database:
             Thread(target=lambda: self.load_database(root, filename)).start()
 
     def load_adb(self, filename):
-        self.mode = "adb"
+        self.mode = "adb_xml"
         self.database = []
         self.category_dict = {}
         logging.info(f"Parsing {filename} file...")
@@ -142,7 +142,7 @@ class Database:
         self.database = load_database(filename=filename)
         self.category_dict = {}
         if not isinstance(self.database, dict):
-            self.mode = "adb"
+            self.mode = "adb_json"
             for record in self.database:
                 for cate in record[-3]:
                     if cate[0] not in self.category_dict:
@@ -229,7 +229,7 @@ class DatabaseFrame(tk.Frame):
         self.midframe.pack()
         self.bottomframe = tk.Frame(master=self)
         self.bottomframe.pack()
-        if self.mode == "adb":
+        if self.mode in ["adb_xml", "adb_json"]:
             self.columns = [
                 "Adb ID", "Name", "Gender", "Rodden Rating", "Date",
                 "Hour", "Julian Date", "Latitude", "Longitude", "Place",
@@ -267,7 +267,6 @@ class DatabaseFrame(tk.Frame):
             master=self.entry_button_frame,
             treeview=self.treeview,
             database=self.database,
-            displayed_results=self.displayed_results,
             info_var=self.info_var
         )
         self.category_label = tk.Label(
@@ -316,7 +315,7 @@ class DatabaseFrame(tk.Frame):
     def create_checkbutton(self):
         check_frame = tk.Frame(master=self.entry_button_frame)
         check_frame.grid(row=1, column=2, pady=10, rowspan=2)
-        if self.mode == "adb":
+        if self.mode in ["adb_xml", "adb_json"]:
             names = (
                 "event",
                 "human",
@@ -403,7 +402,7 @@ class DatabaseFrame(tk.Frame):
     def display_results(self):
         self.treeview.delete(*self.treeview.get_children())
         self.displayed_results = []
-        if self.mode == "adb":
+        if self.mode in ["adb_xml", "adb_json"]:
             event = self.checkbuttons["event"][0]
             human = self.checkbuttons["human"][0]
         else:
@@ -692,7 +691,7 @@ class DatabaseFrame(tk.Frame):
                     if j[0] == self.treeview.item(i)["values"][0]:
                         self.displayed_results.remove(j)
                 self.treeview.delete(i)
-            self.info_var.set(len(self.displayed_results))
+            self.info_var.set(len(self.treeview.get_children()))
 
     def button_3_open_url(self):
         selected = self.treeview.selection()
@@ -709,7 +708,7 @@ class DatabaseFrame(tk.Frame):
     def button_3_on_treeview(self, event):
         self.destroy_menu(self.treeview_menu)
         self.treeview_menu = tk.Menu(master=None, tearoff=False)
-        if self.mode == "adb":
+        if self.mode in ["adb_xml", "adb_json"]:
             label = "Open ADB Page"
         else:
             label = "Open Wikipedia Page"
