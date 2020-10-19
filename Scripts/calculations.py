@@ -145,7 +145,7 @@ def find_observed_values(widget, icons, menu):
         path = path
     if os.path.exists(os.path.join(path, "observed_values.xlsx")):
         msg = "The file already exists.\n Do you want to continue?\n" \
-              " If you press 'Yes', \nthe file will be overwritten. \n" \
+              " If you press 'OK', \nthe file will be overwritten. \n" \
               "If you press 'Cancel',\n you will return to the main " \
               "window. \nIt is recommended that you " \
               "\nreconsider your choices."
