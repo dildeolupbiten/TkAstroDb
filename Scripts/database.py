@@ -113,12 +113,9 @@ class Database:
     def group_categories(self):
         logging.info(f"Started grouping categories.")
         self.all_categories = {}
-        if self.mode == "adb":
-            if isinstance(self.database[0][-1], list):
-                index = -1
-            else:
-                index = -3
-        else:
+        if self.mode == "adb_xml":
+            index = -1
+        elif self.mode in ["adb_json", "normal"]:
             index = -3
         for record in self.database:
             for category in record[index]:
@@ -137,7 +134,6 @@ class Database:
     def load_json(self, filename):
         if filename == "./Database/None":
             return
-        self.mode = "normal"
         logging.info(f"Parsing {filename} file...")
         self.database = load_database(filename=filename)
         self.category_dict = {}
