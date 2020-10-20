@@ -662,7 +662,7 @@ class DatabaseFrame(tk.Frame):
         toplevel.update()
         main_frame = tk.Frame(master=toplevel)
         main_frame.pack()
-        left_frame = tk.Frame(master=main_frame, bd=1, relief="sunken")
+        left_frame = tk.Frame(master=main_frame)
         left_frame.pack(side="left")
         left_label = tk.Label(
             master=left_frame,
@@ -670,7 +670,7 @@ class DatabaseFrame(tk.Frame):
             font="Default 12 bold"
         )
         left_label.pack()
-        right_frame = tk.Frame(master=main_frame, bd=1, relief="sunken")
+        right_frame = tk.Frame(master=main_frame)
         right_frame.pack(side="right")
         right_label = tk.Label(
             master=right_frame,
