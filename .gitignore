@@ -8,4 +8,4 @@ venv
 *.xlsx
 *.log
 *.ini
-
+*.txt

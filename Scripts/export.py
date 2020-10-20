@@ -9,7 +9,7 @@ def export_link(widget, icons):
     displayed_results = []
     mode = ""
     for i in widget.winfo_children():
-        if hasattr(i, "displayed_results"):
+        if hasattr(i, "included"):
             displayed_results += [
                 i.treeview.item(j)["values"]
                 for j in i.treeview.get_children()
@@ -42,7 +42,7 @@ def export_lat_frequency(widget, icons):
     displayed_results = []
     mode = ""
     for i in widget.winfo_children():
-        if hasattr(i, "displayed_results"):
+        if hasattr(i, "included"):
             displayed_results += [
                 i.treeview.item(j)["values"]
                 for j in i.treeview.get_children()
@@ -107,7 +107,7 @@ def export_lat_frequency(widget, icons):
 def export_year_frequency(widget, icons):
     displayed_results = []
     for i in widget.winfo_children():
-        if hasattr(i, "displayed_results"):
+        if hasattr(i, "included"):
             displayed_results += [
                 i.treeview.item(j)["values"]
                 for j in i.treeview.get_children()

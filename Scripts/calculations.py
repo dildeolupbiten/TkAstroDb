@@ -50,17 +50,19 @@ def create_enumerate_dict(lists, keys):
 def find_observed_values(widget, icons, menu):
     displayed_results = []
     selected_categories = []
+    ignored_categories = []
     selected_ratings = []
     checkbuttons = {}
     mode = ""
     for i in widget.winfo_children():
-        if hasattr(i, "displayed_results"):
+        if hasattr(i, "included"):
             mode += i.mode
             displayed_results += [
                 i.treeview.item(j)["values"]
                 for j in i.treeview.get_children()
             ]
-            selected_categories += i.selected_categories
+            selected_categories += i.included
+            ignored_categories += i.ignored
             selected_ratings += i.selected_ratings
             checkbuttons.update(i.checkbuttons)
             break
@@ -167,6 +169,7 @@ def find_observed_values(widget, icons, menu):
                     icons=icons,
                     path=path,
                     selected_categories=selected_categories,
+                    ignored_categories=ignored_categories,
                     mode=mode,
                     menu=menu,
                     save_categories=save_categories
@@ -184,6 +187,7 @@ def find_observed_values(widget, icons, menu):
                 icons=icons,
                 path=path,
                 selected_categories=selected_categories,
+                ignored_categories=ignored_categories,
                 mode=mode,
                 menu=menu,
                 save_categories=save_categories
@@ -199,6 +203,7 @@ def start_calculation(
         icons,
         path,
         selected_categories,
+        ignored_categories,
         mode,
         menu,
         save_categories
@@ -265,7 +270,7 @@ def start_calculation(
             f"House System: {info['House System']}\n"
             f"Rodden Rating: {info['Rodden Rating']}\n"
             f"Orb Factor: {'_'.join(config['ORB FACTORS'].values())}\n"
-            f"Category: {info['Category']}\n\n"
+            f"Category: {info['Category']}\n"
         )
     else:
         log.write(
@@ -278,7 +283,10 @@ def start_calculation(
         )        
         for index, i in enumerate(save_categories, 1):
             log.write(f"\t{index}. {i}\n".expandtabs(20))
-        log.write("\n")
+    log.write("Ignored:\n")
+    for index, i in enumerate(ignored_categories, 1):
+        log.write(f"\t{index}. {i}\n".expandtabs(20))
+    log.write("\n")
     log.write(
         f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| Process started.\n\n"
     )

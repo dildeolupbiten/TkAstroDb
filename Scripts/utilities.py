@@ -53,6 +53,7 @@ def load_defaults():
         }
         config["DATABASE"] = {"selected": "None"}
         config["METHOD"] = {"selected": "Subcategory"}
+        config["CATEGORY SELECTION"] = {"selected": "Basic"}
         config.write(f)
 
 

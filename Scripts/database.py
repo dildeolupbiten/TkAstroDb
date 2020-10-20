@@ -209,7 +209,8 @@ class DatabaseFrame(tk.Frame):
         self.icons = icons
         self.mode = mode
         self.displayed_results = []
-        self.selected_categories = []
+        self.included = []
+        self.ignored = []
         self.selected_ratings = []
         self.found_categories = []
         self.checkbuttons = {}
@@ -423,10 +424,21 @@ class DatabaseFrame(tk.Frame):
             event.set("0")
             human = tk.StringVar()
             human.set("0")
+        if self.mode in ["adb_xml"]:
+            index = -1
+        else:
+            index = -3
         try:
             for key, value in self.all_categories.items():
-                if key[1] in self.selected_categories:
+                if key[1] in self.included:
                     for item in value:
+                        ignore = False
+                        for j in item[index]:
+                            if j[1] in self.ignored:
+                                ignore = True
+                                break
+                        if ignore:
+                            continue
                         if item[3] in self.selected_ratings:
                             if item in self.displayed_results:
                                 pass
@@ -548,20 +560,14 @@ class DatabaseFrame(tk.Frame):
             )
         )
 
-    def select_categories(self):
-        self.selected_categories = []
-        added = []
-        toplevel = tk.Toplevel()
-        toplevel.title("Select Categories")
-        toplevel.resizable(width=False, height=False)
-        toplevel.update()
+    def category_widgets(self, master, container, columns):
         search_label = tk.Label(
-            master=toplevel,
+            master=master,
             text="Search a category",
             font="Default 9 bold"
         )
         search_label.pack()
-        entry = ttk.Entry(master=toplevel)
+        entry = ttk.Entry(master=master)
         entry.pack()
         entry.bind(
             sequence="<KeyRelease>",
@@ -577,11 +583,11 @@ class DatabaseFrame(tk.Frame):
                 event=event
             )
         )
-        frame = tk.Frame(master=toplevel)
+        frame = tk.Frame(master=master)
         frame.pack()
         treeview = Treeview(
             master=frame,
-            columns=["Categories"],
+            columns=columns,
             width=400,
             anchor="w"
         )
@@ -596,7 +602,7 @@ class DatabaseFrame(tk.Frame):
         var = tk.StringVar()
         var.set("Selected = 0")
         info_label = tk.Label(
-            master=toplevel,
+            master=master,
             textvariable=var
         )
         info_label.pack()
@@ -605,45 +611,105 @@ class DatabaseFrame(tk.Frame):
             func=lambda event: self.button_3_on_cat_treeview(
                 event=event,
                 var=var,
-                added=added
+                container=container
             )
         )
         treeview.bind(
             sequence="<Button-1>",
             func=lambda event: self.destroy_menu(menu=self.category_menu)
         )
+
+    def select_categories(self):
+        config = ConfigParser()
+        config.read("defaults.ini")
+        selection = config["CATEGORY SELECTION"]["selected"]
+        if selection == "Basic":
+            self.select_basic_categories()
+        elif selection == "Advanced":
+            self.select_advanced_categories()
+
+    def select_basic_categories(self):
+        self.included = []
+        self.ignored = []
+        included = []
+        toplevel = tk.Toplevel()
+        toplevel.title("Select Categories")
+        toplevel.resizable(width=False, height=False)
+        toplevel.update()
+        self.category_widgets(
+            master=toplevel,
+            container=included,
+            columns=["Include Categories"]
+        )
         button = tk.Button(
             master=toplevel,
             text="Apply",
             command=lambda: self.apply_selection(
-                added=added,
-                toplevel=toplevel
+                included=included,
+                ignored=[],
+                master=toplevel
+            )
+        )
+        button.pack(side="bottom")
+
+    def select_advanced_categories(self):
+        self.included = []
+        self.ignored = []
+        included = []
+        ignored = []
+        toplevel = tk.Toplevel()
+        toplevel.title("Select Categories")
+        toplevel.resizable(width=False, height=False)
+        toplevel.update()
+        main_frame = tk.Frame(master=toplevel)
+        main_frame.pack()
+        left_frame = tk.Frame(master=main_frame)
+        left_frame.pack(side="left")
+        right_frame = tk.Frame(master=main_frame)
+        right_frame.pack(side="right")
+        self.category_widgets(
+            master=left_frame,
+            container=included,
+            columns=["Include Categories"]
+        )
+        self.category_widgets(
+            master=right_frame,
+            container=ignored,
+            columns=["Ignore Categories"]
+        )
+        button = tk.Button(
+            master=toplevel,
+            text="Apply",
+            command=lambda: self.apply_selection(
+                included=included,
+                ignored=ignored,
+                master=toplevel
             )
         )
         button.pack(side="bottom")
 
     @staticmethod
-    def change_status_of_selected(var, added, widget, mode):
+    def change_status_of_selected(var, container, widget, mode):
         selection = widget.selection()
         for i in selection:
             item = widget.item(i)["values"][0]
             tag = widget.item(i)["tags"][0]
-            if mode == "add" and item not in added:
+            if mode == "add" and item not in container:
                 widget.tag_configure(tag, foreground="red")
-                added.append(item)
-            elif mode == "remove" and item in added:
+                container.append(item)
+            elif mode == "remove" and item in container:
                 widget.tag_configure(tag, foreground="black")
-                added.remove(item)
-        var.set(f"Selected = {len(added)}")
+                container.remove(item)
+        var.set(f"Selected = {len(container)}")
 
-    def button_3_on_cat_treeview(self, event, var, added):
+    def button_3_on_cat_treeview(self, event, var, container):
         self.destroy_menu(self.category_menu)
         self.category_menu = tk.Menu(master=None, tearoff=False)
         self.category_menu.add_command(
             label="Add",
             command=lambda: self.change_status_of_selected(
                 var=var,
-                added=added,
+                container=container,
                 widget=event.widget,
                 mode="add"
             )
@@ -652,7 +718,7 @@ class DatabaseFrame(tk.Frame):
             label="Remove",
             command=lambda: self.change_status_of_selected(
                 var=var,
-                added=added,
+                container=container,
                 widget=event.widget,
                 mode="remove"
             )
@@ -690,9 +756,10 @@ class DatabaseFrame(tk.Frame):
                 treeview.selection_set(j)
                 break
 
-    def apply_selection(self, added, toplevel):
-        self.selected_categories = added
-        toplevel.destroy()
+    def apply_selection(self, included, ignored, master):
+        self.included = included
+        self.ignored = ignored
+        master.destroy()
 
     def button_3_remove(self):
         selected = self.treeview.selection()

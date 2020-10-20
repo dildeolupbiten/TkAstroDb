@@ -125,6 +125,13 @@ class Menu(tk.Menu):
             )
         )
         self.options_menu.add_command(
+            label="Category Selection",
+            command=lambda: SingleSelection(
+                title="Category Selection",
+                catalogue=["Basic", "Advanced"]
+            )
+        )
+        self.options_menu.add_command(
             label="House System",
             command=lambda: SingleSelection(
                 title="House System",
