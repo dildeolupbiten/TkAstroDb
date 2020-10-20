@@ -560,7 +560,7 @@ class DatabaseFrame(tk.Frame):
             )
         )
 
-    def category_widgets(self, master, container, columns):
+    def category_widgets(self, master, container):
         search_label = tk.Label(
             master=master,
             text="Search a category",
@@ -587,7 +587,7 @@ class DatabaseFrame(tk.Frame):
         frame.pack()
         treeview = Treeview(
             master=frame,
-            columns=columns,
+            columns=["Categories"],
             width=400,
             anchor="w"
         )
@@ -638,8 +638,7 @@ class DatabaseFrame(tk.Frame):
         toplevel.update()
         self.category_widgets(
             master=toplevel,
-            container=included,
-            columns=["Include Categories"]
+            container=included
         )
         button = tk.Button(
             master=toplevel,
@@ -663,19 +662,29 @@ class DatabaseFrame(tk.Frame):
         toplevel.update()
         main_frame = tk.Frame(master=toplevel)
         main_frame.pack()
-        left_frame = tk.Frame(master=main_frame)
+        left_frame = tk.Frame(master=main_frame, bd=1, relief="sunken")
         left_frame.pack(side="left")
-        right_frame = tk.Frame(master=main_frame)
+        left_label = tk.Label(
+            master=left_frame,
+            text="Include",
+            font="Default 12 bold"
+        )
+        left_label.pack()
+        right_frame = tk.Frame(master=main_frame, bd=1, relief="sunken")
         right_frame.pack(side="right")
+        right_label = tk.Label(
+            master=right_frame,
+            text="Ignore",
+            font="Default 12 bold"
+        )
+        right_label.pack()
         self.category_widgets(
             master=left_frame,
             container=included,
-            columns=["Include Categories"]
         )
         self.category_widgets(
             master=right_frame,
             container=ignored,
-            columns=["Ignore Categories"]
         )
         button = tk.Button(
             master=toplevel,
