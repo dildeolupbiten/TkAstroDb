@@ -30,7 +30,7 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 **Note:** When the program first run in Windows, users might get a [PermissionError](https://docs.python.org/3/library/exceptions.html#PermissionError)  during the installation of [Pyswisseph](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyswisseph) library unless they run **cmd** as Administrator.
 
-**2.** Short time later users should see a window which is similar to below. Waiting time depends on the properties of the user's computer.
+**2.** Short time later users should see a window which is similar to below.
 
 ![img2](https://user-images.githubusercontent.com/29302909/96886659-77a1c700-148c-11eb-86fb-036db92fdae4.png)
 
