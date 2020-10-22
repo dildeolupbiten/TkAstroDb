@@ -174,6 +174,15 @@ def key_value(key, value):
 
 
 def check_update(icons):
+    new = urlopen(
+        "https://raw.githubusercontent.com/dildeolupbiten"\
+        "/TkAstroDb/master/README.md"
+    ).read().decode()
+    with open("README.md", "r", encoding="utf-8") as f:
+        old = f.read()[:-1]
+    if new != old:
+        with open("README.md", "w", encoding="utf-8") as f:
+            f.write(new)
     try:
         scripts = json.load(
             urlopen(
@@ -214,7 +223,7 @@ def check_update(icons):
                             "w",
                             encoding="utf-8"
                     ) as g:
-                        g.write(file)
+                        g.write(file)        
     if update:
         MsgBox(
             title="Info",
