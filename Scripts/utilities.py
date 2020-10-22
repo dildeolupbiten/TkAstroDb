@@ -174,10 +174,19 @@ def key_value(key, value):
 
 
 def check_update(icons):
-    new = urlopen(
-        "https://raw.githubusercontent.com/dildeolupbiten"\
-        "/TkAstroDb/master/README.md"
-    ).read().decode()
+    try:
+        new = urlopen(
+            "https://raw.githubusercontent.com/dildeolupbiten"
+            "/TkAstroDb/master/README.md"
+        ).read().decode()
+    except URLError:
+        MsgBox(
+            title="Warning",
+            message="Couldn't connect.",
+            level="warning",
+            icons=icons
+        )
+        return
     with open("README.md", "r", encoding="utf-8") as f:
         old = f.read()[:-1]
     if new != old:
