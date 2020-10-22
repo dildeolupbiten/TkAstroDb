@@ -25,6 +25,8 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 **For Windows**
 
     python run.py
+    
+**Note:** In order to run the program, Windows users could double click the `run.bat` file.
 
 **Note:** When the program first run in Windows, users might get a [PermissionError](https://docs.python.org/3/library/exceptions.html#PermissionError)  during the installation of [Pyswisseph](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyswisseph) library unless they run **cmd** as Administrator.
 
