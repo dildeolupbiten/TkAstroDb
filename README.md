@@ -34,11 +34,11 @@ In order to run **TkAstroDb**, at least [Python](https://www.python.org/)'s 3.6 
 
 ![img2](https://user-images.githubusercontent.com/29302909/96886659-77a1c700-148c-11eb-86fb-036db92fdae4.png)
 
-**3.** By default there's no folder called **Database**. If users click the **Database** menu button, an empty folder called **Database** would be created in the main directory of the program. Users should move the **XML** file that they obtained to this folder. And if the users click the **Database** menu button for the second time, a window as below would occur.
+**3.** By default there's no folder called **Database**. If users click the **Database** menu button, an empty folder called **Database** would be created in the main directory of the program. Users should move the **XML** file that they obtained to this folder. And if users click the **Database** menu button for the second time, a window as below would occur.
 
 ![img3](https://user-images.githubusercontent.com/29302909/96887895-b2f0c580-148d-11eb-91ae-d730a4735fe1.png)
 
-Users can move many databases to the **Database** folder and select the database you want to work with. The above window is only destroyed when the users press the **Apply** button.
+Users could move many databases to the **Database** folder and select the database they want to work with. The above window is only destroyed when users press the **Apply** button.
 
 **Note:** Users can also use a database that is derived from the original [Astro-Databank](https://www.astro.com/astro-databank/Main_Page) via using [TkEnneagram](https://github.com/dildeolupbiten/TkEnneagram). The format of the derived database is JSON. What users should do is that they should move the derived database to the **Database** folder.
 
@@ -46,7 +46,7 @@ Users can move many databases to the **Database** folder and select the database
 
 ![img4](https://user-images.githubusercontent.com/29302909/96889338-2d6e1500-148f-11eb-98f1-3d100c38ae25.png) 
 
-**5.** If users want to add records manually to the displayed records, they should type the name of the record in the combobox. For example suppose a user wants to add **Albert Einstein** to the displayed records, the user could write **einstein** or a keyword that the program could find to the **Search A Record By Name** section, then if users press **Enter** key, a list of records that contains **einstein** characters would be inserted to the combobox and a drop-down menu would be popped. Users can select the found records from this drop-down menu via clicking to the arrow of the combobox. After selecting the record, a new button called **Add** is created as below.
+**5.** If users want to add records manually to the displayed records, they should type the name of the record in the combobox. For example suppose a user wants to add **Albert Einstein** to the displayed records, the user could write **einstein** or a keyword that the program could find to the **Search A Record By Name** section, then if the user press the **Enter** key, a list of records that contains the **einstein** characters would be inserted to the combobox and a drop-down menu would be popped. Users can select the found records from this drop-down menu via clicking to the arrow of the combobox. After selecting the record, a new button called **Add** is created as below.
 
 ![img5](https://user-images.githubusercontent.com/29302909/96890707-93a76780-1490-11eb-957b-071d69a10a97.png)
 
@@ -54,13 +54,13 @@ If users click the **Add** button, the record would be added to the treeview and
 
 ![img6](https://user-images.githubusercontent.com/29302909/96890745-9efa9300-1490-11eb-8455-6034c44e4c57.png)
 
-**6.** If a record inserted to treeview is selected and users use the right-click of their mause, a right click menu would open and if they want, users could open the ADB page of the record or remove the record from the treeview.
+**6.** If a record that is inserted to treeview is selected and users use the right-click of their mause, a right click menu would open and if they want, users could open the ADB page of the record or remove the record from the treeview.
 
 **7.** Users could select the categories of ADB via clicking the **Select** button near the **Categories** label. There are two ways of selecting the categories. One is the **Basic** category selection method which is coming by default and the window as below would open if the selection method is **Basic**.
 
 ![img7](https://user-images.githubusercontent.com/29302909/96892541-68257c80-1492-11eb-904e-f79b9cc9bf21.png)
 
-Users can search a category by writing something to the search entry. If the characters that users typed match with the characters of the categories in the category list, the horizontal scrollbar would move to the category that contains the characters. And if users press **Enter** key, the program would move to the other categories that contain the characters.
+Users can search a category by writing something to the search entry. If the characters that users typed match with the characters of the categories in the category list, the horizontal scrollbar would move to the position of the category that contains the characters. And if users press **Enter** key, the program would move to the position of next category that contains the characters.
 
 In order to select a category, users should use the right-click of the mause and select the **Add** option. The color of the added category would turn to red. Users could select all the categories by using `CTRL-A`, then the selected categories should be added.
 
@@ -76,19 +76,19 @@ If users click the **Select** button near the **Categories** after selected the 
 
 ![img9](https://user-images.githubusercontent.com/29302909/96897416-3cf15c00-1497-11eb-96f9-7189e6ba6f09.png)
 
-The left frame is for including the categories whereas the right frame for ignoring the categories. For example suppose a user want to create a control group for **Cancer** category that include **Non-Cancer** records, the user could select **Cancer** category from the right frame to be ignored. Note that all selected categories should be added before pressing the **Apply** button.
+The left frame is for including the categories whereas the right frame for ignoring the categories. For example suppose a user wants to create a control group for the **Cancer** category that include **Non-Cancer** records, the user could select the **Cancer** category from the right frame to be ignored. Note that all selected categories should be added before pressing the **Apply** button.
 
 **8.** Users could select the [Rodden Ratings](https://www.google.com/search?&q=rodden+rating) they want to include, thus only the records that have the selected Rodden Ratings would be inserted to the treeview. If users click the **Select** button near the **Rodden Rating**, a window as below would open.
 
 ![img10](https://user-images.githubusercontent.com/29302909/96898559-88583a00-1498-11eb-948e-6327ea3905f9.png)
 
-**9.** After selected the **Categories** and **Rodden Ratings**, users should click the **Display** button to insert the filtered records to the treeview. The inserting process may take time depending on the selected categories and rodden ratings. After the inserting process is completed, users should receive an information message as below.
+**9.** After selected the **Categories** and **Rodden Ratings**, users should click the **Display** button to insert the filtered records to the treeview. The inserting process may take time depending on the selected categories and the selected rodden ratings. After the inserting process is completed, users should receive an information message as below.
 
 ![img11](https://user-images.githubusercontent.com/29302909/96899042-146a6180-1499-11eb-8e7e-8236f53cc4ea.png)
 
 Users could also filter the records using the checkbuttons which can be seen on the main window.
 
-**10.** If users click the **Export** menu cascade after the records are inserted to the treeview, users can export the links, the latitude and year frequencies of the records. The files would be created in the main directory. And it's recommended to move these files to the folder that would be created after completed the process of finding the observed values.
+**10.** If users click the **Export** menu cascade after the records are inserted to the treeview, users could export the links, the latitude and year frequencies of the records. The files would be created in the main directory. And it's recommended to move these files to the folder that would be created after completed the process of finding the observed values.
 
 **11.** Before passing to the calculation process, users could select the **House System** to be used by coming to the **Options** menu cascade then clicking the **House System** menu button. 
 
@@ -100,23 +100,23 @@ By default the **Placidus** house system is selected. However the selected house
 
 ![img13](https://user-images.githubusercontent.com/29302909/96900630-fd2c7380-149a-11eb-826c-0d1cfc60b9fb.png)
 
-The default values of the **Orb Factors** can be seen above. However if users change the values, the changed values would be used as default for next calculations.
+The default values of the **Orb Factors** can be seen above. However if users change the values, the changed values would be used as the default values for next calculations.
 
-**13.** When users completed selecting the options they want, they can start the process of finding the observed values. In order to do that, users should come to the **Calculations** menu cascade then click the **Find Observed Values** menu button. Immediately, the calculation would start and users could watch the progress at the main window.
+**13.** When users completed selecting the options they want, they could start the process of finding the observed values. In order to do that, users should come to the **Calculations** menu cascade then click the **Find Observed Values** menu button. Immediately, the calculation would start and users could watch the progress at the main window.
 
 ![img14](https://user-images.githubusercontent.com/29302909/96901528-108c0e80-149c-11eb-99ca-a8caa9c64130.png)
 
-After the calculation is completed, users should see a message that states that the calculation is completed. And also users should see a new nested directory in the main directory that includes the **output.log** and the **observed_values.xlsx** files. The name of the directories would change according to the selected category, house system, rodden rating, orb factors and checkbuttons.
+After the calculation is completed, users should see a message that states that the calculation is completed. And also users should see a new nested directory in the main directory that includes the **output.log** and the **observed_values.xlsx** files. The name of the directories would change according to the selected category, house system, rodden ratings, orb factors and checkbuttons.
 
 ![img15](https://user-images.githubusercontent.com/29302909/96901522-0f5ae180-149c-11eb-96e9-f293e1910a0e.png)
 
-The **output.log** files includes the information of process. If an error occurs during the calculation process, the errors would be written to the **output.log** file. 
+The **output.log** file includes the information of process. If an error occurs during the calculation process, the errors would be written to the **output.log** file. 
  
-**14.** Users could use other menu buttons of the **Calculations** menu cascade after they found the observed values of different categories. Users could create control groups by selecting all the categories in the category list. That control group would be the largest control group that represents the whole database. However users could create even smaller control groups.
+**14.** Users could use other menu buttons of the **Calculations** menu cascade after they found the observed values of different categories. Users could create control groups by selecting all the categories in the category list. That control group would be the largest control group that represents the whole database. Also users could create even smaller control groups.
 
-A control group could be both an indepenent category or a super category. Regarding the kind of the control group, users should specify the method that will be used in calculating the expected values.
+A control group could be both an indepenent category or a super category. Regarding the kind of the control group, users should specify the method that would be used in calculating the expected values.
 
-For instance, if the user wants to use a super category as the control group, the method should be selected as **Subcategory**. Already by default the method is selected as **Subcategory**. However if users want to change the method of calculating the expected values, they should come to the **Options** menu cascade and select the **Method** menu button. After clicked this menu button, a window like below should open.
+For instance, if the user wants to use a super category as the control group, the method should be selected as **Subcategory**. Already by default the method is selected as **Subcategory**. However if users want to change the method that is used in calculating the expected values, they should come to the **Options** menu cascade and select the **Method** menu button. After clicked this menu button, a window like below should open.
 
 ![img16](https://user-images.githubusercontent.com/29302909/96903276-4d590500-149e-11eb-880a-0e315669a86a.png)
 
@@ -124,11 +124,11 @@ So, basically the **Subcategory** method is for the cases that one category is t
 
 For instance, as mentioned before, if a user wants to create a control group for **Cancer** category that includes people that have no cancer, the method should be selected as **Independent**.
 
-In order to use the the other calculations in the **Calculations** menu cascade, the spreadsheet files should be moved to the main directory of the program and the name of the spreadsheet file that will be used as the control group should be renamed as **control_group.xlsx**. Already the program would look whether or not the files are located in the main directory and would raise warning messages if the files don't exist. If the files are located in the main directory, immediately the calculation process would be started and the process would be completed in seconds and the new spreadsheet files would be created in the main directory. It's recommended to move those files to the directory where the **observed_values.xlsx** is located in. So suppose a user created the spreadsheet files of expected values, chi square values, effect size values, cohen's d effect values and binomial limit values for **Cancer** category, it's recommended to move the created files near the **observed_values.xlsx** of the **Cancer** category.
+In order to use the the other calculations in the **Calculations** menu cascade, the spreadsheet files should be moved to the main directory of the program and the name of the spreadsheet file that will be used as the control group should be renamed as **control_group.xlsx**. Already the program would look whether or not the files are located in the main directory and would raise warning messages if the files don't exist. If the files are located in the main directory, immediately the calculation process would start, the process would be completed in seconds and the new spreadsheet files would be created in the main directory. It's recommended to move these files to the directory where the **observed_values.xlsx** is located in. So suppose a user created the spreadsheet files of the expected values, the chi square values, the effect size values, the cohen's d effect values and the binomial limit values for the **Cancer** category, it's recommended to move the created files near the **observed_values.xlsx** of the **Cancer** category.
 
-**15.** If an update is released, users can update their program by coming to the **Help** menu cascade and clicking the **Check for updates** menu button.
+**15.** If an update is released, users could update their program by coming to the **Help** menu cascade and clicking the **Check for updates** menu button.
 
-**16.** If users click the **About** section which is under the **Help** menu cascade, a window like below opens and users can contact the developer using the email link written on the frame.
+**16.** If users click the **About** section which is under the **Help** menu cascade, a window like below opens and users could contact the developer using the email link written on the frame.
 
 ![img17](https://user-images.githubusercontent.com/29302909/96908127-e12dcf80-14a4-11eb-8994-7be585753cb2.png) 
 
