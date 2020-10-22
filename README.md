@@ -78,7 +78,7 @@ If users click the **Select** button near the **Categories** after selected the 
 
 The left frame is for including the categories whereas the right frame for ignoring the categories. For example suppose a user want to create a control group for **Cancer** category that include **Non-Cancer** records, the user could select **Cancer** category from the right frame to be ignored. Note that all selected categories should be added before pressing the **Apply** button.
 
-**8.** Users could select the [Rodden Ratings](https://www.google.com/search?&q=rodden+rating) they want to include, thus only the records that have the selected Rodden Ratings would be inserted to the treeview. If users click the **Select** button near the **Rodden Rating*, a window as below would open.
+**8.** Users could select the [Rodden Ratings](https://www.google.com/search?&q=rodden+rating) they want to include, thus only the records that have the selected Rodden Ratings would be inserted to the treeview. If users click the **Select** button near the **Rodden Rating**, a window as below would open.
 
 ![img10](https://user-images.githubusercontent.com/29302909/96898559-88583a00-1498-11eb-948e-6327ea3905f9.png)
 
@@ -106,7 +106,7 @@ The default values of the **Orb Factors** can be seen above. However if users ch
 
 ![img14](https://user-images.githubusercontent.com/29302909/96901528-108c0e80-149c-11eb-99ca-a8caa9c64130.png)
 
-After the calculation is completed, users should see a message that states that the calculation is completed. And also users should see a new nested directory in the main directory that includes the **output.log** and the **observed_values.xlsx** files. The name of the directories would change according to the selected category, house system, rodden rating, checkbuttons.
+After the calculation is completed, users should see a message that states that the calculation is completed. And also users should see a new nested directory in the main directory that includes the **output.log** and the **observed_values.xlsx** files. The name of the directories would change according to the selected category, house system, rodden rating, orb factors and checkbuttons.
 
 ![img15](https://user-images.githubusercontent.com/29302909/96901522-0f5ae180-149c-11eb-96e9-f293e1910a0e.png)
 
