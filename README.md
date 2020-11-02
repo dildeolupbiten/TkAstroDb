@@ -46,11 +46,11 @@ Users could move many databases to the **Database** folder and select the databa
 
 ![img4](https://user-images.githubusercontent.com/29302909/96889338-2d6e1500-148f-11eb-98f1-3d100c38ae25.png) 
 
-**5.** If users want to add records manually to the displayed records, they should type the name of the record in the combobox. For example suppose a user wants to add **Albert Einstein** to the displayed records, the user could write **einstein** or a keyword that the program could find to the **Search A Record By Name** section, then if the user press the **Enter** key, a list of records that contains the **einstein** characters would be inserted to the combobox and a drop-down menu would be popped. Users can select the found records from this drop-down menu via clicking to the arrow of the combobox. After selecting the record, a new button called **Add** is created as below.
+**5.** If users want to add records manually to the displayed records, they should type the name of the record in the combobox. For example suppose a user wants to add **Albert Einstein** to the displayed records, the user could write **einstein** or a keyword that the program could find to the **Search A Record By Name** section, then if the user presses the **Enter** key, a list of records that contains the **einstein** characters would be inserted to the combobox and a drop-down menu would be popped. Users could select the found records from this drop-down menu via clicking to the arrow of the combobox. After selecting the record, a new button called **Add** is created as below.
 
 ![img5](https://user-images.githubusercontent.com/29302909/96890707-93a76780-1490-11eb-957b-071d69a10a97.png)
 
-If users click the **Add** button, the record would be added to the treeview and the **Add** button would be destroyed. However, users can continue selecting the records from the drop-down menu. The **Add** button would be created for the next record unless the record is already in the treeview.
+If users click the **Add** button, the record would be added to the treeview and the **Add** button would be destroyed. However, users could continue selecting the records from the drop-down menu. The **Add** button would be created for the next record unless the record is already in the treeview.
 
 ![img6](https://user-images.githubusercontent.com/29302909/96890745-9efa9300-1490-11eb-8455-6034c44e4c57.png)
 
@@ -60,7 +60,7 @@ If users click the **Add** button, the record would be added to the treeview and
 
 ![img7](https://user-images.githubusercontent.com/29302909/96892541-68257c80-1492-11eb-904e-f79b9cc9bf21.png)
 
-Users can search a category by writing something to the search entry. If the characters that users typed match with the characters of the categories in the category list, the horizontal scrollbar would move to the position of the category that contains the characters. And if users press **Enter** key, the program would move to the position of next category that contains the characters.
+Users could search a category by writing something to the search entry. If the characters that users typed match with the characters of the categories in the category list, the horizontal scrollbar would move to the position of the category that contains the characters. And if users press the **Enter** key, the program would move to the position of the next category that contains the characters.
 
 In order to select a category, users should use the right-click of the mause and select the **Add** option. The color of the added category would turn to red. Users could select all the categories by using `CTRL-A`, then the selected categories should be added.
 
@@ -76,17 +76,17 @@ If users click the **Select** button near the **Categories** after selected the 
 
 ![img9](https://user-images.githubusercontent.com/29302909/96897416-3cf15c00-1497-11eb-96f9-7189e6ba6f09.png)
 
-The left frame is for including the categories whereas the right frame for ignoring the categories. For example suppose a user wants to create a control group for the **Cancer** category that include **Non-Cancer** records, the user could select the **Cancer** category from the right frame to be ignored. Note that all selected categories should be added before pressing the **Apply** button.
+The left frame is for including the categories whereas the right frame is for ignoring the categories. For example suppose a user wants to create a control group for the **Cancer** category that includes **Non-Cancer** records, the user could select the **Cancer** category from the right frame to be ignored. Note that all selected categories should be added before pressing the **Apply** button.
 
 **8.** Users could select the [Rodden Ratings](https://www.google.com/search?&q=rodden+rating) they want to include, thus only the records that have the selected Rodden Ratings would be inserted to the treeview. If users click the **Select** button near the **Rodden Rating**, a window as below would open.
 
 ![img10](https://user-images.githubusercontent.com/29302909/96898559-88583a00-1498-11eb-948e-6327ea3905f9.png)
 
-**9.** After selected the **Categories** and **Rodden Ratings**, users should click the **Display** button to insert the filtered records to the treeview. The inserting process may take time depending on the selected categories and the selected rodden ratings. After the inserting process is completed, users should receive an information message as below.
+**9.** After selected the **Categories** and the **Rodden Ratings**, users should click the **Display** button to insert the filtered records to the treeview. The insertion process may take time depending on the selected categories and the selected rodden ratings. After the insertion process is completed, users should receive an information message as below.
 
 ![img11](https://user-images.githubusercontent.com/29302909/96899042-146a6180-1499-11eb-8e7e-8236f53cc4ea.png)
 
-Users could also filter the records using the checkbuttons which can be seen on the main window.
+Users could also filter the records using the checkbuttons which could be seen on the main window.
 
 **10.** If users click the **Export** menu cascade after the records are inserted to the treeview, users could export the links, the latitude and year frequencies of the records. The files would be created in the main directory. And it's recommended to move these files to the folder that would be created after completed the process of finding the observed values.
 
@@ -100,9 +100,9 @@ By default the **Placidus** house system is selected. However the selected house
 
 ![img13](https://user-images.githubusercontent.com/29302909/96900630-fd2c7380-149a-11eb-826c-0d1cfc60b9fb.png)
 
-The default values of the **Orb Factors** can be seen above. However if users change the values, the changed values would be used as the default values for next calculations.
+The default values of the **Orb Factors** could be seen above. However if users change the values, the changed values would be used as the default values for next calculations.
 
-**13.** When users completed selecting the options they want, they could start the process of finding the observed values. In order to do that, users should come to the **Calculations** menu cascade then click the **Find Observed Values** menu button. Immediately, the calculation would start and users could watch the progress at the main window.
+**13.** When users completed selecting the options they want, they could start the process of finding observed values. In order to do that, users should come to the **Calculations** menu cascade then click the **Find Observed Values** menu button. Immediately, the calculation would start and users could watch the progress at the main window.
 
 ![img14](https://user-images.githubusercontent.com/29302909/96901528-108c0e80-149c-11eb-99ca-a8caa9c64130.png)
 
