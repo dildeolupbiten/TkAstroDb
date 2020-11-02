@@ -57,15 +57,6 @@ def load_defaults():
         config.write(f)
 
 
-def msgbox_info(self, message):
-    self.logging_text["state"] = "normal"
-    self.logging_text.insert(
-        "insert",
-        f"- INFO - {dt.now().strftime('%Y.%m.%d %H:%M:%S')} - {message}"
-    )
-    self.logging_text["state"] = "disabled"
-
-
 def convert_coordinates(coord):
     if "n" in coord:
         d, _m = coord.split("n")
