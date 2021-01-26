@@ -5,10 +5,12 @@ from .spreadsheet import Spreadsheet
 from .messagebox import MsgBox, ChoiceBox
 from .utilities import convert_coordinates, progressbar
 from .modules import (
-    os, dt, pd, tk, ttk, time, binom, shutil, Thread, variance, ConfigParser
+    os, dt, pd, tk, ttk, time, binom, shutil,
+    Thread, variance, ConfigParser
 )
 from .constants import (
-    HOUSE_SYSTEMS, PLANETS, SIGNS, TRADITIONAL_RULERSHIP, MODERN_RULERSHIP
+    HOUSE_SYSTEMS, PLANETS, SIGNS, HOUSES,
+    TRADITIONAL_RULERSHIP, MODERN_RULERSHIP
 )
 
 
@@ -567,7 +569,7 @@ def get_values(filename):
     )
     config = ConfigParser()
     config.read("defaults.ini")
-    HOUSES = [f"House-{i}" for i in range(1, 13)]
+
     total = sum(values[7][1: 13])
     planets_in_signs = get_basic_dict(values, [7, 19], [PLANETS, SIGNS])
     houses_in_signs = get_basic_dict(values, [21, 33], [HOUSES, SIGNS])

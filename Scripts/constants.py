@@ -104,6 +104,8 @@ PLANETS = {
     }
 }
 
+HOUSES = [f"House-{i}" for i in range(1, 13)]
+
 HOUSE_SYSTEMS = {
     "Placidus": "P",
     "Koch": "K",
