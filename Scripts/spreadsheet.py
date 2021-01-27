@@ -47,15 +47,15 @@ class Spreadsheet(Workbook):
                 aspect=aspect.title(),
                 orb_factor=self.config["ORB FACTORS"][aspect]
             )
-            row += 16
+            row += 14
         self.write_aspects(
             data=total_aspects,
             row=row,
             aspect="All Aspects",
             orb_factor=""
         )
-        self.write_advanced(data=planets_in_houses_in_signs, row=242)
-        row = 422
+        self.write_advanced(data=planets_in_houses_in_signs, row=218)
+        row = 398
         for i, j in zip(
                 ["Traditional", "Modern"],
                 [total_traditional_rulership, total_modern_rulership]
@@ -66,7 +66,7 @@ class Spreadsheet(Workbook):
                 title=f"{i} House Rulership"
             )
             row += 16
-        row = 454
+        row = 430
         for i, j in zip(
                 ["Traditional", "Modern"],
                 [traditional_rulership, modern_rulership]
