@@ -14,6 +14,13 @@ from .constants import (
 )
 
 
+def only_planets(planets):
+    return [
+        planet for planet in planets
+        if planets[planet]["symbol"]
+    ]
+
+
 def send_warning_message(icons):
     MsgBox(
         title="Warning",
@@ -211,7 +218,7 @@ def start_calculation(
         save_categories
 ):
     planets_in_signs = create_normal_dict(
-        lists=[PLANETS, SIGNS],
+        lists=[only_planets(PLANETS), SIGNS],
         keys=["", ""]
     )
     houses_in_signs = create_normal_dict(
@@ -219,11 +226,11 @@ def start_calculation(
         keys=["House-", ""]
     )
     planets_in_houses = create_normal_dict(
-        lists=[PLANETS, range(1, 13)],
+        lists=[only_planets(PLANETS), range(1, 13)],
         keys=["", "House-"]
     )
     planets_in_houses_in_signs = create_normal_dict(
-        lists=[PLANETS, range(1, 13), SIGNS],
+        lists=[only_planets(PLANETS), range(1, 13), SIGNS],
         keys=["", "House-", ""]
     )
     aspects = create_enumerate_dict(
@@ -331,9 +338,10 @@ def start_calculation(
             )
             continue
         for index, p in enumerate(patterns[0], 1):
-            planets_in_signs[p[0]][p[1]] += 1
-            planets_in_houses[p[0]][p[3]] += 1
-            planets_in_houses_in_signs[p[0]][p[3]][p[1]] += 1
+            if "Ascendant" != p[0] and "Midheaven" != p[0]:
+                planets_in_signs[p[0]][p[1]] += 1
+                planets_in_houses[p[0]][p[3]] += 1
+                planets_in_houses_in_signs[p[0]][p[3]][p[1]] += 1
             for _p in patterns[0][index:]:
                 find_aspect(
                     aspects=aspects,
@@ -569,31 +577,32 @@ def get_values(filename):
     )
     config = ConfigParser()
     config.read("defaults.ini")
+    planets = only_planets(PLANETS)
     total = sum(values[7][1: 13])
-    planets_in_signs = get_basic_dict(values, [7, 19], [PLANETS, SIGNS])
+    planets_in_signs = get_basic_dict(values, [7, 19], [planets, SIGNS])
     houses_in_signs = get_basic_dict(values, [21, 33], [HOUSES, SIGNS])
-    planets_in_houses = get_basic_dict(values, [35, 47], [PLANETS, HOUSES])
+    planets_in_houses = get_basic_dict(values, [35, 47], [planets, HOUSES])
     aspects = {}
     c = 49
     for key in config["ORB FACTORS"]:
-        aspects[key] = get_aspect_dict(values, [c, c + 12], [PLANETS])
-        c += 14
-    total_aspects = get_aspect_dict(values, [203, 215], [PLANETS])
+        aspects[key] = get_aspect_dict(values, [c, c + 14], [PLANETS])
+        c += 16
+    total_aspects = get_aspect_dict(values, [225, 239], [PLANETS])
     planets_in_houses_in_signs = {}
-    c = 217
-    for planet in PLANETS:
+    c = 241
+    for planet in planets:
         planets_in_houses_in_signs[planet] = get_basic_dict(
             values, [c, c + 12], [HOUSES, SIGNS], [2, 14]
         )
         c += 15
     total_traditional_rulership = get_basic_dict(
-        values, [398, 410], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
+        values, [422, 434], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
     )
     total_modern_rulership = get_basic_dict(
-        values, [414, 426], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
+        values, [438, 450], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
     )
     traditional_rulership = {}
-    c = 430
+    c = 454
     for i in range(1, 13):
         traditional_rulership[f"Lord-{i}"] = get_basic_dict(
             values,
@@ -603,7 +612,7 @@ def get_values(filename):
         )
         c += 15
     modern_rulership = {}
-    c = 611
+    c = 635
     for i in range(1, 13):
         modern_rulership[f"Lord-{i}"] = get_basic_dict(
             values,
@@ -623,15 +632,15 @@ def probability_mass_function(n, k, p):
     for i in range(k + 1):
         result += binom.pmf(n=n, k=i, p=p) * 100
     return round(result, 6)
-                
-                
+
+
 def select_basic(
-        d1, 
-        d2, 
-        method, 
-        calculation_type, 
-        cancel, 
-        x_total, 
+        d1,
+        d2,
+        method,
+        calculation_type,
+        cancel,
+        x_total,
         y_total
 ):
     for (key, value), (_key, _value) in zip(d1.items(), d2.items()):
@@ -656,7 +665,7 @@ def select_basic(
                         d1[key][k] = (v - _v) / \
                             (
                                 (
-                                    variance(save1.values()) + 
+                                    variance(save1.values()) +
                                     variance(save2.values())
                                 ) / 2
                             ) ** 0.5
@@ -673,15 +682,15 @@ def select_basic(
                         d1[key][k] = p2
             except ZeroDivisionError:
                 d1[key][k] = 0
-            
+
 
 def select_detailed(
-        d1, 
-        d2, 
-        method, 
-        calculation_type, 
-        cancel, 
-        x_total, 
+        d1,
+        d2,
+        method,
+        calculation_type,
+        cancel,
+        x_total,
         y_total
 ):
     for (key, value), (_key, _value) in zip(d1.items(), d2.items()):

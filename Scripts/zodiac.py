@@ -105,4 +105,5 @@ class Zodiac:
         asc[0] = "Ascendant"
         mc = house_positions[9] + ["House-10"]
         mc[0] = "Midheaven"
+        planet_positions += [asc, mc]
         return planet_positions, house_positions
