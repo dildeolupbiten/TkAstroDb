@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.8
 # -*- coding: utf-8 -*-
 
 import os
@@ -13,7 +13,7 @@ installed_packages = [
     ).split()
 ]
 
-packages = ["numpy==1.19.2", "scipy==1.4.1", "pandas==1.1.2", "XlsxWriter", "xlrd"]
+packages = ["numpy==1.19.2", "scipy==1.4.1", "pandas==1.1.2", "XlsxWriter", "xlrd==1.2.0"]
 
 
 def call(p, n):
