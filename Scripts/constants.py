@@ -101,14 +101,6 @@ PLANETS = {
     "Chiron": {
         "number": swe.CHIRON,
         "symbol": "\u26B7"
-    },
-    "Ascendant": {
-        "number": None,
-        "symbol": None
-    },
-    "Midheaven": {
-        "number": None,
-        "symbol": None
     }
 }
 
