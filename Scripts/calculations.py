@@ -584,25 +584,20 @@ def get_values(filename):
     planets_in_houses = get_basic_dict(values, [35, 47], [planets, HOUSES])
     aspects = {}
     c = 49
-    for key in config["ORB FACTORS"]:
-        aspects[key] = get_aspect_dict(values, [c, c + 14], [PLANETS])
-        c += 16
-    total_aspects = get_aspect_dict(values, [225, 239], [PLANETS])
     planets_in_houses_in_signs = {}
-    c = 241
     for planet in planets:
         planets_in_houses_in_signs[planet] = get_basic_dict(
             values, [c, c + 12], [HOUSES, SIGNS], [2, 14]
         )
         c += 15
     total_traditional_rulership = get_basic_dict(
-        values, [422, 434], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
+        values, [230, 242], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
     )
     total_modern_rulership = get_basic_dict(
-        values, [438, 450], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
+        values, [246, 258], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
     )
     traditional_rulership = {}
-    c = 454
+    c = 262
     for i in range(1, 13):
         traditional_rulership[f"Lord-{i}"] = get_basic_dict(
             values,
@@ -612,7 +607,7 @@ def get_values(filename):
         )
         c += 15
     modern_rulership = {}
-    c = 635
+    c = 443
     for i in range(1, 13):
         modern_rulership[f"Lord-{i}"] = get_basic_dict(
             values,
@@ -621,6 +616,10 @@ def get_values(filename):
             [2, 14]
         )
         c += 15
+    for key in config["ORB FACTORS"]:
+        aspects[key] = get_aspect_dict(values, [c, c + 14], [PLANETS])
+        c += 16
+    total_aspects = get_aspect_dict(values, [c, c + 14], [PLANETS])
     return total, planets_in_signs, houses_in_signs, planets_in_houses, \
         aspects, total_aspects, planets_in_houses_in_signs, \
         total_traditional_rulership, total_modern_rulership, \

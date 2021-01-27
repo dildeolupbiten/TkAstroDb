@@ -39,7 +39,28 @@ class Spreadsheet(Workbook):
         for i in [planets_in_signs, houses_in_signs, planets_in_houses]:
             self.write_basic(data=i, row=row)
             row += 14
-        row = 50
+        self.write_advanced(data=planets_in_houses_in_signs, row=row)
+        row += 180
+        for i, j in zip(
+                ["Traditional", "Modern"],
+                [total_traditional_rulership, total_modern_rulership]
+        ):
+            self.write_basic(
+                data=j,
+                row=row,
+                title=f"{i} House Rulership"
+            )
+            row += 16
+        for i, j in zip(
+                ["Traditional", "Modern"],
+                [traditional_rulership, modern_rulership]
+        ):
+            self.write_advanced(
+                data=j,
+                row=row,
+                title=f"Detailed {i} House Rulership"
+            )
+            row += 181
         for aspect in aspects:
             self.write_aspects(
                 data=aspects[aspect],
@@ -54,29 +75,6 @@ class Spreadsheet(Workbook):
             aspect="All Aspects",
             orb_factor=""
         )
-        self.write_advanced(data=planets_in_houses_in_signs, row=242)
-        row = 422
-        for i, j in zip(
-                ["Traditional", "Modern"],
-                [total_traditional_rulership, total_modern_rulership]
-        ):
-            self.write_basic(
-                data=j,
-                row=row,
-                title=f"{i} House Rulership"
-            )
-            row += 16
-        row = 454
-        for i, j in zip(
-                ["Traditional", "Modern"],
-                [traditional_rulership, modern_rulership]
-        ):
-            self.write_advanced(
-                data=j,
-                row=row,
-                title=f"Detailed {i} House Rulership"
-            )
-            row += 181
         self.close()
 
     def format(
