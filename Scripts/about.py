@@ -7,10 +7,10 @@ class About(tk.Toplevel):
     def __init__(self):
         super().__init__()
         self.resizable(width=False, height=False)
-        self.version = "2.2.2"
+        self.version = "2.2.3"
         self.name = "TkAstroDb"
         self.date_built = "21.12.2018"
-        self.date_updated = "27.01.2021"
+        self.date_updated = "28.01.2021"
         self.thanks = "Alois Trendl, Flavia Alonzo, Sjoerd Visser"
         self.developed_by = "Tanberk Celalettin Kutlu"
         self.contact = "tckutlu@gmail.com"

@@ -17,6 +17,9 @@ class Spreadsheet(Workbook):
             total_modern_rulership,
             traditional_rulership,
             modern_rulership,
+            yod,
+            t_square,
+            grand_trine,
             *args,
             **kwargs
     ):
@@ -75,6 +78,20 @@ class Spreadsheet(Workbook):
             aspect="All Aspects",
             orb_factor=""
         )
+        row = 816
+        for i in [
+            (yod, "Yod ", "Apex"),
+            (t_square, "T-Square ", "Apex"),
+            (grand_trine, "Grand Trine ", "Planet")
+        ]:
+            for k, v in i[0].items():
+                self.write_aspects(
+                    data=v,
+                    row=row,
+                    aspect=i[1],
+                    orb_factor=f"({i[2]}: {k})"
+                )
+                row += 15
         self.close()
 
     def format(
@@ -158,7 +175,10 @@ class Spreadsheet(Workbook):
 
     def write_aspects(self, data, row, aspect, orb_factor):
         if orb_factor:
-            orb = ": Orb Factor: +- " + orb_factor
+            if "Apex" in orb_factor or "Planet" in orb_factor:
+                orb = orb_factor
+            else:
+                orb = ": Orb Factor: +- " + orb_factor
         else:
             orb = ""
         self.sheet.merge_range(
