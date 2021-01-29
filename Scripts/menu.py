@@ -4,9 +4,9 @@ from .about import About
 from .database import Database
 from .modules import tk, Thread
 from .orb_factor import OrbFactor
-from .utilities import check_update
 from .constants import HOUSE_SYSTEMS
-from .selection import SingleSelection
+from .utilities import check_update, table_selection
+from .selection import SingleSelection, MultipleSelection
 from .calculations import find_observed_values, select_calculation
 from .export import export_link, export_lat_frequency, export_year_frequency
 
@@ -22,14 +22,20 @@ class Menu(tk.Menu):
                 icons=icons
             )
         )
+        self.spreadsheet_menu = tk.Menu(master=self, tearoff=False)
         self.calculations_menu = tk.Menu(master=self, tearoff=False)
         self.export_menu = tk.Menu(master=self, tearoff=False)
         self.options_menu = tk.Menu(master=self, tearoff=False)
         self.help_menu = tk.Menu(master=self, tearoff=False)
+        self.add_cascade(label="Spreadsheet", menu=self.spreadsheet_menu)
         self.add_cascade(label="Calculations", menu=self.calculations_menu)
         self.add_cascade(label="Export", menu=self.export_menu)
         self.add_cascade(label="Options", menu=self.options_menu)
         self.add_cascade(label="Help", menu=self.help_menu)
+        self.spreadsheet_menu.add_command(
+            label="Table Selection",
+            command=lambda: table_selection(MultipleSelection)
+        )
         self.calculations_menu.add_command(
             label="Find Observed Values",
             command=lambda: find_observed_values(

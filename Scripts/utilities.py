@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .constants import SIGNS
 from .messagebox import MsgBox
+from .constants import SIGNS, PLANETS, SHEETS
 from .modules import (
-    dt, os, json, time, Popen, urlopen,
+    os, json, time, Popen, urlopen,
     URLError, PhotoImage, ConfigParser
 )
 
@@ -32,6 +32,15 @@ def create_image_files(path):
     }
 
 
+def table_selection(multiple_selection):
+    config = ConfigParser()
+    config.read("defaults.ini")
+    multiple_selection(
+        title="Table Selection",
+        catalogue=config["TABLE SELECTION"].keys()
+    )
+
+
 def load_defaults():
     if os.path.exists("defaults.ini"):
         return
@@ -54,6 +63,10 @@ def load_defaults():
         config["DATABASE"] = {"selected": "None"}
         config["METHOD"] = {"selected": "Subcategory"}
         config["CATEGORY SELECTION"] = {"selected": "Basic"}
+        config["TABLE SELECTION"] = {
+            i.replace(" ", "_"): "true"
+            for i in SHEETS if i != "Info"
+        }
         config.write(f)
 
 
@@ -244,3 +257,61 @@ def check_update(icons):
             level="info",
             icons=icons
         )
+
+
+def get_basic_dict(values, indexes, constants, sub_index=(0, 0)):
+    if sub_index == (0, 0):
+        i1, i2 = 1, 13
+    else:
+        i1, i2 = sub_index
+    return {
+        list(constants[0])[index]: {
+            list(constants[1])[ind]: value
+            for ind, value in enumerate(i[i1:i2])
+        } for index, i in enumerate(values[indexes[0]: indexes[1]])
+    }
+
+
+def get_aspect_dict(values, indexes, constants):
+    return {
+        list(constants[0])[index]: {
+            list(constants[0])[ind]: j[index]
+            for ind, j in enumerate(
+                values[indexes[0]:indexes[1]][index + 1:], index + 1
+            )
+        }
+        for index, i in enumerate(values[indexes[0]: indexes[1]])
+    }
+
+
+def get_pattern_dict(values, c):
+    result = {}
+    for index, planet in enumerate(PLANETS):
+        constants = list(PLANETS)[:index] + list(PLANETS)[index + 1:]
+        result[planet] = get_aspect_dict(values, [c, c + 13], [constants])
+        c += 15
+    return result
+
+
+def get_planet_dict(values, planets, c, arrays):
+    result = {}
+    if planets:
+        array = planets
+    else:
+        array = range(1, 13)
+    for i in array:
+        result[f"Lord-{i}" if not planets else i] = get_basic_dict(
+            values,
+            [c, c + 12],
+            arrays,
+            [2, 14]
+        )
+        c += 15
+    return result
+
+
+def only_planets(planets):
+    return [
+        planet for planet in planets
+        if planets[planet]["symbol"]
+    ]

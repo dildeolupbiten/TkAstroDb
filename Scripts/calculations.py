@@ -3,22 +3,19 @@
 from .zodiac import Zodiac
 from .spreadsheet import Spreadsheet
 from .messagebox import MsgBox, ChoiceBox
-from .utilities import convert_coordinates, progressbar
+from .utilities import (
+    convert_coordinates, progressbar, get_basic_dict,
+    get_planet_dict, get_aspect_dict, get_pattern_dict,
+    only_planets
+)
 from .modules import (
     os, dt, pd, tk, ttk, time, binom, shutil,
     Thread, variance, ConfigParser
 )
 from .constants import (
-    HOUSE_SYSTEMS, PLANETS, SIGNS, HOUSES,
+    HOUSE_SYSTEMS, PLANETS, SIGNS, HOUSES, SHEETS,
     TRADITIONAL_RULERSHIP, MODERN_RULERSHIP
 )
-
-
-def only_planets(planets):
-    return [
-        planet for planet in planets
-        if planets[planet]["symbol"]
-    ]
 
 
 def send_warning_message(icons):
@@ -287,49 +284,92 @@ def start_calculation(
         menu,
         save_categories
 ):
-    planets_in_signs = create_normal_dict(
-        lists=[only_planets(PLANETS), SIGNS],
-        keys=["", ""]
-    )
-    houses_in_signs = create_normal_dict(
-        lists=[range(1, 13), SIGNS],
-        keys=["House-", ""]
-    )
-    planets_in_houses = create_normal_dict(
-        lists=[only_planets(PLANETS), range(1, 13)],
-        keys=["", "House-"]
-    )
-    planets_in_houses_in_signs = create_normal_dict(
-        lists=[only_planets(PLANETS), range(1, 13), SIGNS],
-        keys=["", "House-", ""]
-    )
-    traditional_rulership = create_normal_dict(
-        lists=[range(1, 13), TRADITIONAL_RULERSHIP.values(), range(1, 13)],
-        keys=["Lord-", "", "House-"]
-    )
-    modern_rulership = create_normal_dict(
-        lists=[range(1, 13), MODERN_RULERSHIP.values(), range(1, 13)],
-        keys=["Lord-", "", "House-"]
-    )
-    total_traditional_rulership = create_normal_dict(
-        lists=[range(1, 13), range(1, 13)],
-        keys=["Lord-", "House-"]
-    )
-    total_modern_rulership = create_normal_dict(
-        lists=[range(1, 13), range(1, 13)],
-        keys=["Lord-", "House-"]
-    )
-    aspects = create_enumerate_dict(
-        lists=[list(config["ORB FACTORS"]), PLANETS, PLANETS],
-        keys=["", "", ""],
-    )
-    total_aspects = create_enumerate_dict(
-        lists=[PLANETS, PLANETS],
-        keys=["", ""]
-    )
-    yod = create_3d_dict(list(PLANETS))
-    t_square = create_3d_dict(list(PLANETS))
-    grand_trine = create_3d_dict(list(PLANETS))
+    if config["TABLE SELECTION"]["planets_in_signs"] == "true":
+        planets_in_signs = create_normal_dict(
+            lists=[only_planets(PLANETS), SIGNS],
+            keys=["", ""]
+        )
+    else:
+        planets_in_signs = {}
+    if config["TABLE SELECTION"]["houses_in_signs"] == "true":
+        houses_in_signs = create_normal_dict(
+            lists=[range(1, 13), SIGNS],
+            keys=["House-", ""]
+        )
+    else:
+        houses_in_signs = {}
+    if config["TABLE SELECTION"]["planets_in_houses"] == "true":
+        planets_in_houses = create_normal_dict(
+            lists=[only_planets(PLANETS), range(1, 13)],
+            keys=["", "House-"]
+        )
+    else:
+        planets_in_houses = {}
+    if config["TABLE SELECTION"]["planets_in_houses_in_signs"] == "true":
+        planets_in_houses_in_signs = create_normal_dict(
+            lists=[only_planets(PLANETS), range(1, 13), SIGNS],
+            keys=["", "House-", ""]
+        )
+    else:
+        planets_in_houses_in_signs = {}
+    if config["TABLE SELECTION"]["detailed_traditional_rulership"] == "true":
+        detailed_traditional_rulership = create_normal_dict(
+            lists=[
+                range(1, 13),
+                TRADITIONAL_RULERSHIP.values(),
+                range(1, 13)
+            ],
+            keys=["Lord-", "", "House-"]
+        )
+    else:
+        detailed_traditional_rulership = {}
+    if config["TABLE SELECTION"]["detailed_modern_rulership"] == "true":
+        detailed_modern_rulership = create_normal_dict(
+            lists=[range(1, 13), MODERN_RULERSHIP.values(), range(1, 13)],
+            keys=["Lord-", "", "House-"]
+        )
+    else:
+        detailed_modern_rulership = {}
+    if config["TABLE SELECTION"]["basic_traditional_rulership"] == "true":
+        basic_traditional_rulership = create_normal_dict(
+            lists=[range(1, 13), range(1, 13)],
+            keys=["Lord-", "House-"]
+        )
+    else:
+        basic_traditional_rulership = {}
+    if config["TABLE SELECTION"]["basic_modern_rulership"] == "true":
+        basic_modern_rulership = create_normal_dict(
+            lists=[range(1, 13), range(1, 13)],
+            keys=["Lord-", "House-"]
+        )
+    else:
+        basic_modern_rulership = {}
+    if config["TABLE SELECTION"]["aspects"] == "true":
+        aspects = create_enumerate_dict(
+            lists=[list(config["ORB FACTORS"]), PLANETS, PLANETS],
+            keys=["", "", ""],
+        )
+    else:
+        aspects = {}
+    if config["TABLE SELECTION"]["sum_of_aspects"] == "true":
+        sum_of_aspects = create_enumerate_dict(
+            lists=[PLANETS, PLANETS],
+            keys=["", ""]
+        )
+    else:
+        sum_of_aspects = {}
+    if config["TABLE SELECTION"]["yod"] == "true":
+        yod = create_3d_dict(list(PLANETS))
+    else:
+        yod = {}
+    if config["TABLE SELECTION"]["t-square"] == "true":
+        t_square = create_3d_dict(list(PLANETS))
+    else:
+        t_square = {}
+    if config["TABLE SELECTION"]["grand_trine"] == "true":
+        grand_trine = create_3d_dict(list(PLANETS))
+    else:
+        grand_trine = {}
     size = len(displayed_results)
     received = 0
     now = time.time()
@@ -416,41 +456,50 @@ def start_calculation(
         )
         for index, p in enumerate(patterns[0], 1):
             if "Ascendant" != p[0] and "Midheaven" != p[0]:
-                planets_in_signs[p[0]][p[1]] += 1
-                planets_in_houses[p[0]][p[3]] += 1
-                planets_in_houses_in_signs[p[0]][p[3]][p[1]] += 1
-            for _p in patterns[0][index:]:
-                find_aspect(
-                    aspects=aspects,
-                    temporary=temporary,
-                    orb=config["ORB FACTORS"],
-                    planet1=p[0],
-                    planet2=_p[0],
-                    aspect=abs(p[2] - _p[2])
-                )
-        special_aspect_pattern(temporary, yod, get_yod)
-        special_aspect_pattern(temporary, t_square, get_t_square)
-        special_aspect_pattern(
-            temporary,
-            grand_trine,
-            get_grand_trine,
-            apex=False
-        )
+                if planets_in_signs:
+                    planets_in_signs[p[0]][p[1]] += 1
+                if planets_in_houses:
+                    planets_in_houses[p[0]][p[3]] += 1
+                if planets_in_houses_in_signs:
+                    planets_in_houses_in_signs[p[0]][p[3]][p[1]] += 1
+            if aspects:
+                for _p in patterns[0][index:]:
+                    find_aspect(
+                        aspects=aspects,
+                        temporary=temporary,
+                        orb=config["ORB FACTORS"],
+                        planet1=p[0],
+                        planet2=_p[0],
+                        aspect=abs(p[2] - _p[2])
+                    )
+        if aspects and yod:
+            special_aspect_pattern(temporary, yod, get_yod)
+        if aspects and t_square:
+            special_aspect_pattern(temporary, t_square, get_t_square)
+        if aspects and grand_trine:
+            special_aspect_pattern(
+                temporary,
+                grand_trine,
+                get_grand_trine,
+                apex=False
+            )
         for index, h in enumerate(patterns[1], 1):
-            houses_in_signs[f"House-{h[0]}"][h[1]] += 1
+            if houses_in_signs:
+                houses_in_signs[f"House-{h[0]}"][h[1]] += 1
             lord_traditional = TRADITIONAL_RULERSHIP[h[1]]
             lord_modern = MODERN_RULERSHIP[h[1]]
             for p in patterns[0]:
                 for lord, rulership in [
-                        [lord_traditional, traditional_rulership],
-                        [lord_modern, modern_rulership]
+                    [lord_traditional, detailed_traditional_rulership],
+                    [lord_modern, detailed_modern_rulership]
                 ]:
-                    select_rulership(
-                        lord=lord,
-                        rulership=rulership,
-                        p=p,
-                        index=index
-                    )
+                    if rulership:
+                        select_rulership(
+                            lord=lord,
+                            rulership=rulership,
+                            p=p,
+                            index=index
+                        )
         received += 1
         progressbar(
             s=size,
@@ -465,21 +514,24 @@ def start_calculation(
         f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| Process finished."
     )
     log.close()
-    for aspect in aspects:
-        for index, planet in enumerate(PLANETS, 1):
-            for _planet in list(PLANETS)[index:]:
-                total_aspects[planet][_planet] += \
-                    aspects[aspect][planet][_planet]
-    get_total_of_rulership(
-        constant=TRADITIONAL_RULERSHIP,
-        rulership=traditional_rulership,
-        total=total_traditional_rulership
-    )
-    get_total_of_rulership(
-        constant=MODERN_RULERSHIP,
-        rulership=modern_rulership,
-        total=total_modern_rulership
-    )
+    if aspects and sum_of_aspects:
+        for aspect in aspects:
+            for index, planet in enumerate(PLANETS, 1):
+                for _planet in list(PLANETS)[index:]:
+                    sum_of_aspects[planet][_planet] += \
+                        aspects[aspect][planet][_planet]
+    if detailed_traditional_rulership and basic_traditional_rulership:
+        get_total_of_rulership(
+            constant=TRADITIONAL_RULERSHIP,
+            rulership=detailed_traditional_rulership,
+            total=basic_traditional_rulership
+        )
+    if detailed_modern_rulership and basic_modern_rulership:
+        get_total_of_rulership(
+            constant=MODERN_RULERSHIP,
+            rulership=detailed_modern_rulership,
+            total=basic_modern_rulership
+        )
     if not os.path.exists(os.path.join(".", path)):
         os.makedirs(path)
     filename = os.path.join(path, "observed_values.xlsx")
@@ -490,12 +542,12 @@ def start_calculation(
         houses_in_signs=houses_in_signs,
         planets_in_houses=planets_in_houses,
         aspects=aspects,
-        total_aspects=total_aspects,
+        sum_of_aspects=sum_of_aspects,
         planets_in_houses_in_signs=planets_in_houses_in_signs,
-        total_traditional_rulership=total_traditional_rulership,
-        total_modern_rulership=total_modern_rulership,
-        traditional_rulership=traditional_rulership,
-        modern_rulership=modern_rulership,
+        basic_traditional_rulership=basic_traditional_rulership,
+        basic_modern_rulership=basic_modern_rulership,
+        detailed_traditional_rulership=detailed_traditional_rulership,
+        detailed_modern_rulership=detailed_modern_rulership,
         yod=yod,
         t_square=t_square,
         grand_trine=grand_trine
@@ -650,63 +702,15 @@ def find_aspect(aspects, temporary, orb, aspect, planet1, planet2):
         temporary["opposite"][planet1][planet2] += 1
 
 
-def get_basic_dict(values, indexes, constants, sub_index=(0, 0)):
-    if sub_index == (0, 0):
-        i1, i2 = 1, 13
-    else:
-        i1, i2 = sub_index
-    return {
-        list(constants[0])[index]: {
-            list(constants[1])[ind]: value
-            for ind, value in enumerate(i[i1:i2])
-        } for index, i in enumerate(values[indexes[0]: indexes[1]])
-    }
-
-
-def get_aspect_dict(values, indexes, constants):
-    return {
-        list(constants[0])[index]: {
-            list(constants[0])[ind]: j[index]
-            for ind, j in enumerate(
-                values[indexes[0]:indexes[1]][index + 1:], index + 1
-            )
-        }
-        for index, i in enumerate(values[indexes[0]: indexes[1]])
-    }
-
-
-def get_pattern_dict(values, c):
-    result = {}
-    for index, planet in enumerate(PLANETS):
-        constants = list(PLANETS)[:index] + list(PLANETS)[index + 1:]
-        result[planet] = get_aspect_dict(values, [c, c + 13], [constants])
-        c += 15
-    return result
-
-
-def get_planet_dict(values, planets, c, arrays):
-    result = {}
-    if planets:
-        array = planets
-    else:
-        array = range(1, 13)
-    for i in array:
-        result[f"Lord-{i}" if not planets else i] = get_basic_dict(
-            values,
-            [c, c + 12],
-            arrays,
-            [2, 14]
-        )
-        c += 15
-    return result
-
-
 def get_values(filename):
-    df = pd.read_excel(filename)
-    values = df.values
-    info = {df.columns[0].replace(":", ""): df.columns[2]}
-    info.update({i[0].replace(":", ""): i[2] for i in values[:5]})
-    info.update({"Database": df.columns[5]})
+    dfs = [
+        pd.read_excel(filename, sheet_name=name)
+        for name in SHEETS
+    ]
+    values = dfs[0].values
+    info = {dfs[0].columns[0].replace(":", ""): dfs[0].columns[2]}
+    info.update({i[0].replace(":", ""): str(i[2]) for i in values[:5]})
+    info.update({"Database": dfs[0].columns[5]})
     info.update(
         {
             i[3].replace(":", ""): i[5]
@@ -716,58 +720,111 @@ def get_values(filename):
     config = ConfigParser()
     config.read("defaults.ini")
     planets = only_planets(PLANETS)
-    total = sum(values[7][1: 13])
-    planets_in_signs = get_basic_dict(values, [7, 19], [planets, SIGNS])
-    houses_in_signs = get_basic_dict(values, [21, 33], [HOUSES, SIGNS])
-    planets_in_houses = get_basic_dict(values, [35, 47], [planets, HOUSES])
-    aspects = {}
-    planets_in_houses_in_signs = get_planet_dict(
-        values,
-        planets,
-        49,
-        [HOUSES, SIGNS]
-    )
-    total_traditional_rulership = get_basic_dict(
-        values, [230, 242], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
-    )
-    total_modern_rulership = get_basic_dict(
-        values, [246, 258], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
-    )
-    traditional_rulership = get_planet_dict(
-        values,
-        None,
-        262,
-        [list(TRADITIONAL_RULERSHIP.values()), HOUSES]
-    )
-    modern_rulership = get_planet_dict(
-        values,
-        None,
-        443,
-        [list(MODERN_RULERSHIP.values()), HOUSES]
-    )
-    c = 623
-    for key in config["ORB FACTORS"]:
-        aspects[key] = get_aspect_dict(values, [c, c + 14], [PLANETS])
-        c += 16
-    total_aspects = get_aspect_dict(values, [c, c + 14], [PLANETS])
-    yod = get_pattern_dict(values, 815)
-    t_square = get_pattern_dict(values, 1025)
-    grand_trine = get_pattern_dict(values, 1235)
+    values = dfs[1].values
+    if len(values) != 0:
+        total = sum(values[0][1: 13])
+        planets_in_signs = get_basic_dict(values, [0, 12], [planets, SIGNS])
+    else:
+        total = 0
+        planets_in_signs = {}
+    values = dfs[2].values
+    if len(values) != 0:
+        houses_in_signs = get_basic_dict(values, [0, 12], [HOUSES, SIGNS])
+    else:
+        houses_in_signs = {}
+    values = dfs[3].values
+    if len(values) != 0:
+        planets_in_houses = get_basic_dict(values, [0, 12], [planets, HOUSES])
+    else:
+        planets_in_houses = {}
+    values = dfs[4].values
+    if len(values) != 0:
+        planets_in_houses_in_signs = get_planet_dict(
+            values,
+            planets,
+            0,
+            [HOUSES, SIGNS]
+        )
+    else:
+        planets_in_houses_in_signs = {}
+    values = dfs[5].values
+    if len(values) != 0:
+        basic_traditional_rulership = get_basic_dict(
+            values, [0, 12], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
+        )
+    else:
+        basic_traditional_rulership = {}
+    values = dfs[6].values
+    if len(values) != 0:
+        basic_modern_rulership = get_basic_dict(
+            values, [0, 12], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
+        )
+    else:
+        basic_modern_rulership = {}
+    values = dfs[7].values
+    if len(values) != 0:
+        detailed_traditional_rulership = get_planet_dict(
+            values,
+            None,
+            0,
+            [list(TRADITIONAL_RULERSHIP.values()), HOUSES]
+        )
+    else:
+        detailed_traditional_rulership = {}
+    values = dfs[8].values
+    if len(values) != 0:
+        detailed_modern_rulership = get_planet_dict(
+            values,
+            None,
+            0,
+            [list(MODERN_RULERSHIP.values()), HOUSES]
+        )
+    else:
+        detailed_modern_rulership = {}
+    values = dfs[9].values
+    if len(values) != 0:
+        c = 0
+        aspects = {}
+        for key in config["ORB FACTORS"]:
+            aspects[key] = get_aspect_dict(values, [c, c + 14], [PLANETS])
+            c += 16
+    else:
+        aspects = {}
+    values = dfs[10].values
+    if len(values) != 0:
+        sum_of_aspects = get_aspect_dict(values, [0, 14], [PLANETS])
+    else:
+        sum_of_aspects = {}
+    values = dfs[11].values
+    if len(values) != 0:
+        yod = get_pattern_dict(values, 0)
+    else:
+        yod = {}
+    values = dfs[12].values
+    if len(values) != 0:
+        t_square = get_pattern_dict(values, 0)
+    else:
+        t_square = {}
+    values = dfs[13].values
+    if len(values) != 0:
+        grand_trine = get_pattern_dict(values, 0)
+    else:
+        grand_trine = {}
     return (
         total,
         planets_in_signs,
         houses_in_signs,
         planets_in_houses,
         aspects,
-        total_aspects,
+        sum_of_aspects,
         yod,
         t_square,
         grand_trine,
         planets_in_houses_in_signs,
-        total_traditional_rulership,
-        total_modern_rulership,
-        traditional_rulership,
-        modern_rulership,
+        basic_traditional_rulership,
+        basic_modern_rulership,
+        detailed_traditional_rulership,
+        detailed_modern_rulership,
         info
     )
 
@@ -925,7 +982,7 @@ def select_calculation(
             else:
                 cancel = False
             select_basic(
-                d1=x[i], 
+                d1=x[i],
                 d2=y[i],
                 method=method,
                 calculation_type=calculation_type,
@@ -939,7 +996,7 @@ def select_calculation(
             else:
                 cancel = False
             select_detailed(
-                d1=x[i], 
+                d1=x[i],
                 d2=y[i],
                 method=method,
                 calculation_type=calculation_type,
@@ -947,22 +1004,26 @@ def select_calculation(
                 x_total=x[0],
                 y_total=y[0]
             )
+    results = [
+        x[i] if len(x[i]) == len(y[i]) else {}
+        for i in range(1, 14)
+    ]
     Spreadsheet(
         filename=output,
         info=x_info,
-        planets_in_signs=x[1],
-        houses_in_signs=x[2],
-        planets_in_houses=x[3],
-        aspects=x[4],
-        total_aspects=x[5],
-        yod=x[6],
-        t_square=x[7],
-        grand_trine=x[8],
-        planets_in_houses_in_signs=x[9],
-        total_traditional_rulership=x[10],
-        total_modern_rulership=x[11],
-        traditional_rulership=x[12],
-        modern_rulership=x[13],
+        planets_in_signs=results[0],
+        houses_in_signs=results[1],
+        planets_in_houses=results[2],
+        aspects=results[3],
+        sum_of_aspects=results[4],
+        yod=results[5],
+        t_square=results[6],
+        grand_trine=results[7],
+        planets_in_houses_in_signs=results[8],
+        basic_traditional_rulership=results[9],
+        basic_modern_rulership=results[10],
+        detailed_traditional_rulership=results[11],
+        detailed_modern_rulership=results[12],
     )
     widget.after(
         0, 

@@ -42,7 +42,8 @@ class Database:
         else:
             SingleSelection(
                 title="Database",
-                catalogue=[i for i in os.listdir("Database")]
+                catalogue=[i for i in os.listdir("Database")],
+                destroy=True
             )
             config = ConfigParser()
             config.read("defaults.ini")

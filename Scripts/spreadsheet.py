@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from .modules import Workbook, ConfigParser
+from .modules import Workbook, ConfigParser, pd
+from .constants import (
+    SIGNS, HOUSES, SHEETS, PLANETS,
+    MODERN_RULERSHIP, TRADITIONAL_RULERSHIP
+)
+from .utilities import (
+    only_planets, get_basic_dict, get_planet_dict,
+    get_aspect_dict, get_pattern_dict,
+)
 
 
 class Spreadsheet(Workbook):
@@ -11,12 +19,12 @@ class Spreadsheet(Workbook):
             houses_in_signs,
             planets_in_houses,
             aspects,
-            total_aspects,
+            sum_of_aspects,
             planets_in_houses_in_signs,
-            total_traditional_rulership,
-            total_modern_rulership,
-            traditional_rulership,
-            modern_rulership,
+            basic_traditional_rulership,
+            basic_modern_rulership,
+            detailed_traditional_rulership,
+            detailed_modern_rulership,
             yod,
             t_square,
             grand_trine,
@@ -24,7 +32,10 @@ class Spreadsheet(Workbook):
             **kwargs
     ):
         super().__init__(*args, **kwargs)
-        self.sheet = self.add_worksheet()
+        self.sheets = {
+            name: self.add_worksheet(name=name)
+            for name in SHEETS
+        }
         self.cols = [
             "A", "B", "C",
             "D", "E", "F",
@@ -37,61 +48,196 @@ class Spreadsheet(Workbook):
         self.config.read("defaults.ini")
         self.orb_factor = self.config["ORB FACTORS"]
         if info:
-            self.write_info(info=info)
-        row = 8
-        for i in [planets_in_signs, houses_in_signs, planets_in_houses]:
-            self.write_basic(data=i, row=row)
-            row += 14
-        self.write_advanced(data=planets_in_houses_in_signs, row=row)
-        row += 180
-        for i, j in zip(
-                ["Traditional", "Modern"],
-                [total_traditional_rulership, total_modern_rulership]
-        ):
-            self.write_basic(
-                data=j,
-                row=row,
-                title=f"{i} House Rulership"
+            self.write_info(
+                sheet=self.sheets["Info"],
+                info=info
             )
-            row += 16
-        for i, j in zip(
-                ["Traditional", "Modern"],
-                [traditional_rulership, modern_rulership]
-        ):
-            self.write_advanced(
-                data=j,
-                row=row,
-                title=f"Detailed {i} House Rulership"
-            )
-            row += 181
-        for aspect in aspects:
-            self.write_aspects(
-                data=aspects[aspect],
-                row=row,
-                aspect=aspect.title(),
-                orb_factor=self.config["ORB FACTORS"][aspect]
-            )
-            row += 16
-        self.write_aspects(
-            data=total_aspects,
-            row=row,
-            aspect="All Aspects",
-            orb_factor=""
-        )
-        row = 816
-        for i in [
-            (yod, "Yod ", "Apex"),
-            (t_square, "T-Square ", "Apex"),
-            (grand_trine, "Grand Trine ", "Planet")
-        ]:
-            for k, v in i[0].items():
-                self.write_aspects(
-                    data=v,
-                    row=row,
-                    aspect=i[1],
-                    orb_factor=f"({i[2]}: {k})"
-                )
-                row += 15
+        planets = only_planets(PLANETS)
+        for index, name in enumerate(SHEETS):
+            try:
+                df = pd.read_excel(kwargs["filename"], sheet_name=name)
+            except FileNotFoundError:
+                df = None
+            if name == "Planets In Signs":
+                if not planets_in_signs:
+                    if df is not None and len(df.values) != 0:
+                        planets_in_signs = get_basic_dict(
+                            values=df.values,
+                            indexes=[0, 12],
+                            constants=[planets, SIGNS]
+                        )
+                if planets_in_signs:
+                    self.write_basic(
+                        sheet=self.sheets[name],
+                        data=planets_in_signs,
+                        row=1
+                    )
+                    planets_in_signs.clear()
+            elif name == "Houses In Signs":
+                if not houses_in_signs:
+                    if df is not None and len(df.values) != 0:
+                        houses_in_signs = get_basic_dict(
+                            values=df.values,
+                            indexes=[0, 12],
+                            constants=[HOUSES, SIGNS]
+                        )
+                if houses_in_signs:
+                    self.write_basic(
+                        sheet=self.sheets[name],
+                        data=houses_in_signs,
+                        row=1
+                    )
+                    houses_in_signs.clear()
+            elif name == "Planets In Houses":
+                if not planets_in_houses:
+                    if df is not None and len(df.values) != 0:
+                        planets_in_houses = get_basic_dict(
+                            values=df.values,
+                            indexes=[0, 12],
+                            constants=[planets, HOUSES]
+                        )
+                if planets_in_houses:
+                    self.write_basic(
+                        sheet=self.sheets[name],
+                        data=planets_in_houses,
+                        row=1
+                    )
+                    planets_in_houses.clear()
+            elif name == "Planets In Houses In Signs":
+                if not planets_in_houses_in_signs:
+                    if df is not None and len(df.values) != 0:
+                        planets_in_houses_in_signs = get_planet_dict(
+                            values=df.values,
+                            planets=planets,
+                            c=0,
+                            arrays=[HOUSES, SIGNS]
+                        )
+                if planets_in_houses_in_signs:
+                    self.write_advanced(
+                        sheet=self.sheets[name],
+                        data=planets_in_houses_in_signs,
+                        row=1
+                    )
+                    planets_in_houses_in_signs.clear()
+            elif name in [
+                "Basic Traditional Rulership",
+                "Basic Modern Rulership"
+            ]:
+                if name == "Basic Traditional Rulership":
+                    d = basic_traditional_rulership
+                else:
+                    d = basic_modern_rulership
+                if not d:
+                    if df is not None and len(df.values) != 0:
+                        d = get_basic_dict(
+                            values=df.values,
+                            indexes=[0, 12],
+                            constants=[
+                                [f"Lord-{i}" for i in range(1, 13)],
+                                HOUSES
+                            ]
+                        )
+                if d:
+                    self.write_basic(
+                        sheet=self.sheets[name],
+                        data=d,
+                        row=1,
+                        total=True
+                    )
+                    d.clear()
+            elif name in [
+                "Detailed Traditional Rulership",
+                "Detailed Modern Rulership"
+            ]:
+                if name == "Detailed Traditional Rulership":
+                    d = detailed_traditional_rulership
+                    rulership = list(TRADITIONAL_RULERSHIP.values())
+                else:
+                    d = detailed_modern_rulership
+                    rulership = list(MODERN_RULERSHIP.values())
+                if not d:
+                    if df is not None and len(df.values) != 0:
+                        d = get_planet_dict(
+                            df.values,
+                            None,
+                            0,
+                            [rulership, HOUSES]
+                        )
+                if d:
+                    self.write_advanced(
+                        sheet=self.sheets[name],
+                        data=d,
+                        row=1
+                    )
+                    d.clear()
+            elif name == "Aspects":
+                if not aspects:
+                    if df is not None and len(df.values) != 0:
+                        c = 0
+                        for key in self.config["ORB FACTORS"]:
+                            aspects[key] = get_aspect_dict(
+                                values=df.values,
+                                indexes=[c, c + 14],
+                                constants=[PLANETS]
+                            )
+                            c += 16
+                if aspects:
+                    row = 1
+                    for aspect in aspects:
+                        self.write_aspects(
+                            sheet=self.sheets[name],
+                            data=aspects[aspect],
+                            row=row,
+                            aspect=aspect.title(),
+                            orb_factor=self.config["ORB FACTORS"][aspect]
+                        )
+                        row += 16
+                    aspects.clear()
+            elif name == "Sum Of Aspects":
+                if not sum_of_aspects:
+                    if df is not None and len(df.values) != 0:
+                        sum_of_aspects = get_aspect_dict(
+                            values=df.values,
+                            indexes=[0, 14],
+                            constants=[PLANETS]
+                        )
+                if sum_of_aspects:
+                    self.write_aspects(
+                        sheet=self.sheets[name],
+                        data=sum_of_aspects,
+                        row=1,
+                        aspect=name,
+                        orb_factor=""
+                    )
+                    sum_of_aspects.clear()
+            elif name in ["Yod", "T-Square", "Grand Trine"]:
+                if name == "Yod":
+                    d = yod
+                    title = "Apex"
+                elif name == "T-Square":
+                    d = t_square
+                    title = "Apex"
+                else:
+                    d = grand_trine
+                    title = "Planet"
+                if not d:
+                    if df is not None and len(df.values) != 0:
+                        d = get_pattern_dict(
+                            values=df.values,
+                            c=0
+                        )
+                if d:
+                    row = 1
+                    for k, v in d.items():
+                        self.write_aspects(
+                            sheet=self.sheets[name],
+                            data=v,
+                            row=row,
+                            aspect=name + " ",
+                            orb_factor=f"({title}: {k})"
+                        )
+                        row += 15
+                    d.clear()
         self.close()
 
     def format(
@@ -113,67 +259,54 @@ class Spreadsheet(Workbook):
             }
         )
 
-    def write_basic(self, data, row, title=""):
-        title_row = row
+    def write_basic(self, sheet, data, row, total=False):
         totals = [[] for _ in range(13)]
-        if title:
-            title_row = row + 1
-            self.sheet.merge_range(
-                f"A{row}:N{row}",
-                title,
-                self.format(align="center", bold=True)
-            )
-            self.sheet.write(
-                f"A{row + 14}",
-                "Total",
-                self.format(align="center", bold=True)
-            )
-            row += 1
-        self.sheet.write(
+        sheet.write(
             f"N{row}", "Total", self.format(align="center", bold=True)
         )
         for keys, values in data.items():
             if keys.startswith("House"):
                 keys = keys.replace("House-", "Cusp ")
-            self.sheet.write(
+            sheet.write(
                 f"A{row + 1}",
                 keys.replace("-", " "),
                 self.format(align="center", bold=True)
             )
-            total = 0
+            t = 0
             for column, (key, value) in enumerate(values.items()):
-                total += value
-                self.sheet.write(
-                    f"{self.cols[1 + column]}{row + 1}",
-                    value,
-                    self.format(align="center", bold=False)
-                )
-                if title:
-                    totals[column].append(value)
-                if row == title_row:
-                    if "-" in key:
-                        key = key.replace("-", " ")
-                    self.sheet.write(
+                if row == 1:
+                    sheet.write(
                         f"{self.cols[1 + column]}{row}",
                         key,
                         self.format(align="center", bold=True)
                     )
-            self.sheet.write(
+                t += value
+                sheet.write(
+                    f"{self.cols[1 + column]}{row + 1}",
+                    value,
+                    self.format(align="center", bold=False)
+                )
+                if total:
+                    totals[column].append(value)
+            sheet.write(
                 f"N{row + 1}",
-                total,
+                t,
                 self.format(align="center", bold=False)
             )
-            totals[12].append(total)
+            totals[12].append(t)
             row += 1
-        if title:
+        if total:
+            sheet.write(
+                f"N{row}", "Total", self.format(align="center", bold=True)
+            )
             for index, i in enumerate(totals):
-                self.sheet.write(
-                    f"{self.cols[1 + index]}{row + 1}",
+                sheet.write(
+                    f"{self.cols[1 + index]}{row}",
                     sum(i),
                     self.format(align="center", bold=False)
                 )
 
-    def write_aspects(self, data, row, aspect, orb_factor):
+    def write_aspects(self, sheet, data, row, aspect, orb_factor):
         if orb_factor:
             if "Apex" in orb_factor or "Planet" in orb_factor:
                 orb = orb_factor
@@ -181,20 +314,20 @@ class Spreadsheet(Workbook):
                 orb = ": Orb Factor: +- " + orb_factor
         else:
             orb = ""
-        self.sheet.merge_range(
+        sheet.merge_range(
             f"A{row}:C{row}",
             aspect.title() + orb,
             self.format(align="left", bold=True)
         )
         for index, (key, value) in enumerate(data.items()):
-            self.sheet.write(
+            sheet.write(
                 f"{self.cols[index]}{row + 1}",
                 key,
                 self.format(align="center", bold=True)
             )
             r = 0
             for k, v in value.items():
-                self.sheet.write(
+                sheet.write(
                     f"{self.cols[index]}{row + 2 + r}",
                     v,
                     self.format(align="center", bold=False)
@@ -202,25 +335,18 @@ class Spreadsheet(Workbook):
                 r += 1
             row += 1
 
-    def write_advanced(self, data, row, title=""):
-        if title:
-            self.sheet.merge_range(
-                f"A{row}:O{row}",
-                title,
-                self.format(align="center", bold=True)
-            )
-            row += 1
+    def write_advanced(self, sheet, data, row):
         for key, value in data.items():
             if "Lord" in key:
                 word = "is"
             else:
                 word = "in"
-            self.sheet.merge_range(
+            sheet.merge_range(
                 f"A{row + 1}:A{row + 12}",
                 f"{key.replace('-', ' ')}\n{word}",
                 self.format(bold=True, align="center")
             )
-            self.sheet.merge_range(
+            sheet.merge_range(
                 f"A{row + 13}:B{row + 13}",
                 "Total",
                 self.format(bold=True, align="center")
@@ -231,13 +357,13 @@ class Spreadsheet(Workbook):
                 if r == 0:
                     col = 0
                     for _k, _v in v.items():
-                        self.sheet.write(
+                        sheet.write(
                             f"{self.cols[2 + col]}{row}",
                             _k.replace("-", " "),
                             self.format(bold=True, align="center")
                         )
                         col += 1
-                    self.sheet.write(
+                    sheet.write(
                         f"{self.cols[2 + col]}{row}",
                         "Total",
                         self.format(bold=True, align="center")
@@ -245,7 +371,7 @@ class Spreadsheet(Workbook):
                 col = 0
                 total = 0
                 for _key, _value in v.items():
-                    self.sheet.write(
+                    sheet.write(
                         f"{self.cols[2 + col]}{row + 1 + r}",
                         _value,
                         self.format(bold=False, align="center")
@@ -253,52 +379,52 @@ class Spreadsheet(Workbook):
                     total += _value
                     totals[col].append(_value)
                     col += 1
-                self.sheet.write(
+                sheet.write(
                     f"{self.cols[2 + col]}{row + 1 + r}",
                     total,
                     self.format(bold=False, align="center")
                 )
                 totals[col].append(total)
-                self.sheet.write(
+                sheet.write(
                     f"B{row + 1 + r}",
                     k,
                     self.format(bold=True, align="center")
                 )
                 r += 1
             for i in range(12):
-                self.sheet.merge_range(
+                sheet.merge_range(
                     f"A{row + 13}:B{row + 13}",
                     "Total",
                     self.format(bold=True, align="center")
                 )
             for index, i in enumerate(totals):
-                self.sheet.write(
+                sheet.write(
                     f"{self.cols[2 + index]}{row + 13}",
                     sum(i),
                     self.format(bold=False, align="center")
                 )
             row += 15
 
-    def write_info(self, info):
+    def write_info(self, sheet, info):
         for index, (key, value) in enumerate(info.items()):
             if index < 6:
-                self.sheet.merge_range(
+                sheet.merge_range(
                     f"A{index + 1}:B{index + 1}",
                     key + ":",
                     self.format(bold=True, align="left")
                 )
-                self.sheet.write(
+                sheet.write(
                     f"C{index + 1}",
                     value,
                     self.format(bold=False, align="left")
                 )
             else:
-                self.sheet.merge_range(
+                sheet.merge_range(
                     f"D{index - 5}:E{index - 5}",
                     key + ":",
                     self.format(bold=True, align="left")
                 )
-                self.sheet.merge_range(
+                sheet.merge_range(
                     f"F{index - 5}:N{index - 5}",
                     value,
                     self.format(bold=False, align="left")

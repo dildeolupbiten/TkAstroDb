@@ -153,3 +153,20 @@ TRADITIONAL_RULERSHIP = {
     "Aquarius": "Saturn (+)",
     "Pisces": "Jupiter (-)"
 }
+
+SHEETS = [
+    "Info",
+    "Planets In Signs",
+    "Houses In Signs",
+    "Planets In Houses",
+    "Planets In Houses In Signs",
+    "Basic Traditional Rulership",
+    "Basic Modern Rulership",
+    "Detailed Traditional Rulership",
+    "Detailed Modern Rulership",
+    "Aspects",
+    "Sum Of Aspects",
+    "Yod",
+    "T-Square",
+    "Grand Trine"
+]
