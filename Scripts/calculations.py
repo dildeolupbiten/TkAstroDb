@@ -5,8 +5,8 @@ from .spreadsheet import Spreadsheet
 from .messagebox import MsgBox, ChoiceBox
 from .utilities import (
     convert_coordinates, progressbar, get_basic_dict,
-    get_planet_dict, get_aspect_dict, get_pattern_dict,
-    only_planets
+    get_planet_dict, get_aspect_dict, only_planets,
+    get_3d_pattern_dict, get_4d_pattern_dict
 )
 from .modules import (
     os, dt, pd, tk, ttk, time, binom, shutil,
@@ -66,6 +66,22 @@ def create_3d_dict(planets):
     return result
 
 
+def create_4d_dict(planets):
+    result = {}
+    for i, p in enumerate(planets):
+        result[p] = {}
+        _planets = planets[:i] + planets[i + 1:]
+        for _i, _p in enumerate(_planets):
+            result[p][_p] = {}
+            planets_ = _planets[:_i] + _planets[_i + 1:]
+            for i_, p_ in enumerate(planets_):
+                result[p][_p][p_] = {}
+                __planets = planets_[i_ + 1:]
+                for __i, __p in enumerate(__planets):
+                    result[p][_p][p_][__p] = 0
+    return result
+
+
 def get_aspects(aspects, aspect_type):
     result = {}
     for keys, values in aspects[aspect_type].items():
@@ -111,16 +127,88 @@ def three_point(aspects, aspect_type):
     return result
 
 
+def four_point(aspects, aspect_type):
+    if aspect_type in ["mystic rectangle", "kite"]:
+        first = "sextile"
+        second = "trine"
+        third = "opposite"
+    elif aspect_type == "grand cross":
+        first = "square"
+        second = "square"
+        third = "opposite"
+    else:
+        return
+    first = get_aspects(aspects, first)
+    second = get_aspects(aspects, second)
+    third = get_aspects(aspects, third)
+    result = []
+    for k, v in third.items():
+        for i in v:
+            for j in second[i]:
+                if j in first[k]:
+                    if aspect_type == "kite":
+                        for m in second[j]:
+                            if (
+                                m in first[k]
+                                and
+                                m in second[i]
+                                and
+                                sorted([k, i, j, m]) not in
+                                [sorted(n) for n in result]
+                            ):
+                                result += [[k, i, j, m]]
+                    else:
+                        for m in third[j]:
+                            if (
+                                m in first[i]
+                                and
+                                m in second[k]
+                                and
+                                sorted([k, i, j, m]) not in
+                                [sorted(n) for n in result]
+                            ):
+                                result += [[k, i, j, m]]
+    return result
+
+
+def no_subset(subset, superset):
+    result = [i for i in subset]
+    for i in subset:
+        for j in superset:
+            if all(k in j for k in i):
+                result.remove(i)
+                break
+    return result
+
+
 def get_yod(aspects):
     return three_point(aspects, "yod")
 
 
 def get_t_square(aspects):
-    return three_point(aspects, "t-square")
+    return no_subset(
+        subset=three_point(aspects, "t-square"),
+        superset=get_grand_cross(aspects)
+    )
 
 
 def get_grand_trine(aspects):
-    return three_point(aspects, "grand trine")
+    return no_subset(
+        subset=three_point(aspects, "grand trine"),
+        superset=get_kite(aspects)
+    )
+
+
+def get_mystic_rectangle(aspects):
+    return four_point(aspects, "mystic rectangle")
+
+
+def get_grand_cross(aspects):
+    return four_point(aspects, "grand cross")
+
+
+def get_kite(aspects):
+    return four_point(aspects, "kite")
 
 
 def find_observed_values(widget, icons, menu):
@@ -370,6 +458,18 @@ def start_calculation(
         grand_trine = create_3d_dict(list(PLANETS))
     else:
         grand_trine = {}
+    if config["TABLE SELECTION"]["mystic_rectangle"] == "true":
+        mystic_rectangle = create_4d_dict(list(PLANETS))
+    else:
+        mystic_rectangle = {}
+    if config["TABLE SELECTION"]["grand_cross"] == "true":
+        grand_cross = create_4d_dict(list(PLANETS))
+    else:
+        grand_cross = {}
+    if config["TABLE SELECTION"]["kite"] == "true":
+        kite = create_4d_dict(list(PLANETS))
+    else:
+        kite = {}
     size = len(displayed_results)
     received = 0
     now = time.time()
@@ -414,6 +514,7 @@ def start_calculation(
     )
     log.flush()
     menu.entryconfigure(0, command=lambda: send_warning_message(icons=icons))
+    total = 0
     for i in displayed_results:
         if mode in ["adb_xml", "adb_json"]:
             jd = float(i[6])
@@ -425,9 +526,9 @@ def start_calculation(
             lon = i[8]
         try:
             patterns = Zodiac(
-                jd=jd,
-                lat=lat,
-                lon=lon,
+                jd=jd,  # 2438421.958739,  # 2416368.687535,  # 2446429.670774,  # jd,
+                lat=lat,  # 37.48,  # 50.11,  # 47.51,  # lat,
+                lon=lon,  # 37.29,  # 8.68,  # 8.54,  # lon,
                 hsys=HOUSE_SYSTEMS[config["HOUSE SYSTEM"]["selected"]]
             ).patterns()
         except BaseException as err:
@@ -473,15 +574,35 @@ def start_calculation(
                         aspect=abs(p[2] - _p[2])
                     )
         if aspects and yod:
-            special_aspect_pattern(temporary, yod, get_yod)
+            special_aspect_3d_pattern(temporary, yod, get_yod)
         if aspects and t_square:
-            special_aspect_pattern(temporary, t_square, get_t_square)
+            special_aspect_3d_pattern(temporary, t_square, get_t_square)
         if aspects and grand_trine:
-            special_aspect_pattern(
+            special_aspect_3d_pattern(
                 temporary,
                 grand_trine,
                 get_grand_trine,
                 apex=False
+            )
+        if aspects and mystic_rectangle:
+            special_aspect_4d_pattern(
+                temporary,
+                mystic_rectangle,
+                get_mystic_rectangle,
+                apex=False
+            )
+        if aspects and grand_cross:
+            special_aspect_4d_pattern(
+                temporary,
+                grand_cross,
+                get_grand_cross,
+                apex=False
+            )
+        if aspects and kite:
+            special_aspect_4d_pattern(
+                temporary,
+                kite,
+                get_kite,
             )
         for index, h in enumerate(patterns[1], 1):
             if houses_in_signs:
@@ -510,6 +631,7 @@ def start_calculation(
             plabel=plabel,
             pstring=pstring
         )
+        total += 1
     log.write(
         f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| Process finished."
     )
@@ -535,6 +657,7 @@ def start_calculation(
     if not os.path.exists(os.path.join(".", path)):
         os.makedirs(path)
     filename = os.path.join(path, "observed_values.xlsx")
+    info["Number Of Records"] = total
     Spreadsheet(
         filename=filename,
         info=info,
@@ -550,7 +673,10 @@ def start_calculation(
         detailed_modern_rulership=detailed_modern_rulership,
         yod=yod,
         t_square=t_square,
-        grand_trine=grand_trine
+        grand_trine=grand_trine,
+        mystic_rectangle=mystic_rectangle,
+        grand_cross=grand_cross,
+        kite=kite
     )
     shutil.move(
         src=os.path.join(os.getcwd(), "output.log"),
@@ -577,7 +703,7 @@ def start_calculation(
     )
 
 
-def special_aspect_pattern(temporary, pattern, func, apex=True):
+def special_aspect_3d_pattern(temporary, pattern, func, apex=True):
     for i in func(temporary):
         if not apex:
             ordered = sorted(i, key=list(PLANETS).index)
@@ -587,6 +713,20 @@ def special_aspect_pattern(temporary, pattern, func, apex=True):
         else:
             ordered = sorted(i[:-1], key=list(PLANETS).index)
             pattern[i[-1]][ordered[0]][ordered[1]] += 1
+
+
+def special_aspect_4d_pattern(temporary, pattern, func, apex=True):
+    for i in func(temporary):
+        if not apex:
+            ordered1 = sorted(i[2:], key=list(PLANETS).index)
+            pattern[i[0]][i[1]][ordered1[0]][ordered1[1]] += 1
+            pattern[i[1]][i[0]][ordered1[0]][ordered1[1]] += 1
+            ordered2 = sorted(i[:2], key=list(PLANETS).index)
+            pattern[i[2]][i[3]][ordered2[0]][ordered2[1]] += 1
+            pattern[i[3]][i[2]][ordered2[0]][ordered2[1]] += 1
+        else:
+            ordered = sorted(i[2:], key=list(PLANETS).index)
+            pattern[i[0]][i[1]][ordered[0]][ordered[1]] += 1
 
 
 def select_rulership(lord, rulership, index, p):
@@ -708,76 +848,83 @@ def get_values(filename):
         for name in SHEETS
     ]
     values = dfs[0].values
-    info = {dfs[0].columns[0].replace(":", ""): dfs[0].columns[2]}
-    info.update({i[0].replace(":", ""): str(i[2]) for i in values[:5]})
-    info.update({"Database": dfs[0].columns[5]})
-    info.update(
-        {
-            i[3].replace(":", ""): i[5]
-            for i in values[:5] if not isinstance(i[3], float)
-        }
-    )
+    info = {v[0].replace(":", ""): v[2] for v in values}
+    total = info["Number Of Records"]
     config = ConfigParser()
     config.read("defaults.ini")
     planets = only_planets(PLANETS)
     values = dfs[1].values
     if len(values) != 0:
-        total = sum(values[0][1: 13])
-        planets_in_signs = get_basic_dict(values, [0, 12], [planets, SIGNS])
+        planets_in_signs = get_basic_dict(
+            values=values,
+            indexes=[0, 12],
+            constants=[planets, SIGNS]
+        )
     else:
-        total = 0
         planets_in_signs = {}
     values = dfs[2].values
     if len(values) != 0:
-        houses_in_signs = get_basic_dict(values, [0, 12], [HOUSES, SIGNS])
+        houses_in_signs = get_basic_dict(
+            values=values,
+            indexes=[0, 12],
+            constants=[HOUSES, SIGNS]
+        )
     else:
         houses_in_signs = {}
     values = dfs[3].values
     if len(values) != 0:
-        planets_in_houses = get_basic_dict(values, [0, 12], [planets, HOUSES])
+        planets_in_houses = get_basic_dict(
+            values=values,
+            indexes=[0, 12],
+            constants=[planets, HOUSES]
+        )
     else:
         planets_in_houses = {}
     values = dfs[4].values
     if len(values) != 0:
         planets_in_houses_in_signs = get_planet_dict(
-            values,
-            planets,
-            0,
-            [HOUSES, SIGNS]
+            values=values,
+            planets=planets,
+            c=0,
+            arrays=[HOUSES, SIGNS]
         )
     else:
         planets_in_houses_in_signs = {}
     values = dfs[5].values
     if len(values) != 0:
         basic_traditional_rulership = get_basic_dict(
-            values, [0, 12], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
+            values=values,
+            indexes=[0, 12],
+            constants=[[f"Lord-{i}" for i in range(1, 13)], HOUSES]
         )
     else:
         basic_traditional_rulership = {}
     values = dfs[6].values
     if len(values) != 0:
         basic_modern_rulership = get_basic_dict(
-            values, [0, 12], [[f"Lord-{i}" for i in range(1, 13)], HOUSES]
+            values=values,
+            indexes=[0, 12],
+            constants=[[f"Lord-{i}" for i in range(1, 13)], HOUSES]
         )
     else:
         basic_modern_rulership = {}
     values = dfs[7].values
     if len(values) != 0:
         detailed_traditional_rulership = get_planet_dict(
-            values,
-            None,
-            0,
-            [list(TRADITIONAL_RULERSHIP.values()), HOUSES]
+            values=values,
+            planets=None,
+            c=0,
+            arrays=[list(TRADITIONAL_RULERSHIP.values()), HOUSES]
         )
     else:
         detailed_traditional_rulership = {}
     values = dfs[8].values
     if len(values) != 0:
         detailed_modern_rulership = get_planet_dict(
-            values,
-            None,
-            0,
-            [list(MODERN_RULERSHIP.values()), HOUSES]
+            values=values,
+            planets=None,
+            c=0,
+            arrays=[list(MODERN_RULERSHIP.values()), HOUSES]
         )
     else:
         detailed_modern_rulership = {}
@@ -786,30 +933,41 @@ def get_values(filename):
         c = 0
         aspects = {}
         for key in config["ORB FACTORS"]:
-            aspects[key] = get_aspect_dict(values, [c, c + 14], [PLANETS])
+            aspects[key] = get_aspect_dict(
+                values=values,
+                indexes=[c, c + 14],
+                constants=[PLANETS]
+            )
             c += 16
     else:
         aspects = {}
     values = dfs[10].values
     if len(values) != 0:
-        sum_of_aspects = get_aspect_dict(values, [0, 14], [PLANETS])
+        sum_of_aspects = get_aspect_dict(
+            values=values,
+            indexes=[0, 14],
+            constants=[PLANETS]
+        )
     else:
         sum_of_aspects = {}
-    values = dfs[11].values
-    if len(values) != 0:
-        yod = get_pattern_dict(values, 0)
-    else:
-        yod = {}
-    values = dfs[12].values
-    if len(values) != 0:
-        t_square = get_pattern_dict(values, 0)
-    else:
-        t_square = {}
-    values = dfs[13].values
-    if len(values) != 0:
-        grand_trine = get_pattern_dict(values, 0)
-    else:
-        grand_trine = {}
+    pattern_3d = []
+    for i in range(11, 14):
+        values = dfs[i].values
+        if len(values) != 0:
+            pattern_3d.append(
+                get_3d_pattern_dict(values=values, c=0)
+            )
+        else:
+            pattern_3d.append({})
+    pattern_4d = []
+    for i in range(14, 17):
+        values = dfs[i].values
+        if len(values) != 0:
+            pattern_4d.append(
+                get_4d_pattern_dict(values=values, c=0)
+            )
+        else:
+            pattern_4d.append({})
     return (
         total,
         planets_in_signs,
@@ -817,9 +975,12 @@ def get_values(filename):
         planets_in_houses,
         aspects,
         sum_of_aspects,
-        yod,
-        t_square,
-        grand_trine,
+        pattern_3d[0],
+        pattern_3d[1],
+        pattern_3d[2],
+        pattern_4d[0],
+        pattern_4d[1],
+        pattern_4d[2],
         planets_in_houses_in_signs,
         basic_traditional_rulership,
         basic_modern_rulership,
@@ -836,7 +997,7 @@ def probability_mass_function(n, k, p):
     return round(result, 6)
 
 
-def select_basic(
+def select_dict(
         d1,
         d2,
         method,
@@ -884,57 +1045,6 @@ def select_basic(
                         d1[key][k] = p2
             except ZeroDivisionError:
                 d1[key][k] = 0
-
-
-def select_detailed(
-        d1,
-        d2,
-        method,
-        calculation_type,
-        cancel,
-        x_total,
-        y_total
-):
-    for (key, value), (_key, _value) in zip(d1.items(), d2.items()):
-        for (k, v), (k_, v_) in zip(value.items(), _value.items()):
-            save1 = {m: n for m, n in v.items()}
-            save2 = {m: n for m, n in v_.items()}
-            for (_k, _v), (__k, __v) in zip(v.items(), v_.items()):
-                try:
-                    if calculation_type == "expected":
-                        if method == "Subcategory":
-                            d1[key][k][_k] = __v * x_total / y_total
-                        elif method == "Independent":
-                            d1[key][k][_k] = \
-                                x_total * (_v + __v) / (x_total + y_total)
-                    elif calculation_type == "effect-size":
-                        d1[key][k][_k] = _v / __v
-                    elif calculation_type == "chi-square":
-                        d1[key][k][_k] = (_v - __v) ** 2 / __v
-                    elif calculation_type == "cohen's d":
-                        if cancel:
-                            d1[key][k][_k] = ""
-                        else:
-                            d1[key][k][_k] = (_v - __v) / \
-                                (
-                                    (
-                                        variance(save1.values()) +
-                                        variance(save2.values())
-                                    ) / 2
-                                ) ** 0.5
-                    elif calculation_type == "binomial limit":
-                        p1 = probability_mass_function(
-                            n=x_total, k=_v, p=__v / y_total
-                        )
-                        p2 = 100 - probability_mass_function(
-                            n=x_total, k=_v - 1, p=__v / y_total
-                        )
-                        if p1 < p2:
-                            d1[key][k][_k] = -p1
-                        elif p1 > p2:
-                            d1[key][k][_k] = p2
-                except ZeroDivisionError:
-                    d1[key][k][_k] = 0
     
     
 def select_calculation(
@@ -967,21 +1077,21 @@ def select_calculation(
     y_info = y[-1]
     if calculation_type in ["expected", "binomial limit"]:
         for k in x_info:
-            x_info[k] = x_info[k] + " & " + y_info[k]
+            x_info[k] = str(x_info[k]) + " & " + str(y_info[k])
     else:
         x_info = y_info
     config = ConfigParser()
     config.read("defaults.ini")
     method = config["METHOD"]["selected"]
     for i in range(len(y)):
-        if i in [0, 14]:
+        if i in [0, 17]:
             continue
-        if i in [1, 2, 3, 5, 10, 11]:
+        if i in [1, 2, 3, 5, 13, 14]:
             if i == 5 and calculation_type == "cohen's d":
                 cancel = True
             else:
                 cancel = False
-            select_basic(
+            select_dict(
                 d1=x[i],
                 d2=y[i],
                 method=method,
@@ -991,22 +1101,40 @@ def select_calculation(
                 y_total=y[0]
             )
         else:
-            if i in [4, 6, 7, 8] and calculation_type == "cohen's d":
+            if (
+                i in [4, 6, 7, 8, 9, 10, 11]
+                and
+                calculation_type == "cohen's d"
+            ):
                 cancel = True
             else:
                 cancel = False
-            select_detailed(
-                d1=x[i],
-                d2=y[i],
-                method=method,
-                calculation_type=calculation_type,
-                cancel=cancel,
-                x_total=x[0],
-                y_total=y[0]
-            )
+            if i in [9, 10, 11]:
+                for key in x[i]:
+                    for k in x[i][key]:
+                        select_dict(
+                            d1=x[i][key][k],
+                            d2=y[i][key][k],
+                            method=method,
+                            calculation_type=calculation_type,
+                            cancel=cancel,
+                            x_total=x[0],
+                            y_total=y[0]
+                        )
+            else:
+                for key in x[i]:
+                    select_dict(
+                        d1=x[i][key],
+                        d2=y[i][key],
+                        method=method,
+                        calculation_type=calculation_type,
+                        cancel=cancel,
+                        x_total=x[0],
+                        y_total=y[0]
+                    )
     results = [
         x[i] if len(x[i]) == len(y[i]) else {}
-        for i in range(1, 14)
+        for i in range(1, 17)
     ]
     Spreadsheet(
         filename=output,
@@ -1019,11 +1147,14 @@ def select_calculation(
         yod=results[5],
         t_square=results[6],
         grand_trine=results[7],
-        planets_in_houses_in_signs=results[8],
-        basic_traditional_rulership=results[9],
-        basic_modern_rulership=results[10],
-        detailed_traditional_rulership=results[11],
-        detailed_modern_rulership=results[12],
+        mystic_rectangle=results[8],
+        grand_cross=results[9],
+        kite=results[10],
+        planets_in_houses_in_signs=results[11],
+        basic_traditional_rulership=results[12],
+        basic_modern_rulership=results[13],
+        detailed_traditional_rulership=results[14],
+        detailed_modern_rulership=results[15],
     )
     widget.after(
         0, 

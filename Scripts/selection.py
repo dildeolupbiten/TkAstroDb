@@ -126,7 +126,10 @@ class MultipleSelection(Selection):
                 "Sum Of Aspects",
                 "Yod",
                 "T-Square",
-                "Grand Trine"
+                "Grand Trine",
+                "Mystic Rectangle",
+                "Grand Cross",
+                "Kite"
             ]:
                 if value[-1].get():
                     self.checkbuttons["Aspects"][-1].set(True)

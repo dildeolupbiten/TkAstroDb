@@ -284,12 +284,28 @@ def get_aspect_dict(values, indexes, constants):
     }
 
 
-def get_pattern_dict(values, c):
+def get_3d_pattern_dict(values, c):
     result = {}
     for index, planet in enumerate(PLANETS):
         constants = list(PLANETS)[:index] + list(PLANETS)[index + 1:]
         result[planet] = get_aspect_dict(values, [c, c + 13], [constants])
         c += 15
+    return result
+
+
+def get_4d_pattern_dict(values, c):
+    result = {}
+    for index, planet in enumerate(PLANETS):
+        planets = list(PLANETS)[:index] + list(PLANETS)[index + 1:]
+        result[planet] = {}
+        for _index, _planet in enumerate(planets):
+            constants = planets[:_index] + planets[_index + 1:]
+            result[planet][_planet] = get_aspect_dict(
+                values,
+                [c, c + 12],
+                [constants]
+            )
+            c += 14
     return result
 
 

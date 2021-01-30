@@ -168,5 +168,8 @@ SHEETS = [
     "Sum Of Aspects",
     "Yod",
     "T-Square",
-    "Grand Trine"
+    "Grand Trine",
+    "Mystic Rectangle",
+    "Grand Cross",
+    "Kite"
 ]

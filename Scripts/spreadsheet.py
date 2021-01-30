@@ -7,7 +7,7 @@ from .constants import (
 )
 from .utilities import (
     only_planets, get_basic_dict, get_planet_dict,
-    get_aspect_dict, get_pattern_dict,
+    get_aspect_dict, get_3d_pattern_dict, get_4d_pattern_dict
 )
 
 
@@ -28,6 +28,9 @@ class Spreadsheet(Workbook):
             yod,
             t_square,
             grand_trine,
+            mystic_rectangle,
+            grand_cross,
+            kite,
             *args,
             **kwargs
     ):
@@ -222,7 +225,7 @@ class Spreadsheet(Workbook):
                     title = "Planet"
                 if not d:
                     if df is not None and len(df.values) != 0:
-                        d = get_pattern_dict(
+                        d = get_3d_pattern_dict(
                             values=df.values,
                             c=0
                         )
@@ -237,6 +240,38 @@ class Spreadsheet(Workbook):
                             orb_factor=f"({title}: {k})"
                         )
                         row += 15
+                    d.clear()
+            elif name in ["Mystic Rectangle", "Grand Cross", "Kite"]:
+                if name == "Mystic Rectangle":
+                    d = mystic_rectangle
+                    title = "Opposite"
+                    apex = ""
+                elif name == "Grand Cross":
+                    d = grand_cross
+                    title = "Opposite"
+                    apex = ""
+                else:
+                    d = kite
+                    title = "Opposite"
+                    apex = "Apex "
+                if not d:
+                    if df is not None and len(df.values) != 0:
+                        d = get_4d_pattern_dict(
+                            values=df.values,
+                            c=0
+                        )
+                if d:
+                    row = 1
+                    for key, value in d.items():
+                        for k, v in value.items():
+                            self.write_aspects(
+                                sheet=self.sheets[name],
+                                data=v,
+                                row=row,
+                                aspect=name + " ",
+                                orb_factor=f"({apex}{key} {title} {k})"
+                            )
+                            row += 14
                     d.clear()
         self.close()
 
@@ -308,7 +343,13 @@ class Spreadsheet(Workbook):
 
     def write_aspects(self, sheet, data, row, aspect, orb_factor):
         if orb_factor:
-            if "Apex" in orb_factor or "Planet" in orb_factor:
+            if (
+                "Apex" in orb_factor
+                or
+                "Planet" in orb_factor
+                or
+                "Opposite" in orb_factor
+            ):
                 orb = orb_factor
             else:
                 orb = ": Orb Factor: +- " + orb_factor
@@ -407,25 +448,13 @@ class Spreadsheet(Workbook):
 
     def write_info(self, sheet, info):
         for index, (key, value) in enumerate(info.items()):
-            if index < 6:
-                sheet.merge_range(
-                    f"A{index + 1}:B{index + 1}",
-                    key + ":",
-                    self.format(bold=True, align="left")
-                )
-                sheet.write(
-                    f"C{index + 1}",
-                    value,
-                    self.format(bold=False, align="left")
-                )
-            else:
-                sheet.merge_range(
-                    f"D{index - 5}:E{index - 5}",
-                    key + ":",
-                    self.format(bold=True, align="left")
-                )
-                sheet.merge_range(
-                    f"F{index - 5}:N{index - 5}",
-                    value,
-                    self.format(bold=False, align="left")
-                )
+            sheet.merge_range(
+                f"A{index + 1}:B{index + 1}",
+                key + ":",
+                self.format(bold=True, align="left")
+            )
+            sheet.merge_range(
+                f"C{index + 1}:N{index + 1}",
+                value,
+                self.format(bold=False, align="left")
+            )
