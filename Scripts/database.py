@@ -398,7 +398,10 @@ class DatabaseFrame(tk.Frame):
         if self.mode in ["adb_xml"]:
             index = -1
         else:
-            index = -3
+            if len(self.database[0]) == 13:
+                index = -1
+            else:
+                index = -3            
         try:
             for key, value in self.all_categories.items():
                 if key[1] in self.included:
