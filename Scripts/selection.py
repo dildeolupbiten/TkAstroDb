@@ -4,7 +4,7 @@ from .modules import tk, ConfigParser
 
 
 class Selection(tk.Toplevel):
-    def __init__(self, title, catalogue, destroy=False, *args, **kwargs):
+    def __init__(self, title, catalogue, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.title(title)
         self.config = ConfigParser()
@@ -22,8 +22,6 @@ class Selection(tk.Toplevel):
             command=lambda: self.apply(title=title.upper())
         )
         self.button.pack()
-        if destroy:
-            self.wm_protocol("WM_DELETE_WINDOW", lambda: None)
 
     def apply(self, title):
         pass
@@ -31,6 +29,7 @@ class Selection(tk.Toplevel):
 
 class SingleSelection(Selection):
     def __init__(self, title, catalogue, *args, **kwargs):
+        self.done = False
         super().__init__(
             title=title,
             catalogue=catalogue,
@@ -59,6 +58,7 @@ class SingleSelection(Selection):
                 config[title] = {"selected": i}
                 with open("defaults.ini", "w") as f:
                     config.write(f)
+        self.done = True
         self.destroy()
 
     def configure_checkbuttons(self, option):
@@ -76,13 +76,22 @@ class SingleSelection(Selection):
 
 
 class MultipleSelection(Selection):
-    def __init__(self, title, catalogue, *args, **kwargs):
+    def __init__(
+            self, 
+            title, 
+            catalogue, 
+            get=False, 
+            *args, 
+            **kwargs
+    ):
         super().__init__(
             title=title,
             catalogue=catalogue,
             *args,
             **kwargs
         )
+        self.result = []
+        self.get = get
         self.check_all = tk.BooleanVar()
         self.check_all.set(False)
         self.select_all = tk.Checkbutton(
@@ -96,11 +105,14 @@ class MultipleSelection(Selection):
         ]
         for i, j in enumerate(catalogue):
             var = tk.BooleanVar()
-            if self.config[title.upper()][j] == "true":
-                var.set(True)
+            if not self.get:
+                if self.config[title.upper()][j] == "true":
+                    var.set(True)
+                else:
+                    var.set(False)
+                text = j.title().replace("_", " ")
             else:
-                var.set(False)
-            text = j.title().replace("_", " ")
+                text = j
             checkbutton = tk.Checkbutton(
                 master=self.topframe,
                 text=text,
@@ -111,6 +123,8 @@ class MultipleSelection(Selection):
         for k, v in self.checkbuttons.items():
             v[0]["command"] = self.check_command
         self.select_all["command"] = self.check_all_command
+        if self.get:
+            self.wait_window()
 
     def check_all_command(self):
         if self.check_all.get():
@@ -145,17 +159,24 @@ class MultipleSelection(Selection):
                     ][-1].set(True)
 
     def apply(self, title):
-        selected = {}
-        config = ConfigParser()
-        config.read("defaults.ini")
-        for k, v in self.checkbuttons.items():
-            if k == "Check/Uncheck All":
-                continue
-            if v[1].get():
-                selected[k.replace(" ", "_")] = "true"
-            else:
-                selected[k.replace(" ", "_")] = "false"
-        config[title] = selected
-        with open("defaults.ini", "w") as f:
-            config.write(f)
+        if not self.get:
+            selected = {}
+            config = ConfigParser()
+            config.read("defaults.ini")
+            for k, v in self.checkbuttons.items():
+                if k == "Check/Uncheck All":
+                    continue
+                if v[1].get():
+                    selected[k.replace(" ", "_")] = "true"
+                else:
+                    selected[k.replace(" ", "_")] = "false"
+            config[title] = selected
+            with open("defaults.ini", "w") as f:
+                config.write(f)
+        else:
+            for k, v in self.checkbuttons.items():
+                if k == "Check/Uncheck All":
+                    continue
+                if v[1].get():
+                    self.result.append(k)
         self.destroy()

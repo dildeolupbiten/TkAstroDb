@@ -4,9 +4,11 @@ from .treeview import Treeview
 from .search import SearchFrame
 from .selection import SingleSelection
 from .messagebox import MsgBox, ChoiceBox
-from .utilities import tbutton_command, check_all_command, load_database
+from .utilities import (
+    tbutton_command, check_all_command, load_database, from_xml
+)
 from .modules import (
-    os, tk, ET, ttk, open_new, logging, ConfigParser, Thread
+    os, tk, ttk, open_new, logging, ConfigParser, Thread
 )
 
 
@@ -40,70 +42,31 @@ class Database:
         if not os.listdir("Database"):
             return
         else:
-            SingleSelection(
+            selection = SingleSelection(
                 title="Database",
-                catalogue=[i for i in os.listdir("Database")],
-                destroy=True
+                catalogue=[
+                    i for i in os.listdir("Database")
+                    if i.endswith("xml") or i.endswith("json")
+                ]
             )
-            config = ConfigParser()
-            config.read("defaults.ini")
-            filename = config["DATABASE"]["selected"]
-            filename = os.path.join(".", "Database", filename)
-            Thread(target=lambda: self.load_database(root, filename)).start()
+            if selection.done:
+                config = ConfigParser()
+                config.read("defaults.ini")
+                filename = config["DATABASE"]["selected"]
+                filename = os.path.join(".", "Database", filename)
+                Thread(
+                    target=lambda: self.load_database(root, filename),
+                    daemon=True
+                ).start()
+            else:
+                return
 
     def load_adb(self, filename):
         self.mode = "adb_xml"
         self.database = []
         self.category_dict = {}
         logging.info(f"Parsing {filename} file...")
-        tree = ET.parse(filename)
-        root = tree.getroot()
-        for i in range(1000000):
-            try:
-                user_data = []
-                for gender, roddenrating, bdata, adb_link, categories in \
-                        zip(
-                            root[i + 2][1].findall("gender"),
-                            root[i + 2][1].findall("roddenrating"),
-                            root[i + 2][1].findall("bdata"),
-                            root[i + 2][2].findall("adb_link"),
-                            root[i + 2][3].findall("categories")
-                        ):
-                    name = root[i + 2][1][0].text
-                    sbdate_dmy = bdata[1].text
-                    sbtime = bdata[2].text
-                    jd_ut = bdata[2].get("jd_ut")
-                    lat = bdata[3].get("slati")
-                    lon = bdata[3].get("slong")
-                    place = bdata[3].text
-                    country = bdata[4].text
-                    category = [
-                        (
-                            categories[j].get("cat_id"),
-                            categories[j].text
-                        )
-                        for j in range(len(categories))
-                    ]
-                    for cate in category:
-                        if cate[0] not in self.category_dict.keys():
-                            self.category_dict[cate[0]] = cate[1]
-                    user_data.append(int(root[i + 2].get("adb_id")))
-                    user_data.append(name)
-                    user_data.append(gender.text)
-                    user_data.append(roddenrating.text)
-                    user_data.append(sbdate_dmy)
-                    user_data.append(sbtime)
-                    user_data.append(jd_ut)
-                    user_data.append(lat)
-                    user_data.append(lon)
-                    user_data.append(place)
-                    user_data.append(country)
-                    user_data.append(adb_link.text)
-                    user_data.append(category)
-                    if len(user_data) != 0:
-                        self.database.append(user_data)
-            except IndexError:
-                break
+        self.database, self.category_dict = from_xml(filename)
         try:
             logging.info("Completed parsing.")
             logging.info(f"{len(self.database)} records are available.")
@@ -117,7 +80,10 @@ class Database:
         if self.mode == "adb_xml":
             index = -1
         else:
-            index = -3
+            if len(self.database[0]) == 13:
+                index = -1
+            else:
+                index = -3
         for record in self.database:
             for category in record[index]:
                 if (category[0], category[1]) not in self.all_categories:
@@ -139,9 +105,13 @@ class Database:
         self.database = load_database(filename=filename)
         self.category_dict = {}
         if not isinstance(self.database, dict):
+            if len(self.database[0]) == 13:
+                index = -1
+            else:
+                index = -3
             self.mode = "adb_json"
             for record in self.database:
-                for cate in record[-3]:
+                for cate in record[index]:
                     if cate[0] not in self.category_dict:
                         self.category_dict[cate[0]] = cate[1]
         else:

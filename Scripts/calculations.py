@@ -337,7 +337,8 @@ def find_observed_values(widget, icons, menu):
                     mode=mode,
                     menu=menu,
                     save_categories=save_categories
-                )
+                ),
+                daemon=True
             ).start()
         else:
             return
@@ -355,7 +356,8 @@ def find_observed_values(widget, icons, menu):
                 mode=mode,
                 menu=menu,
                 save_categories=save_categories
-            )
+            ),
+            daemon=True
         ).start()
 
 
@@ -698,7 +700,8 @@ def start_calculation(
                 widget=widget,
                 icons=icons,
                 menu=menu
-            )
+            ),
+            daemon=True
         ).start()
     )
 

@@ -3,9 +3,69 @@
 from .messagebox import MsgBox
 from .constants import SIGNS, PLANETS, SHEETS
 from .modules import (
-    os, json, time, Popen, urlopen,
-    URLError, PhotoImage, ConfigParser
+    os, ET, json, time, Popen, urlopen,
+    Thread, URLError, PhotoImage, ConfigParser
 )
+
+
+def get_xml_file_list(path):
+    files = {
+        os.path.join(path, i): os.stat(os.path.join(path, i)).st_mtime
+        for i in os.listdir(path) if i.endswith("xml")
+    }
+    return sorted(files, key=files.get, reverse=True)
+    
+    
+def start_merging_databases(files, widget, icons):
+    split = [os.path.split(i)[-1][:-4] for i in files][::-1]
+    data = []
+    names = []
+    for file in files:
+        for i in from_xml(file)[0]:
+            if i[1] not in names:
+                data.append(i)
+                names.append(i)
+    with open(
+            os.path.join("./Database", "_&_".join(split) + ".json"), 
+            "w", 
+            encoding="utf-8"
+    ) as f:
+        json.dump(sorted(data), f, indent=4, ensure_ascii=False)
+    if len(files) == 1:
+        txt = "Database was"
+    else:
+        txt = "Databases were merged and"
+    if files:
+        widget.after(
+            0,
+            lambda: MsgBox(
+                title="Info",
+                level="info",
+                message=f"{txt} converted!",
+                icons=icons
+            )
+        )
+        
+    
+def merge_databases(multiple_selection, icons, widget):
+    files = get_xml_file_list("./Database")
+    selection = multiple_selection(
+        title="Merge And Convert File(s)",
+        catalogue=[os.path.split(i)[-1] for i in files],
+        get=True
+    )
+    files = [os.path.join("./Database", i) for i in selection.result]
+    if not files:
+        return
+    else:
+        Thread(
+            target=lambda: start_merging_databases(
+                files=files,
+                widget=widget,
+                icons=icons
+            ),
+            daemon=True
+        ).start()
 
 
 def load_database(filename, i=0):
@@ -244,6 +304,8 @@ def check_update(icons):
             level="info",
             icons=icons
         )
+        if os.path.exists("defaults.ini"):
+            os.remove("defaults.ini")
         if os.name == "posix":
             Popen(["python3", "run.py"])
             os.kill(os.getpid(), __import__("signal").SIGKILL)
@@ -331,3 +393,57 @@ def only_planets(planets):
         planet for planet in planets
         if planets[planet]["symbol"]
     ]
+
+
+def from_xml(filename):
+    database = []
+    category_dict = {}
+    tree = ET.parse(filename)
+    root = tree.getroot()
+    for i in range(1000000):
+        try:
+            user_data = []
+            for gender, roddenrating, bdata, adb_link, categories in \
+                    zip(
+                        root[i + 2][1].findall("gender"),
+                        root[i + 2][1].findall("roddenrating"),
+                        root[i + 2][1].findall("bdata"),
+                        root[i + 2][2].findall("adb_link"),
+                        root[i + 2][3].findall("categories")
+                    ):
+                name = root[i + 2][1][0].text
+                sbdate_dmy = bdata[1].text
+                sbtime = bdata[2].text
+                jd_ut = bdata[2].get("jd_ut")
+                lat = bdata[3].get("slati")
+                lon = bdata[3].get("slong")
+                place = bdata[3].text
+                country = bdata[4].text
+                category = [
+                    (
+                        categories[j].get("cat_id"),
+                        categories[j].text
+                    )
+                    for j in range(len(categories))
+                ]
+                for cate in category:
+                    if cate[0] not in category_dict.keys():
+                        category_dict[cate[0]] = cate[1]
+                user_data.append(int(root[i + 2].get("adb_id")))
+                user_data.append(name)
+                user_data.append(gender.text)
+                user_data.append(roddenrating.text)
+                user_data.append(sbdate_dmy)
+                user_data.append(sbtime)
+                user_data.append(jd_ut)
+                user_data.append(lat)
+                user_data.append(lon)
+                user_data.append(place)
+                user_data.append(country)
+                user_data.append(adb_link.text)
+                user_data.append(category)
+                if len(user_data) != 0:
+                    database.append(user_data)
+        except IndexError:
+            break
+    return database, category_dict
