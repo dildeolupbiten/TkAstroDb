@@ -34,7 +34,7 @@ def start_merging_databases(files, widget, icons):
     if len(files) == 1:
         txt = "Database was"
     else:
-        txt = "Databases were merged and"
+        txt = "Databases were \nmerged and"
     if files:
         widget.after(
             0,
