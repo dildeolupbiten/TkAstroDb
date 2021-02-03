@@ -397,7 +397,7 @@ def only_planets(planets):
 
 def from_xml(filename):
     database = []
-    category_dict = {}
+    category_names = []
     tree = ET.parse(filename)
     root = tree.getroot()
     for i in range(1000000):
@@ -419,16 +419,16 @@ def from_xml(filename):
                 lon = bdata[3].get("slong")
                 place = bdata[3].text
                 country = bdata[4].text
-                category = [
+                categories = [
                     (
                         categories[j].get("cat_id"),
                         categories[j].text
                     )
                     for j in range(len(categories))
                 ]
-                for cate in category:
-                    if cate[0] not in category_dict.keys():
-                        category_dict[cate[0]] = cate[1]
+                for category in categories:
+                    if category[1] not in category_names:
+                        category_names.append(category[1])
                 user_data.append(int(root[i + 2].get("adb_id")))
                 user_data.append(name)
                 user_data.append(gender.text)
@@ -441,9 +441,9 @@ def from_xml(filename):
                 user_data.append(place)
                 user_data.append(country)
                 user_data.append(adb_link.text)
-                user_data.append(category)
+                user_data.append(categories)
                 if len(user_data) != 0:
                     database.append(user_data)
         except IndexError:
             break
-    return database, category_dict
+    return database, sorted(category_names)
