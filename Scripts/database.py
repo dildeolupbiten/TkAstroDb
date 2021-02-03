@@ -570,7 +570,7 @@ class DatabaseFrame(tk.Frame):
             treeview.insert(
                 index=index,
                 parent="",
-                values=i.replace(" ", "\ "),
+                values=f"\"{i}\"",
                 tag=index
             )
         var = tk.StringVar()

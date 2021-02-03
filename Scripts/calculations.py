@@ -238,7 +238,7 @@ def find_observed_values(widget, icons, menu):
             selected_categories = "Control_Group"
         else:
             selected_categories = selected_categories[0]\
-                .replace(" : ", "/").replace(" ", "_")
+                .replace("/ ", "_").replace("/", "_").replace(" : ", "/")
     else:
         if len(displayed_results) == 1:
             selected_categories = displayed_results[0][1]\
