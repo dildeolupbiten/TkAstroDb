@@ -221,10 +221,7 @@ def find_observed_values(widget, icons, menu):
     for i in widget.winfo_children():
         if hasattr(i, "included"):
             mode += i.mode
-            displayed_results += [
-                i.treeview.item(j)["values"]
-                for j in i.treeview.get_children()
-            ]
+            displayed_results += i.displayed_results
             selected_categories += i.included
             ignored_categories += i.ignored
             selected_ratings += i.selected_ratings

@@ -194,12 +194,22 @@ class DatabaseFrame(tk.Frame):
         )
         self.rating_button.grid(row=2, column=1, padx=5, pady=5)
         self.create_checkbutton()
+        self.button_frame = tk.Frame(master=self.topframe)
+        self.button_frame.grid(row=10, column=0, columnspan=4, pady=10)
+        self.get_button = tk.Button(
+            master=self.button_frame,
+            text="Get Records",
+            command=self.get_records,
+            width=12
+        )
+        self.get_button.pack(side="left")
         self.display_button = tk.Button(
-            master=self.topframe,
+            master=self.button_frame,
             text="Display Records",
             command=self.display_results,
+            width=12
         )
-        self.display_button.grid(row=10, column=0, columnspan=4, pady=10)
+        self.display_button.pack(side="left")
         self.total_msgbox_info = tk.Label(
             master=self.bottomframe,
             text="Total = "
@@ -236,30 +246,12 @@ class DatabaseFrame(tk.Frame):
             var.set(value="0")
             checkbutton = tk.Checkbutton(
                 master=check_frame,
-                text=f"Do not display {j} charts.",
+                text=f"Do not select {j}.",
                 variable=var)
             checkbutton.grid(row=i, column=2, columnspan=2, sticky="w")
             self.checkbuttons[j] = [var, checkbutton]
-
-    def display_results(self):
-        if self.treeview.get_children():
-            msg = "There are records in treeview.\n" \
-                  "Are you sure you want to insert \nthe records?\n" \
-                  "If you press 'OK', \nthe records in treeview would be\n" \
-                  "deleted."
-            choicebox = ChoiceBox(
-                title="Warning",
-                level="warning",
-                message=msg,
-                icons=self.icons,
-                width=400,
-                height=200,
-            )
-            if choicebox.choice:
-                pass
-            else:
-                return
-        self.treeview.delete(*self.treeview.get_children())
+            
+    def get_records(self, display=False):
         self.displayed_results = []
         male = self.checkbuttons["male"][0]
         female = self.checkbuttons["female"][0]
@@ -280,100 +272,123 @@ class DatabaseFrame(tk.Frame):
                 index = -1
             else:
                 index = -3
-        num = 0
-        try:
-            for record in self.database:
-                if record[3] not in self.selected_ratings:
-                    continue
-                if event.get() == "1" and record[2] == "N/A":
-                    continue
-                if human.get() == "1" and record[2] in ["F", "M"]:
-                    continue
-                if male.get() == "1" and record[2] == "M":
-                    continue
-                if female.get() == "1" and record[2] == "F":
-                    continue
-                if (
-                    isinstance(record[7], str)
-                    and
-                    north.get() == "1"
-                    and
-                    "n" in record[7]
-                ):
-                    continue
-                if (
-                    isinstance(record[7], float)
-                    and
-                    north.get() == "1"
-                    and
-                    record[7] > 0
-                ):
-                    continue
-                if (
-                    isinstance(record[7], str)
-                    and
-                    south.get() == "1"
-                    and
-                    "s" in record[7]
-                ):
-                    continue
-                if (
-                    isinstance(record[7], float)
-                    and
-                    south.get() == "1"
-                    and
-                    record[7] < 0
-                ):
-                    continue
-                if record[0] in [3546, 68092]:
-                    continue
-                if not any(
-                    category[1] in self.included
-                    for category in record[index]
-                ):
-                    continue
-                if any(
-                    category[1] in self.ignored
-                    for category in record[index]
-                ):
-                    continue
+        for record in self.database:
+            if record[3] not in self.selected_ratings:
+                continue
+            if event.get() == "1" and record[2] == "N/A":
+                continue
+            if human.get() == "1" and record[2] in ["F", "M"]:
+                continue
+            if male.get() == "1" and record[2] == "M":
+                continue
+            if female.get() == "1" and record[2] == "F":
+                continue
+            if (
+                isinstance(record[7], str)
+                and
+                north.get() == "1"
+                and
+                "n" in record[7]
+            ):
+                continue
+            if (
+                isinstance(record[7], float)
+                and
+                north.get() == "1"
+                and
+                record[7] > 0
+            ):
+                continue
+            if (
+                isinstance(record[7], str)
+                and
+                south.get() == "1"
+                and
+                "s" in record[7]
+            ):
+                continue
+            if (
+                isinstance(record[7], float)
+                and
+                south.get() == "1"
+                and
+                record[7] < 0
+            ):
+                continue
+            if record[0] in [3546, 68092]:
+                continue
+            if not any(
+                category[1] in self.included
+                for category in record[index]
+            ):
+                continue
+            if any(
+                category[1] in self.ignored
+                for category in record[index]
+            ):
+                continue
+            self.displayed_results += [record]
+        if not display:
+            self.inform_user(message="gotten")
+
+    def display_results(self):
+        if self.treeview.get_children():
+            msg = "There are records in treeview.\n" \
+                  "Are you sure you want to insert \nthe records?\n" \
+                  "If you press 'OK', \nthe records in treeview would be\n" \
+                  "deleted."
+            choicebox = ChoiceBox(
+                title="Warning",
+                level="warning",
+                message=msg,
+                icons=self.icons,
+                width=400,
+                height=200,
+            )
+            if choicebox.choice:
+                pass
+            else:
+                return
+        if not self.displayed_results:
+            self.get_records(display=True)
+        self.treeview.delete(*self.treeview.get_children())
+        for index, i in enumerate(self.displayed_results):
+            try:
                 self.treeview.insert(
                     parent="",
-                    index=num,
-                    values=[col for col in record]
-                )
-                num += 1
-                self.info_var.set(num)
+                    index=index,
+                    values=i
+                )                
+                self.info_var.set(index + 1)
                 self.update()
-        except tk.TclError:
-            return
-        if num == 0:
+            except tk.TclError:
+                return
+        self.inform_user()
+                
+    def inform_user(self, message="inserted"):
+        self.update()
+        if len(self.displayed_results) == 0:
             MsgBox(
                 title="Info",
-                message="No record is inserted.",
+                message=f"No record is {message}.",
                 icons=self.icons,
                 level="info"
             )
-        elif num == 1:
+        elif len(self.displayed_results) == 1:
             MsgBox(
                 title="Info",
-                message="1 record is inserted.",
+                message=f"1 record is {message}.",
                 icons=self.icons,
                 level="info"
             )
         else:
             MsgBox(
                 title="Display Records",
-                message=f"{num} "
-                        f"records are inserted.",
+                message=f"{len(self.displayed_results)} "
+                        f"records are {message}.",
                 icons=self.icons,
                 level="info"
             )
-        self.displayed_results = [
-            self.treeview.item(i)["values"]
-            for i in self.treeview.get_children()
-        ]
-        self.update()
 
     def select_ratings(self):
         self.selected_ratings = []
@@ -649,7 +664,7 @@ class DatabaseFrame(tk.Frame):
                     if j[0] == self.treeview.item(i)["values"][0]:
                         self.displayed_results.remove(j)
                 self.treeview.delete(i)
-            self.info_var.set(len(self.treeview.get_children()))
+            self.info_var.set(len(self.displayed_results))
 
     def button_3_open_url(self):
         selected = self.treeview.selection()
