@@ -349,8 +349,7 @@ class DatabaseFrame(tk.Frame):
                 pass
             else:
                 return
-        if not self.displayed_results:
-            self.get_records(display=True)
+        self.get_records(display=True)
         self.treeview.delete(*self.treeview.get_children())
         for index, i in enumerate(self.displayed_results):
             try:
