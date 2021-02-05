@@ -16,7 +16,7 @@ logging.info("Session started")
 def main():
     root = tk.Tk()
     root.title("TkAstroDb")
-    root.geometry("800x600")
+    root.geometry("800x650")
     root.resizable(width=False, height=False)
     icons = create_image_files(path="Icons")
     Menu(master=root, icons=icons)

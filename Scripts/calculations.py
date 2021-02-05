@@ -218,9 +218,13 @@ def find_observed_values(widget, icons, menu):
     selected_ratings = []
     checkbuttons = {}
     mode = ""
+    start = ""
+    end = ""
     for i in widget.winfo_children():
         if hasattr(i, "included"):
             mode += i.mode
+            start += i.start
+            end += i.end
             displayed_results += i.displayed_results
             selected_categories += i.included
             ignored_categories += i.ignored
@@ -261,13 +265,18 @@ def find_observed_values(widget, icons, menu):
                 for key, value in checkbuttons.items()
             }
         )
+    if start and end:
+        year_range = f"{start} - {end}"
+    else:
+        year_range = "None"
     info.update(
         {
             "Database": config["DATABASE"]["selected"]
             .replace(".json", "").replace(".xml", ""),
             "House System": config["HOUSE SYSTEM"]["selected"],
             "Rodden Rating": selected_ratings,
-            "Category": selected_categories
+            "Category": selected_categories,
+            "Year Range": year_range
         }
     )
     path = os.path.join(
@@ -492,6 +501,7 @@ def start_calculation(
             f"Rodden Rating: {info['Rodden Rating']}\n"
             f"Orb Factor: {'_'.join(config['ORB FACTORS'].values())}\n"
             f"Category: {info['Category']}\n"
+            f"Year Range: {info['Year Range']}\n"
         )
     else:
         log.write(
@@ -500,6 +510,7 @@ def start_calculation(
             f"Rodden Rating: {info['Rodden Rating']}\n"
             f"Orb Factor: {'_'.join(config['ORB FACTORS'].values())}\n"
             f"Category: {info['Category']}\n"
+            f"Year Range: {info['Year Range']}\n"
             f"Selected Categories:\n"
         )        
         for index, i in enumerate(save_categories, 1):
@@ -525,9 +536,9 @@ def start_calculation(
             lon = i[8]
         try:
             patterns = Zodiac(
-                jd=jd,  # 2438421.958739,  # 2416368.687535,  # 2446429.670774,  # jd,
-                lat=lat,  # 37.48,  # 50.11,  # 47.51,  # lat,
-                lon=lon,  # 37.29,  # 8.68,  # 8.54,  # lon,
+                jd=jd,
+                lat=lat,
+                lon=lon,
                 hsys=HOUSE_SYSTEMS[config["HOUSE SYSTEM"]["selected"]]
             ).patterns()
         except BaseException as err:

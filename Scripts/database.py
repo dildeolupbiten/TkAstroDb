@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from .entry import EntryFrame
 from .treeview import Treeview
 from .search import SearchFrame
 from .selection import SingleSelection
@@ -121,6 +122,8 @@ class DatabaseFrame(tk.Frame):
         self.treeview_menu = None
         self.entry_menu = None
         self.pressed_return = 0
+        self.start = ""
+        self.end = ""
         self.info_var = tk.StringVar()
         self.info_var.set("0")
         self.topframe = tk.Frame(master=self)
@@ -194,8 +197,14 @@ class DatabaseFrame(tk.Frame):
         )
         self.rating_button.grid(row=2, column=1, padx=5, pady=5)
         self.create_checkbutton()
+        self.entry_frame = EntryFrame(
+            master=self.topframe,
+            texts=["From", "To"],
+            title="Select Year Range"
+        )
+        self.entry_frame.grid(row=10, column=0, columnspan=4, pady=10)
         self.button_frame = tk.Frame(master=self.topframe)
-        self.button_frame.grid(row=10, column=0, columnspan=4, pady=10)
+        self.button_frame.grid(row=11, column=0, columnspan=4, pady=10)
         self.get_button = tk.Button(
             master=self.button_frame,
             text="Get Records",
@@ -272,6 +281,8 @@ class DatabaseFrame(tk.Frame):
                 index = -1
             else:
                 index = -3
+        self.start = self.entry_frame.widgets["From"].get()
+        self.end = self.entry_frame.widgets["To"].get()
         for record in self.database:
             if record[3] not in self.selected_ratings:
                 continue
@@ -327,6 +338,14 @@ class DatabaseFrame(tk.Frame):
                 for category in record[index]
             ):
                 continue
+            year = int(record[4].split()[2])
+            if (
+                self.start 
+                and 
+                self.end 
+                and not int(self.start) <= year <= int(self.end)
+            ):
+                continue
             self.displayed_results += [record]
         if not display:
             self.inform_user(message="gotten")
@@ -349,8 +368,7 @@ class DatabaseFrame(tk.Frame):
                 pass
             else:
                 return
-        if not self.displayed_results:
-            self.get_records(display=True)
+        self.get_records(display=True)
         self.treeview.delete(*self.treeview.get_children())
         for index, i in enumerate(self.displayed_results):
             try:
