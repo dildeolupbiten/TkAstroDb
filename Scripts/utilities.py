@@ -427,7 +427,7 @@ def from_xml(filename):
                     for j in range(len(categories))
                 ]
                 for category in categories:
-                    if category[1] not in category_names:
+                    if category[1] and category[1] not in category_names:
                         category_names.append(category[1])
                 user_data.append(int(root[i + 2].get("adb_id")))
                 user_data.append(name)
