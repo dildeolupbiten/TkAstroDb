@@ -15,7 +15,6 @@ from .modules import (
 
 class Database:
     def __init__(self, root, icons):
-        self.mode = None
         self.icons = icons
         self.database = None
         self.category_names = []
@@ -31,7 +30,6 @@ class Database:
             database=self.database,
             category_names=self.category_names,
             icons=self.icons,
-            mode=self.mode
         )
 
     def choose_operation(self, root):
@@ -60,7 +58,6 @@ class Database:
                 return
 
     def load_adb(self, filename):
-        self.mode = "adb_xml"
         logging.info(f"Parsing {filename} file...")
         self.database, self.category_names = from_xml(filename)
         try:
@@ -75,7 +72,6 @@ class Database:
         logging.info(f"Parsing {filename} file...")
         self.database = load_database(filename=filename)
         self.category_names = []
-        self.mode = "adb_json"
         if len(self.database[0]) == 13:
             index = -1
         else:
@@ -100,7 +96,6 @@ class DatabaseFrame(tk.Frame):
             database,
             category_names,
             icons,
-            mode,
             *args,
             **kwargs
     ):
@@ -111,7 +106,6 @@ class DatabaseFrame(tk.Frame):
         self.database = database
         self.category_names = category_names
         self.icons = icons
-        self.mode = mode
         self.displayed_results = []
         self.included = []
         self.ignored = []
@@ -132,18 +126,13 @@ class DatabaseFrame(tk.Frame):
         self.midframe.pack()
         self.bottomframe = tk.Frame(master=self)
         self.bottomframe.pack()
-        if self.mode in ["adb_xml", "adb_json"]:
-            self.columns = [
-                "Adb ID", "Name", "Gender", "Rodden Rating", "Date",
-                "Hour", "Julian Date", "Latitude", "Longitude", "Place",
-                "Country", "Adb Link", "Category"
-            ]
-        else:
-            self.columns = [
-                "No", "Name", "Gender", "Rodden Rating", "Date",
-                "Hour", "Julian Date", "Latitude", "Longitude", "Type",
-                "Wing", "URL", "Category", "Access Time", "Update Time"
-            ]
+        self.columns = [
+            "Adb ID", "Name", "Gender", "Rodden Rating", "Date",
+            "Hour", "Julian Date", "Latitude", "Longitude", "Place",
+            "Country", "Adb Link", "Category"
+        ]
+        if len(database[0]) == 15:
+            self.columns.extend(["Type", "Wing"])
         self.treeview = Treeview(
             master=self.midframe,
             columns=self.columns,
@@ -234,22 +223,14 @@ class DatabaseFrame(tk.Frame):
     def create_checkbutton(self):
         check_frame = tk.Frame(master=self.entry_button_frame)
         check_frame.grid(row=1, column=2, pady=10, rowspan=2)
-        if self.mode in ["adb_xml", "adb_json"]:
-            names = (
-                "event",
-                "human",
-                "male",
-                "female",
-                "North Hemisphere",
-                "South Hemisphere"
-             )
-        else:
-            names = (
-                "male",
-                "female",
-                "North Hemisphere",
-                "South Hemisphere"
-            )
+        names = (
+            "event",
+            "human",
+            "male",
+            "female",
+            "North Hemisphere",
+            "South Hemisphere"
+         )
         for i, j in enumerate(names):
             var = tk.StringVar()
             var.set(value="0")
@@ -262,25 +243,16 @@ class DatabaseFrame(tk.Frame):
             
     def get_records(self, display=False):
         self.displayed_results = []
+        event = self.checkbuttons["event"][0]
+        human = self.checkbuttons["human"][0]
         male = self.checkbuttons["male"][0]
         female = self.checkbuttons["female"][0]
         north = self.checkbuttons["North Hemisphere"][0]
         south = self.checkbuttons["South Hemisphere"][0]
-        if self.mode in ["adb_xml", "adb_json"]:
-            event = self.checkbuttons["event"][0]
-            human = self.checkbuttons["human"][0]
-        else:
-            event = tk.StringVar()
-            event.set("0")
-            human = tk.StringVar()
-            human.set("0")
-        if self.mode in ["adb_xml"]:
+        if len(self.database[0]) == 13:
             index = -1
         else:
-            if len(self.database[0]) == 13:
-                index = -1
-            else:
-                index = -3
+            index = -3
         self.start = self.entry_frame.widgets["From"].get()
         self.end = self.entry_frame.widgets["To"].get()
         for record in self.database:
@@ -432,8 +404,8 @@ class DatabaseFrame(tk.Frame):
         check_all.set(False)
         check_uncheck.grid(row=0, column=0, sticky="nw")
         for num, c in enumerate(
-                ["AA", "A", "B", "C", "DD", "X", "XX", "AX"],
-                1
+            ["AA", "A", "B", "C", "DD", "X", "XX", "AX"],
+            1
         ):
             self.update()
             rating = c
@@ -655,9 +627,9 @@ class DatabaseFrame(tk.Frame):
             self.found_categories = {
                 i: j for i, j in enumerate(treeview.get_children())
                 if (
-                        event.widget.get().lower()
-                        in
-                        treeview.item(j)["values"][0].lower()
+                    event.widget.get().lower()
+                    in
+                    treeview.item(j)["values"][0].lower()
                 )
             }
             for i, j in self.found_categories.items():
@@ -699,12 +671,8 @@ class DatabaseFrame(tk.Frame):
     def button_3_on_treeview(self, event):
         self.destroy_menu(self.treeview_menu)
         self.treeview_menu = tk.Menu(master=None, tearoff=False)
-        if self.mode in ["adb_xml", "adb_json"]:
-            label = "Open ADB Page"
-        else:
-            label = "Open Wikipedia Page"
         self.treeview_menu.add_command(
-            label=label,
+            label="Open ADB Page",
             command=self.button_3_open_url
         )
         self.treeview_menu.add_command(

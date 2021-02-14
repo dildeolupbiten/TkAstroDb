@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from .modules import tk, ttk
-from .utilities import key_value
 
 
 class SearchFrame(tk.Frame):
@@ -64,10 +63,7 @@ class SearchFrame(tk.Frame):
 
     def command(self, info_var):
         if not self.is_added():
-            if isinstance(self.found[self.id], dict):
-                values = key_value(key=self.id, value=self.found[self.id])
-            else:
-                values = [self.id] + self.found[self.id]
+            values = [self.id] + self.found[self.id]
             self.treeview.insert(
                 index=len(self.treeview.get_children()),
                 parent="",
@@ -85,29 +81,16 @@ class SearchFrame(tk.Frame):
         if self.combobox.get():
             database = database
             value = self.combobox.get().lower()
-            self.found = None
             self.id = None
-            if isinstance(database, dict):
-                self.found = {
-                    k: v
-                    for k, v in database.items()
-                    if value.lower() in v["Name"].lower()
-                }
-                if self.found:
-                    self.combobox["values"] = [
-                        f"{k} {v['Name']}" for k, v in self.found.items()
-                    ]
-                    self.combobox.event_generate("<Down>")
-            else:
-                self.found = {
-                    str(i[0]): i[1:]
-                    for i in database
-                    if value.lower() in i[1].lower()
-                }
-                if self.found:
-                    self.combobox["values"] = [
-                        f"{k} {v[0]}" for k, v in self.found.items()
-                    ]
-                    self.combobox.event_generate("<Down>")
+            self.found = {
+                str(i[0]): i[1:]
+                for i in database
+                if value.lower() in i[1].lower()
+            }
+            if self.found:
+                self.combobox["values"] = [
+                    f"{k} {v[0]}" for k, v in self.found.items()
+                ]
+                self.combobox.event_generate("<Down>")
         else:
             self.combobox["values"] = []

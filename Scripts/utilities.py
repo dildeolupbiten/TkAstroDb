@@ -68,17 +68,9 @@ def merge_databases(multiple_selection, icons, widget):
         ).start()
 
 
-def load_database(filename, i=0):
+def load_database(filename):
     with open(filename, encoding="utf-8") as f:
-        data = json.load(f)
-        if isinstance(data, dict):
-            return {
-                k: v
-                for index, (k, v) in enumerate(data.items())
-                if index >= i
-            }
-        else:
-            return data
+        return json.load(f)
 
 
 def create_image_files(path):
@@ -221,20 +213,6 @@ def progressbar(s, r, n, pframe, pbar, plabel, pstring):
         pframe.destroy()
         pbar.destroy()
         plabel.destroy()
-
-
-def key_value(key, value):
-    v1 = [key]
-    v2 = [
-        v for k, v in value.items()
-        if k not in ["Categories", "Notes", "Access Time", "Update Time"]
-    ]
-    v3 = [
-        {i: j for i, j in enumerate(value["Categories"], 1)}
-        if value["Categories"] else None
-    ]
-    v4 = [value["Access Time"], value["Update Time"]]
-    return v1 + v2 + v3 + v4
 
 
 def check_update(icons):
@@ -403,14 +381,13 @@ def from_xml(filename):
     for i in range(1000000):
         try:
             user_data = []
-            for gender, roddenrating, bdata, adb_link, categories in \
-                    zip(
-                        root[i + 2][1].findall("gender"),
-                        root[i + 2][1].findall("roddenrating"),
-                        root[i + 2][1].findall("bdata"),
-                        root[i + 2][2].findall("adb_link"),
-                        root[i + 2][3].findall("categories")
-                    ):
+            for gender, roddenrating, bdata, adb_link, categories in zip(
+                root[i + 2][1].findall("gender"),
+                root[i + 2][1].findall("roddenrating"),
+                root[i + 2][1].findall("bdata"),
+                root[i + 2][2].findall("adb_link"),
+                root[i + 2][3].findall("categories")
+            ):
                 name = root[i + 2][1][0].text
                 sbdate_dmy = bdata[1].text
                 sbtime = bdata[2].text

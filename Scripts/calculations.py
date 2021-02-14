@@ -217,12 +217,10 @@ def find_observed_values(widget, icons, menu):
     ignored_categories = []
     selected_ratings = []
     checkbuttons = {}
-    mode = ""
     start = ""
     end = ""
     for i in widget.winfo_children():
         if hasattr(i, "included"):
-            mode += i.mode
             start += i.start
             end += i.end
             displayed_results += i.displayed_results
@@ -340,7 +338,6 @@ def find_observed_values(widget, icons, menu):
                     path=path,
                     selected_categories=selected_categories,
                     ignored_categories=ignored_categories,
-                    mode=mode,
                     menu=menu,
                     save_categories=save_categories
                 ),
@@ -359,7 +356,6 @@ def find_observed_values(widget, icons, menu):
                 path=path,
                 selected_categories=selected_categories,
                 ignored_categories=ignored_categories,
-                mode=mode,
                 menu=menu,
                 save_categories=save_categories
             ),
@@ -376,7 +372,6 @@ def start_calculation(
         path,
         selected_categories,
         ignored_categories,
-        mode,
         menu,
         save_categories
 ):
@@ -526,14 +521,9 @@ def start_calculation(
     menu.entryconfigure(0, command=lambda: send_warning_message(icons=icons))
     total = 0
     for i in displayed_results:
-        if mode in ["adb_xml", "adb_json"]:
-            jd = float(i[6])
-            lat = convert_coordinates(i[7])
-            lon = convert_coordinates(i[8])
-        else:
-            jd = i[6]
-            lat = i[7]
-            lon = i[8]
+        jd = float(i[6])
+        lat = convert_coordinates(i[7])
+        lon = convert_coordinates(i[8])
         try:
             patterns = Zodiac(
                 jd=jd,

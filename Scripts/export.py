@@ -7,14 +7,12 @@ from .utilities import dd_to_dms, convert_coordinates
 
 def export_link(widget, icons):
     displayed_results = []
-    mode = ""
     for i in widget.winfo_children():
         if hasattr(i, "included"):
             displayed_results += [
                 i.treeview.item(j)["values"]
                 for j in i.treeview.get_children()
             ]
-            mode += i.mode
     if not displayed_results:
         MsgBox(
             title="Warning",
@@ -25,7 +23,7 @@ def export_link(widget, icons):
         return
     with open(file="links.txt", mode="w", encoding="utf-8") as f:
         for i, j in enumerate(displayed_results):
-            if mode == "adb_xml":
+            if len(j) == 13:
                 url = j[-2]
             else:
                 url = j[-4]
@@ -40,14 +38,12 @@ def export_link(widget, icons):
 
 def export_lat_frequency(widget, icons):
     displayed_results = []
-    mode = ""
     for i in widget.winfo_children():
         if hasattr(i, "included"):
             displayed_results += [
                 i.treeview.item(j)["values"]
                 for j in i.treeview.get_children()
             ]
-            mode += i.mode
     if not displayed_results:
         MsgBox(
             title="Warning",
@@ -64,10 +60,7 @@ def export_lat_frequency(widget, icons):
     }
     latitudes = []
     for item in displayed_results:
-        if mode in ["adb_xml", "adb_json"]:
-            latitudes.append(convert_coordinates(item[7]))
-        else:
-            latitudes.append(float(item[7]))
+        latitudes.append(convert_coordinates(item[7]))
     for i in latitudes:
         for j in range(90):
             if j <= i < j + 1:
@@ -86,8 +79,11 @@ def export_lat_frequency(widget, icons):
         for keys, values in latitude_freq_south.items()
         if len(values) != 0
     }
-    with open(file="latitude-frequency.txt", mode="w",
-              encoding="utf-8") as f:
+    with open(
+        file="latitude-frequency.txt",
+        mode="w",
+        encoding="utf-8"
+    ) as f:
         f.write("Latitude Intervals\n\n")
         for i, j in edit_latitude_freq_south.items():
             f.write(f"{i} = {j}\n")
