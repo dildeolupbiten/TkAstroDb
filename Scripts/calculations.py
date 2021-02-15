@@ -783,11 +783,11 @@ def find_aspect(aspects, temporary, orb, aspect, planet1, planet2):
         aspects["sextile"][planet1][planet2] += 1
         temporary["sextile"][planet1][planet2] += 1
     elif (
-            72 - float(orb["sextile"]) <
-            aspect < 72 + float(orb["sextile"])
+            72 - float(orb["quintile"]) <
+            aspect < 72 + float(orb["quintile"])
             or
-            288 - float(orb["sextile"]) <
-            aspect < 288 + float(orb["sextile"])
+            288 - float(orb["quintile"]) <
+            aspect < 288 + float(orb["quintile"])
     ):
         aspects["quintile"][planet1][planet2] += 1
         temporary["quintile"][planet1][planet2] += 1
