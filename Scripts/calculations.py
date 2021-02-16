@@ -382,6 +382,20 @@ def start_calculation(
         )
     else:
         planets_in_signs = {}
+    if config["TABLE SELECTION"]["planets_in_elements"] == "true":
+        planets_in_elements = create_normal_dict(
+            lists=[only_planets(PLANETS), ["Fire", "Earth", "Air", "Water"]],
+            keys=["", ""]
+        )
+    else:
+        planets_in_elements = {}
+    if config["TABLE SELECTION"]["planets_in_modes"] == "true":
+        planets_in_modes = create_normal_dict(
+            lists=[only_planets(PLANETS), ["Cardinal", "Fixed", "Mutable"]],
+            keys=["", ""]
+        )
+    else:
+        planets_in_modes = {}
     if config["TABLE SELECTION"]["houses_in_signs"] == "true":
         houses_in_signs = create_normal_dict(
             lists=[range(1, 13), SIGNS],
@@ -389,6 +403,20 @@ def start_calculation(
         )
     else:
         houses_in_signs = {}
+    if config["TABLE SELECTION"]["houses_in_elements"] == "true":
+        houses_in_elements = create_normal_dict(
+            lists=[range(1, 13), ["Fire", "Earth", "Air", "Water"]],
+            keys=["House-", ""]
+        )
+    else:
+        houses_in_elements = {}
+    if config["TABLE SELECTION"]["houses_in_modes"] == "true":
+        houses_in_modes = create_normal_dict(
+            lists=[range(1, 13), ["Cardinal", "Fixed", "Mutable"]],
+            keys=["House-", ""]
+        )
+    else:
+        houses_in_modes = {}
     if config["TABLE SELECTION"]["planets_in_houses"] == "true":
         planets_in_houses = create_normal_dict(
             lists=[only_planets(PLANETS), range(1, 13)],
@@ -632,28 +660,40 @@ def start_calculation(
             pstring=pstring
         )
         total += 1
-    log.write(
-        f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| Process finished."
-    )
-    log.close()
-    if aspects and sum_of_aspects:
+    if planets_in_elements or planets_in_modes:
+        elements_and_modes(
+            element=planets_in_elements,
+            mode=planets_in_modes,
+            lookup=planets_in_signs
+        )
+    if houses_in_elements or houses_in_modes:
+        elements_and_modes(
+            element=houses_in_elements,
+            mode=houses_in_modes,
+            lookup=houses_in_signs
+        )
+    if sum_of_aspects:
         for aspect in aspects:
             for index, planet in enumerate(PLANETS, 1):
                 for _planet in list(PLANETS)[index:]:
                     sum_of_aspects[planet][_planet] += \
                         aspects[aspect][planet][_planet]
-    if detailed_traditional_rulership and basic_traditional_rulership:
+    if basic_traditional_rulership:
         get_total_of_rulership(
             constant=TRADITIONAL_RULERSHIP,
             rulership=detailed_traditional_rulership,
             total=basic_traditional_rulership
         )
-    if detailed_modern_rulership and basic_modern_rulership:
+    if basic_modern_rulership:
         get_total_of_rulership(
             constant=MODERN_RULERSHIP,
             rulership=detailed_modern_rulership,
             total=basic_modern_rulership
         )
+    log.write(
+        f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| Process finished."
+    )
+    log.close()
     if not os.path.exists(os.path.join(".", path)):
         os.makedirs(path)
     filename = os.path.join(path, "observed_values.xlsx")
@@ -662,7 +702,11 @@ def start_calculation(
         filename=filename,
         info=info,
         planets_in_signs=planets_in_signs,
+        planets_in_elements=planets_in_elements,
+        planets_in_modes=planets_in_modes,
         houses_in_signs=houses_in_signs,
+        houses_in_elements=houses_in_elements,
+        houses_in_modes=houses_in_modes,
         planets_in_houses=planets_in_houses,
         aspects=aspects,
         sum_of_aspects=sum_of_aspects,
@@ -702,6 +746,27 @@ def start_calculation(
             daemon=True
         ).start()
     )
+
+
+def elements_and_modes(element, mode, lookup):
+    for var, signs in lookup.items():
+        for sign, value in signs.items():
+            if element:
+                if sign in ["Aries", "Leo", "Sagittarius"]:
+                    element[var]["Fire"] += value
+                elif sign in ["Taurus", "Virgo", "Capricorn"]:
+                    element[var]["Earth"] += value
+                elif sign in ["Gemini", "Libra", "Aquarius"]:
+                    element[var]["Air"] += value
+                elif sign in ["Cancer", "Scorpio", "Pisces"]:
+                    element[var]["Water"] += value
+            if mode:
+                if sign in ["Aries", "Cancer", "Libra", "Capricorn"]:
+                    mode[var]["Cardinal"] += value
+                elif sign in ["Taurus", "Leo", "Scorpio", "Aquarius"]:
+                    mode[var]["Fixed"] += value
+                elif sign in ["Gemini", "Virgo", "Sagittarius", "Pisces"]:
+                    mode[var]["Mutable"] += value
 
 
 def special_aspect_3d_pattern(temporary, pattern, func, apex=True):
@@ -853,35 +918,29 @@ def get_values(filename):
     total = info["Number Of Records"]
     config = ConfigParser()
     config.read("defaults.ini")
+    elements = ["Fire", "Earth", "Air", "Water"]
+    modes = ["Cardinal", "Fixed", "Mutable"]
     planets = only_planets(PLANETS)
-    values = dfs[1].values
-    if len(values) != 0:
-        planets_in_signs = get_basic_dict(
-            values=values,
-            indexes=[0, 12],
-            constants=[planets, SIGNS]
-        )
-    else:
-        planets_in_signs = {}
-    values = dfs[2].values
-    if len(values) != 0:
-        houses_in_signs = get_basic_dict(
-            values=values,
-            indexes=[0, 12],
-            constants=[HOUSES, SIGNS]
-        )
-    else:
-        houses_in_signs = {}
-    values = dfs[3].values
-    if len(values) != 0:
-        planets_in_houses = get_basic_dict(
-            values=values,
-            indexes=[0, 12],
-            constants=[planets, HOUSES]
-        )
-    else:
-        planets_in_houses = {}
-    values = dfs[4].values
+    pattern_2d = []
+    for i, j, k, m in zip(
+        range(1, 8),
+        [planets] * 3 + [HOUSES] * 3 + [planets],
+        [SIGNS, elements, modes] * 2 + [HOUSES],
+        [(1, 13), (1, 5), (1, 4), (1, 13), (1, 5), (1, 4), (1, 13)]
+    ):
+        values = dfs[i].values
+        if len(values) != 0:
+            pattern_2d.append(
+                get_basic_dict(
+                    values=values,
+                    indexes=[0, 12],
+                    constants=[j, k],
+                    sub_index=m
+                )
+            )
+        else:
+            pattern_2d.append({})
+    values = dfs[8].values
     if len(values) != 0:
         planets_in_houses_in_signs = get_planet_dict(
             values=values,
@@ -891,7 +950,7 @@ def get_values(filename):
         )
     else:
         planets_in_houses_in_signs = {}
-    values = dfs[5].values
+    values = dfs[9].values
     if len(values) != 0:
         basic_traditional_rulership = get_basic_dict(
             values=values,
@@ -900,7 +959,7 @@ def get_values(filename):
         )
     else:
         basic_traditional_rulership = {}
-    values = dfs[6].values
+    values = dfs[10].values
     if len(values) != 0:
         basic_modern_rulership = get_basic_dict(
             values=values,
@@ -909,7 +968,7 @@ def get_values(filename):
         )
     else:
         basic_modern_rulership = {}
-    values = dfs[7].values
+    values = dfs[11].values
     if len(values) != 0:
         detailed_traditional_rulership = get_planet_dict(
             values=values,
@@ -919,7 +978,7 @@ def get_values(filename):
         )
     else:
         detailed_traditional_rulership = {}
-    values = dfs[8].values
+    values = dfs[12].values
     if len(values) != 0:
         detailed_modern_rulership = get_planet_dict(
             values=values,
@@ -929,7 +988,7 @@ def get_values(filename):
         )
     else:
         detailed_modern_rulership = {}
-    values = dfs[9].values
+    values = dfs[13].values
     if len(values) != 0:
         c = 0
         aspects = {}
@@ -942,7 +1001,7 @@ def get_values(filename):
             c += 16
     else:
         aspects = {}
-    values = dfs[10].values
+    values = dfs[14].values
     if len(values) != 0:
         sum_of_aspects = get_aspect_dict(
             values=values,
@@ -952,7 +1011,7 @@ def get_values(filename):
     else:
         sum_of_aspects = {}
     pattern_3d = []
-    for i in range(11, 14):
+    for i in range(15, 18):
         values = dfs[i].values
         if len(values) != 0:
             pattern_3d.append(
@@ -961,7 +1020,7 @@ def get_values(filename):
         else:
             pattern_3d.append({})
     pattern_4d = []
-    for i in range(14, 17):
+    for i in range(18, 21):
         values = dfs[i].values
         if len(values) != 0:
             pattern_4d.append(
@@ -971,17 +1030,11 @@ def get_values(filename):
             pattern_4d.append({})
     return (
         total,
-        planets_in_signs,
-        houses_in_signs,
-        planets_in_houses,
+        *pattern_2d,
         aspects,
         sum_of_aspects,
-        pattern_3d[0],
-        pattern_3d[1],
-        pattern_3d[2],
-        pattern_4d[0],
-        pattern_4d[1],
-        pattern_4d[2],
+        *pattern_3d,
+        *pattern_4d,
         planets_in_houses_in_signs,
         basic_traditional_rulership,
         basic_modern_rulership,
@@ -1085,10 +1138,10 @@ def select_calculation(
     config.read("defaults.ini")
     method = config["METHOD"]["selected"]
     for i in range(len(y)):
-        if i in [0, 17]:
+        if i in [0, 21]:
             continue
-        if i in [1, 2, 3, 5, 13, 14]:
-            if i == 5 and calculation_type == "cohen's d":
+        if i in [1, 2, 3, 4, 5, 6, 7, 9, 17, 18]:
+            if i == 9 and calculation_type == "cohen's d":
                 cancel = True
             else:
                 cancel = False
@@ -1103,14 +1156,14 @@ def select_calculation(
             )
         else:
             if (
-                i in [4, 6, 7, 8, 9, 10, 11]
+                i in [8, 10, 11, 12, 13, 14, 15]
                 and
                 calculation_type == "cohen's d"
             ):
                 cancel = True
             else:
                 cancel = False
-            if i in [9, 10, 11]:
+            if i in [13, 14, 15]:
                 for key in x[i]:
                     for k in x[i][key]:
                         select_dict(
@@ -1135,27 +1188,31 @@ def select_calculation(
                     )
     results = [
         x[i] if len(x[i]) == len(y[i]) else {}
-        for i in range(1, 17)
+        for i in range(1, 21)
     ]
     Spreadsheet(
         filename=output,
         info=x_info,
         planets_in_signs=results[0],
-        houses_in_signs=results[1],
-        planets_in_houses=results[2],
-        aspects=results[3],
-        sum_of_aspects=results[4],
-        yod=results[5],
-        t_square=results[6],
-        grand_trine=results[7],
-        mystic_rectangle=results[8],
-        grand_cross=results[9],
-        kite=results[10],
-        planets_in_houses_in_signs=results[11],
-        basic_traditional_rulership=results[12],
-        basic_modern_rulership=results[13],
-        detailed_traditional_rulership=results[14],
-        detailed_modern_rulership=results[15],
+        planets_in_elements=results[1],
+        planets_in_modes=results[2],
+        houses_in_signs=results[3],
+        houses_in_elements=results[4],
+        houses_in_modes=results[5],
+        planets_in_houses=results[6],
+        aspects=results[7],
+        sum_of_aspects=results[8],
+        yod=results[9],
+        t_square=results[10],
+        grand_trine=results[11],
+        mystic_rectangle=results[12],
+        grand_cross=results[13],
+        kite=results[14],
+        planets_in_houses_in_signs=results[15],
+        basic_traditional_rulership=results[16],
+        basic_modern_rulership=results[17],
+        detailed_traditional_rulership=results[18],
+        detailed_modern_rulership=results[19],
     )
     widget.after(
         0, 

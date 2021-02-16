@@ -157,7 +157,11 @@ TRADITIONAL_RULERSHIP = {
 SHEETS = [
     "Info",
     "Planets In Signs",
+    "Planets In Elements",
+    "Planets In Modes",
     "Houses In Signs",
+    "Houses In Elements",
+    "Houses In Modes",
     "Planets In Houses",
     "Planets In Houses In Signs",
     "Basic Traditional Rulership",

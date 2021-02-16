@@ -16,7 +16,11 @@ class Spreadsheet(Workbook):
             self,
             info,
             planets_in_signs,
+            planets_in_elements,
+            planets_in_modes,
             houses_in_signs,
+            houses_in_elements,
+            houses_in_modes,
             planets_in_houses,
             aspects,
             sum_of_aspects,
@@ -76,6 +80,44 @@ class Spreadsheet(Workbook):
                         row=1
                     )
                     planets_in_signs.clear()
+            elif name == "Planets In Elements":
+                if not planets_in_elements:
+                    if df is not None and len(df.values) != 0:
+                        planets_in_elements = get_basic_dict(
+                            values=df.values,
+                            indexes=[0, 12],
+                            constants=[
+                                planets,
+                                ["Fire", "Earth", "Air", "Water"]
+                            ],
+                            sub_index=(1, 5)
+                        )
+                if planets_in_elements:
+                    self.write_basic(
+                        sheet=self.sheets[name],
+                        data=planets_in_elements,
+                        row=1
+                    )
+                    planets_in_elements.clear()
+            elif name == "Planets In Modes":
+                if not planets_in_modes:
+                    if df is not None and len(df.values) != 0:
+                        planets_in_modes = get_basic_dict(
+                            values=df.values,
+                            indexes=[0, 12],
+                            constants=[
+                                planets,
+                                ["Cardinal", "Fixed", "Mutable"]
+                            ],
+                            sub_index=(1, 4)
+                        )
+                if planets_in_modes:
+                    self.write_basic(
+                        sheet=self.sheets[name],
+                        data=planets_in_modes,
+                        row=1
+                    )
+                    planets_in_modes.clear()
             elif name == "Houses In Signs":
                 if not houses_in_signs:
                     if df is not None and len(df.values) != 0:
@@ -91,6 +133,44 @@ class Spreadsheet(Workbook):
                         row=1
                     )
                     houses_in_signs.clear()
+            elif name == "Houses In Elements":
+                if not houses_in_elements:
+                    if df is not None and len(df.values) != 0:
+                        houses_in_elements = get_basic_dict(
+                            values=df.values,
+                            indexes=[0, 12],
+                            constants=[
+                                HOUSES,
+                                ["Fire", "Earth", "Air", "Water"]
+                            ],
+                            sub_index=(1, 5)
+                        )
+                if houses_in_elements:
+                    self.write_basic(
+                        sheet=self.sheets[name],
+                        data=houses_in_elements,
+                        row=1
+                    )
+                    houses_in_elements.clear()
+            elif name == "Houses In Modes":
+                if not houses_in_modes:
+                    if df is not None and len(df.values) != 0:
+                        houses_in_modes = get_basic_dict(
+                            values=df.values,
+                            indexes=[0, 12],
+                            constants=[
+                                HOUSES,
+                                ["Cardinal", "Fixed", "Mutable"]
+                            ],
+                            sub_index=(1, 4)
+                        )
+                if houses_in_modes:
+                    self.write_basic(
+                        sheet=self.sheets[name],
+                        data=houses_in_modes,
+                        row=1
+                    )
+                    houses_in_modes.clear()
             elif name == "Planets In Houses":
                 if not planets_in_houses:
                     if df is not None and len(df.values) != 0:
@@ -296,8 +376,9 @@ class Spreadsheet(Workbook):
 
     def write_basic(self, sheet, data, row, total=False):
         totals = [[] for _ in range(13)]
+        pos = self.cols[len(data[list(data)[0]]) + 1]
         sheet.write(
-            f"N{row}", "Total", self.format(align="center", bold=True)
+            f"{pos}{row}", "Total", self.format(align="center", bold=True)
         )
         for keys, values in data.items():
             if keys.startswith("House"):
@@ -324,7 +405,7 @@ class Spreadsheet(Workbook):
                 if total:
                     totals[column].append(value)
             sheet.write(
-                f"N{row + 1}",
+                f"{pos}{row + 1}",
                 t,
                 self.format(align="center", bold=False)
             )
@@ -332,7 +413,7 @@ class Spreadsheet(Workbook):
             row += 1
         if total:
             sheet.write(
-                f"N{row}", "Total", self.format(align="center", bold=True)
+                f"{pos}{row}", "Total", self.format(align="center", bold=True)
             )
             for index, i in enumerate(totals):
                 sheet.write(
