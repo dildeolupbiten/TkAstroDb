@@ -79,7 +79,6 @@ class SearchFrame(tk.Frame):
 
     def search(self, database):
         if self.combobox.get():
-            database = database
             value = self.combobox.get().lower()
             self.id = None
             self.found = {
