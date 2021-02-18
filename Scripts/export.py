@@ -9,10 +9,7 @@ def export_link(widget, icons):
     displayed_results = []
     for i in widget.winfo_children():
         if hasattr(i, "included"):
-            displayed_results += [
-                i.treeview.item(j)["values"]
-                for j in i.treeview.get_children()
-            ]
+            displayed_results += i.displayed_results
     if not displayed_results:
         MsgBox(
             title="Warning",
@@ -40,10 +37,7 @@ def export_lat_frequency(widget, icons):
     displayed_results = []
     for i in widget.winfo_children():
         if hasattr(i, "included"):
-            displayed_results += [
-                i.treeview.item(j)["values"]
-                for j in i.treeview.get_children()
-            ]
+            displayed_results += i.displayed_results
     if not displayed_results:
         MsgBox(
             title="Warning",
@@ -104,10 +98,7 @@ def export_year_frequency(widget, icons):
     displayed_results = []
     for i in widget.winfo_children():
         if hasattr(i, "included"):
-            displayed_results += [
-                i.treeview.item(j)["values"]
-                for j in i.treeview.get_children()
-            ]
+            displayed_results += i.displayed_results
     if not displayed_results:
         MsgBox(
             title="Warning",

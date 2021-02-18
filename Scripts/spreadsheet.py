@@ -531,7 +531,7 @@ class Spreadsheet(Workbook):
         for index, (key, value) in enumerate(info.items()):
             sheet.merge_range(
                 f"A{index + 1}:B{index + 1}",
-                key + ":",
+                key,
                 self.format(bold=True, align="left")
             )
             sheet.merge_range(

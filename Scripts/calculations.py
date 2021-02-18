@@ -6,7 +6,8 @@ from .messagebox import MsgBox, ChoiceBox
 from .utilities import (
     convert_coordinates, progressbar, get_basic_dict,
     get_planet_dict, get_aspect_dict, only_planets,
-    get_3d_pattern_dict, get_4d_pattern_dict
+    get_3d_pattern_dict, get_4d_pattern_dict, get_mode,
+    get_element
 )
 from .modules import (
     os, dt, pd, tk, ttk, time, binom, shutil,
@@ -116,12 +117,12 @@ def three_point(aspects, aspect_type):
         for i in v:
             for j in first[i]:
                 if (
-                        j in first[k]
-                        and
-                        j in first[i]
-                        and
-                        sorted([k, i, j]) not in
-                        [sorted(m) for m in result]
+                    j in first[k]
+                    and
+                    j in first[i]
+                    and
+                    sorted([k, i, j]) not in
+                    [sorted(m) for m in result]
                 ):
                     result += [[k, i, j]]
     return result
@@ -217,12 +218,20 @@ def find_observed_values(widget, icons, menu):
     ignored_categories = []
     selected_ratings = []
     checkbuttons = {}
-    start = ""
-    end = ""
+    year_from = ""
+    year_to = ""
+    latitude_from = ""
+    latitude_to = ""
+    longitude_from = ""
+    longitude_to = ""
     for i in widget.winfo_children():
         if hasattr(i, "included"):
-            start += i.start
-            end += i.end
+            year_from += i.ranges["Year"].widgets["From"].get()
+            year_to += i.ranges["Year"].widgets["To"].get()
+            latitude_from += i.ranges["Latitude"].widgets["From"].get()
+            latitude_to += i.ranges["Latitude"].widgets["To"].get()
+            longitude_from += i.ranges["Longitude"].widgets["From"].get()
+            longitude_to += i.ranges["Longitude"].widgets["To"].get()
             displayed_results += i.displayed_results
             selected_categories += i.included
             ignored_categories += i.ignored
@@ -263,10 +272,18 @@ def find_observed_values(widget, icons, menu):
                 for key, value in checkbuttons.items()
             }
         )
-    if start and end:
-        year_range = f"{start} - {end}"
+    if year_from and year_to:
+        year_range = f"{year_from} - {year_to}"
     else:
         year_range = "None"
+    if latitude_from and latitude_to:
+        latitude_range = f"{latitude_from} - {latitude_to}"
+    else:
+        latitude_range = "None"
+    if longitude_from and longitude_to:
+        longitude_range = f"{longitude_from} - {longitude_to}"
+    else:
+        longitude_range = "None"
     info.update(
         {
             "Database": config["DATABASE"]["selected"]
@@ -274,7 +291,9 @@ def find_observed_values(widget, icons, menu):
             "House System": config["HOUSE SYSTEM"]["selected"],
             "Rodden Rating": selected_ratings,
             "Category": selected_categories,
-            "Year Range": year_range
+            "Year Range": year_range,
+            "Latitude Range": latitude_range,
+            "Longitude Range": longitude_range
         }
     )
     path = os.path.join(
@@ -300,17 +319,31 @@ def find_observed_values(widget, icons, menu):
         else:
             path = os.path.join(path, "Event+Human")
     if (
-            info["South Hemisphere"] == "False" 
-            and 
-            info["North Hemisphere"] == "True"
+        info["South Hemisphere"] == "False"
+        and
+        info["North Hemisphere"] == "True"
     ):
         path = os.path.join(path, "North")
     elif (
-            info["South Hemisphere"] == "True" 
-            and 
-            info["North Hemisphere"] == "False"
+        info["South Hemisphere"] == "True"
+        and
+        info["North Hemisphere"] == "False"
     ):
         path = os.path.join(path, "South")
+    else:
+        path = path
+    if (
+        info["West Hemisphere"] == "False"
+        and
+        info["East Hemisphere"] == "True"
+    ):
+        path = os.path.join(path, "East")
+    elif (
+        info["West Hemisphere"] == "True"
+        and
+        info["East Hemisphere"] == "False"
+    ):
+        path = os.path.join(path, "West")
     else:
         path = path
     if os.path.exists(os.path.join(path, "observed_values.xlsx")):
@@ -525,6 +558,8 @@ def start_calculation(
             f"Orb Factor: {'_'.join(config['ORB FACTORS'].values())}\n"
             f"Category: {info['Category']}\n"
             f"Year Range: {info['Year Range']}\n"
+            f"Latitude Range: {info['Latitude Range']}\n"
+            f"Longitude Range: {info['Longitude Range']}\n"
         )
     else:
         log.write(
@@ -534,6 +569,8 @@ def start_calculation(
             f"Orb Factor: {'_'.join(config['ORB FACTORS'].values())}\n"
             f"Category: {info['Category']}\n"
             f"Year Range: {info['Year Range']}\n"
+            f"Latitude Range: {info['Latitude Range']}\n"
+            f"Longitude Range: {info['Longitude Range']}\n"
             f"Selected Categories:\n"
         )        
         for index, i in enumerate(save_categories, 1):
@@ -583,14 +620,47 @@ def start_calculation(
             lists=[list(config["ORB FACTORS"]), PLANETS, PLANETS],
             keys=["", "", ""],
         )
-        for index, p in enumerate(patterns[0], 1):
+        for index, (p, h) in enumerate(zip(patterns[0], patterns[1]), 1):
             if "Ascendant" != p[0] and "Midheaven" != p[0]:
                 if planets_in_signs:
                     planets_in_signs[p[0]][p[1]] += 1
+                if planets_in_elements:
+                    planets_in_elements[p[0]][get_element(p[1])] += 1
+                if planets_in_modes:
+                    planets_in_modes[p[0]][get_mode(p[1])] += 1
                 if planets_in_houses:
                     planets_in_houses[p[0]][p[3]] += 1
                 if planets_in_houses_in_signs:
                     planets_in_houses_in_signs[p[0]][p[3]][p[1]] += 1
+                if houses_in_signs:
+                    houses_in_signs[f"House-{h[0]}"][h[1]] += 1
+                if houses_in_elements:
+                    houses_in_elements[f"House-{h[0]}"][get_element(h[1])] += 1
+                if houses_in_modes:
+                    houses_in_modes[f"House-{h[0]}"][get_mode(h[1])] += 1
+                rulers = []
+                if basic_traditional_rulership:
+                    rulers.append(
+                        [
+                            TRADITIONAL_RULERSHIP[h[1]],
+                            detailed_traditional_rulership
+                        ]
+                    )
+                if basic_modern_rulership:
+                    rulers.append(
+                            [MODERN_RULERSHIP[h[1]],
+                             detailed_modern_rulership]
+                    )
+                if rulers:
+                    for _p in patterns[0]:
+                        for lord, rulership in rulers:
+                            if rulership:
+                                select_rulership(
+                                    lord=lord,
+                                    rulership=rulership,
+                                    p=_p,
+                                    index=index
+                                )
             if aspects:
                 for _p in patterns[0][index:]:
                     find_aspect(
@@ -632,23 +702,6 @@ def start_calculation(
                 kite,
                 get_kite,
             )
-        for index, h in enumerate(patterns[1], 1):
-            if houses_in_signs:
-                houses_in_signs[f"House-{h[0]}"][h[1]] += 1
-            lord_traditional = TRADITIONAL_RULERSHIP[h[1]]
-            lord_modern = MODERN_RULERSHIP[h[1]]
-            for p in patterns[0]:
-                for lord, rulership in [
-                    [lord_traditional, detailed_traditional_rulership],
-                    [lord_modern, detailed_modern_rulership]
-                ]:
-                    if rulership:
-                        select_rulership(
-                            lord=lord,
-                            rulership=rulership,
-                            p=p,
-                            index=index
-                        )
         received += 1
         progressbar(
             s=size,
@@ -660,18 +713,6 @@ def start_calculation(
             pstring=pstring
         )
         total += 1
-    if planets_in_elements or planets_in_modes:
-        elements_and_modes(
-            element=planets_in_elements,
-            mode=planets_in_modes,
-            lookup=planets_in_signs
-        )
-    if houses_in_elements or houses_in_modes:
-        elements_and_modes(
-            element=houses_in_elements,
-            mode=houses_in_modes,
-            lookup=houses_in_signs
-        )
     if sum_of_aspects:
         for aspect in aspects:
             for index, planet in enumerate(PLANETS, 1):
@@ -814,95 +855,95 @@ def get_total_of_rulership(constant, rulership, total):
 
 def find_aspect(aspects, temporary, orb, aspect, planet1, planet2):
     if (
-            0 < aspect < float(orb["conjunction"])
-            or
-            360 - float(orb["conjunction"]) < aspect < 360
+        0 < aspect < float(orb["conjunction"])
+        or
+        360 - float(orb["conjunction"]) < aspect < 360
     ):
         aspects["conjunction"][planet1][planet2] += 1
         temporary["conjunction"][planet1][planet2] += 1
     elif (
-            30 - float(orb["semi-sextile"]) <
-            aspect < 30 + float(orb["semi-sextile"])
-            or
-            330 - float(orb["semi-sextile"]) <
-            aspect < 330 + float(orb["semi-sextile"])
+        30 - float(orb["semi-sextile"]) <
+        aspect < 30 + float(orb["semi-sextile"])
+        or
+        330 - float(orb["semi-sextile"]) <
+        aspect < 330 + float(orb["semi-sextile"])
     ):
         aspects["semi-sextile"][planet1][planet2] += 1
         temporary["semi-sextile"][planet1][planet2] += 1
     elif (
-            45 - float(orb["semi-square"]) <
-            aspect < 45 + float(orb["semi-square"])
-            or
-            315 - float(orb["semi-square"]) <
-            aspect < 315 + float(orb["semi-square"])
+        45 - float(orb["semi-square"]) <
+        aspect < 45 + float(orb["semi-square"])
+        or
+        315 - float(orb["semi-square"]) <
+        aspect < 315 + float(orb["semi-square"])
     ):
         aspects["semi-square"][planet1][planet2] += 1
         temporary["semi-square"][planet1][planet2] += 1
     elif (
-            60 - float(orb["sextile"]) <
-            aspect < 60 + float(orb["sextile"])
-            or
-            300 - float(orb["sextile"]) <
-            aspect < 300 + float(orb["sextile"])
+        60 - float(orb["sextile"]) <
+        aspect < 60 + float(orb["sextile"])
+        or
+        300 - float(orb["sextile"]) <
+        aspect < 300 + float(orb["sextile"])
     ):
         aspects["sextile"][planet1][planet2] += 1
         temporary["sextile"][planet1][planet2] += 1
     elif (
-            72 - float(orb["quintile"]) <
-            aspect < 72 + float(orb["quintile"])
-            or
-            288 - float(orb["quintile"]) <
-            aspect < 288 + float(orb["quintile"])
+        72 - float(orb["quintile"]) <
+        aspect < 72 + float(orb["quintile"])
+        or
+        288 - float(orb["quintile"]) <
+        aspect < 288 + float(orb["quintile"])
     ):
         aspects["quintile"][planet1][planet2] += 1
         temporary["quintile"][planet1][planet2] += 1
     elif (
-            90 - float(orb["square"]) <
-            aspect < 90 + float(orb["square"]) or
-            270 - float(orb["square"]) <
-            aspect < 270 + float(orb["square"])
+        90 - float(orb["square"]) <
+        aspect < 90 + float(orb["square"]) or
+        270 - float(orb["square"]) <
+        aspect < 270 + float(orb["square"])
     ):
         aspects["square"][planet1][planet2] += 1
         temporary["square"][planet1][planet2] += 1
     elif (
-            120 - float(orb["trine"]) <
-            aspect < 120 + float(orb["trine"])
-            or
-            240 - float(orb["trine"]) <
-            aspect < 240 + float(orb["trine"])
+        120 - float(orb["trine"]) <
+        aspect < 120 + float(orb["trine"])
+        or
+        240 - float(orb["trine"]) <
+        aspect < 240 + float(orb["trine"])
     ):
         aspects["trine"][planet1][planet2] += 1
         temporary["trine"][planet1][planet2] += 1
     elif (
-            135 - float(orb["sesquiquadrate"]) <
-            aspect < 135 + float(orb["sesquiquadrate"])
-            or
-            225 - float(orb["sesquiquadrate"]) <
-            aspect < 225 + float(orb["sesquiquadrate"])
+        135 - float(orb["sesquiquadrate"]) <
+        aspect < 135 + float(orb["sesquiquadrate"])
+        or
+        225 - float(orb["sesquiquadrate"]) <
+        aspect < 225 + float(orb["sesquiquadrate"])
     ):
         aspects["sesquiquadrate"][planet1][planet2] += 1
         temporary["sesquiquadrate"][planet1][planet2] += 1
     elif (
-            144 - float(orb["biquintile"]) <
-            aspect < 144 + float(orb["biquintile"])
-            or
-            216 - float(orb["biquintile"]) <
-            aspect < 216 + float(orb["biquintile"])
+        144 - float(orb["biquintile"]) <
+        aspect < 144 + float(orb["biquintile"])
+        or
+        216 - float(orb["biquintile"]) <
+        aspect < 216 + float(orb["biquintile"])
     ):
         aspects["biquintile"][planet1][planet2] += 1
         temporary["biquintile"][planet1][planet2] += 1
     elif (
-            150 - float(orb["quincunx"]) <
-            aspect < 150 + float(orb["quincunx"])
-            or
-            210 - float(orb["quincunx"]) <
-            aspect < 210 + float(orb["quincunx"])
+        150 - float(orb["quincunx"]) <
+        aspect < 150 + float(orb["quincunx"])
+        or
+        210 - float(orb["quincunx"]) <
+        aspect < 210 + float(orb["quincunx"])
     ):
         aspects["quincunx"][planet1][planet2] += 1
         temporary["quincunx"][planet1][planet2] += 1
     elif (
-            180 - float(orb["opposite"]) <
-            aspect < 180 + float(orb["opposite"])
+        180 - float(orb["opposite"]) <
+        aspect < 180 + float(orb["opposite"])
     ):
         aspects["opposite"][planet1][planet2] += 1
         temporary["opposite"][planet1][planet2] += 1

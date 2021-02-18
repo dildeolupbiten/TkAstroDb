@@ -424,3 +424,23 @@ def from_xml(filename):
         except IndexError:
             break
     return database, sorted(category_names)
+
+
+def get_element(sign: str):
+    if sign in ["Aries", "Leo", "Sagittarius"]:
+        return "Fire"
+    elif sign in ["Taurus", "Virgo", "Capricorn"]:
+        return "Earth"
+    elif sign in ["Gemini", "Libra", "Aquarius"]:
+        return "Air"
+    elif sign in ["Cancer", "Scorpio", "Pisces"]:
+        return "Water"
+
+
+def get_mode(sign: str):
+    if sign in ["Aries", "Cancer", "Libra", "Capricorn"]:
+        return "Cardinal"
+    elif sign in ["Taurus", "Leo", "Scorpio", "Aquarius"]:
+        return "Fixed"
+    elif sign in ["Gemini", "Virgo", "Sagittarius", "Pisces"]:
+        return "Mutable"
