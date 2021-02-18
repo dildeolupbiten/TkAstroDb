@@ -708,13 +708,11 @@ class DatabaseFrame(tk.Frame):
 
     def button_3_remove(self):
         selected = self.treeview.selection()
-        if not selected:
-            pass
-        else:
+        if selected:
+            results = {i[0]: i for i in self.displayed_results}
             for i in selected:
-                for j in self.displayed_results:
-                    if j[0] == self.treeview.item(i)["values"][0]:
-                        self.displayed_results.remove(j)
+                adb_id = self.treeview.item(i)["values"][0]
+                self.displayed_results.remove(results[adb_id])
                 self.treeview.delete(i)
             self.info_var.set(len(self.displayed_results))
 

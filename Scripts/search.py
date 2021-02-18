@@ -76,6 +76,7 @@ class SearchFrame(tk.Frame):
         self.id = self.var.get().split(" ")[0]
         if not self.is_added():
             self.button.pack(side="right")
+        self.combobox.selection_clear()
 
     def search(self, database):
         if self.combobox.get():
