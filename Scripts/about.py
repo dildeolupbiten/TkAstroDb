@@ -30,15 +30,15 @@ class About(tk.Toplevel):
         )
         self.title.pack()
         for i, text in enumerate(
-                [
-                    "Version",
-                    "Date Built",
-                    "Date Updated",
-                    "Thanks To",
-                    "Developed By",
-                    "Contact",
-                    "Github"
-                ]
+            [
+                "Version",
+                "Date Built",
+                "Date Updated",
+                "Thanks To",
+                "Developed By",
+                "Contact",
+                "Github"
+            ]
         ):
             label = tk.Label(
                 master=self.bottom_frame,
@@ -55,15 +55,15 @@ class About(tk.Toplevel):
             )
             double_dot.grid(row=i, column=1, sticky="w")
         for i, j in enumerate(
-                (
-                    self.version,
-                    self.date_built,
-                    self.date_updated,
-                    self.thanks,
-                    self.developed_by,
-                    self.contact,
-                    self.github
-                )
+            (
+                self.version,
+                self.date_built,
+                self.date_updated,
+                self.thanks,
+                self.developed_by,
+                self.contact,
+                self.github
+            )
         ):
             if j in [self.contact, self.github]:
                 info = tk.Label(
