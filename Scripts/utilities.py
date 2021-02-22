@@ -24,7 +24,7 @@ def start_merging_databases(files, widget, icons):
         for i in from_xml(file)[0]:
             if i[1] not in names:
                 data.append(i)
-                names.append(i)
+                names.append(i[1])
     with open(
             os.path.join("./Database", "_&_".join(split) + ".json"), 
             "w", 
