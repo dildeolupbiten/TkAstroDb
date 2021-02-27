@@ -124,13 +124,33 @@ def load_defaults():
 
 def convert_coordinates(coord):
     if "n" in coord:
-        return dms_to_dd(coord.replace("n", " "))
+        d, _m = coord.split("n")
+        if len(_m) == 4:
+            m = _m[:2]
+            s = _m[2:]
+            return dms_to_dd(f"{d}\u00b0{m}'{s}\"")
+        return dms_to_dd(coord.replace("n", "\u00b0") + "'0\"")
     elif "s" in coord:
-        return -1 * dms_to_dd(coord.replace("s", " "))
+        d, _m = coord.split("s")
+        if len(_m) == 4:
+            m = _m[:2]
+            s = _m[2:]
+            return -1 * dms_to_dd(f"{d}\u00b0{m}'{s}\"")
+        return -1 * dms_to_dd(coord.replace("s", "\u00b0") + "'0\"")
     elif "e" in coord:
-        return dms_to_dd(coord.replace("e", " "))
+        d, _m = coord.split("e")
+        if len(_m) == 4:
+            m = _m[:2]
+            s = _m[2:]
+            return dms_to_dd(f"{d}\u00b0{m}'{s}\"")
+        return dms_to_dd(coord.replace("e", "\u00b0") + "'0\"")
     elif "w" in coord:
-        return -1 * dms_to_dd(coord.replace("w", " "))
+        d, _m = coord.split("w")
+        if len(_m) == 4:
+            m = _m[:2]
+            s = _m[2:]
+            return -1 * dms_to_dd(f"{d}\u00b0{m}'{s}\"")
+        return -1 * dms_to_dd(coord.replace("w", "\u00b0") + "'0\"")
 
 
 def tbutton_command(cvar_list, tlevel, select):
@@ -158,13 +178,10 @@ def dd_to_dms(dd):
 
 
 def dms_to_dd(dms):
-    dms = dms.split(" ")
-    degree = int(dms[0])
-    minute = float(dms[1]) / 60
-    if len(dms) == 3:
-        second = float(dms[2]) / 3600
-    else:
-        second = 0
+    dms = dms.replace("\u00b0", " ").replace("\'", " ").replace("\"", " ")
+    degree = int(dms.split(" ")[0])
+    minute = float(dms.split(" ")[1]) / 60
+    second = float(dms.split(" ")[2]) / 3600
     return degree + minute + second
 
 

@@ -147,22 +147,6 @@ class MultipleSelection(Selection):
             ]:
                 if value[-1].get():
                     self.checkbuttons["Aspects"][-1].set(True)
-            elif key == "Basic Traditional Rulership":
-                if value[-1].get():
-                    self.checkbuttons[
-                        "Detailed Traditional Rulership"
-                    ][-1].set(True)
-            elif key == "Basic Modern Rulership":
-                if value[-1].get():
-                    self.checkbuttons[
-                        "Detailed Modern Rulership"
-                    ][-1].set(True)
-            elif key in ["Planets In Elements", "Planets In Modes"]:
-                if value[-1].get():
-                    self.checkbuttons["Planets In Signs"][-1].set(True)
-            elif key in ["Houses In Elements", "Houses In Modes"]:
-                if value[-1].get():
-                    self.checkbuttons["Houses In Signs"][-1].set(True)
 
     def apply(self, title):
         if not self.get:
