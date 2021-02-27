@@ -6,8 +6,7 @@ from .messagebox import MsgBox, ChoiceBox
 from .utilities import (
     convert_coordinates, progressbar, get_basic_dict,
     get_planet_dict, get_aspect_dict, only_planets,
-    get_3d_pattern_dict, get_4d_pattern_dict, get_mode,
-    get_element
+    get_3d_pattern_dict, get_4d_pattern_dict
 )
 from .modules import (
     os, dt, pd, tk, ttk, time, binom, shutil,
@@ -589,13 +588,44 @@ def start_calculation(
         jd = float(i[6])
         lat = convert_coordinates(i[7])
         lon = convert_coordinates(i[8])
+        if any(
+            [
+                yod,
+                t_square,
+                grand_trine,
+                mystic_rectangle,
+                grand_cross,
+                kite
+            ]
+        ):
+            temporary = create_enumerate_dict(
+                lists=[list(config["ORB FACTORS"]), PLANETS, PLANETS],
+                keys=["", "", ""],
+            )
+        else:
+            temporary = {}
         try:
-            patterns = Zodiac(
+            Zodiac(
                 jd=jd,
                 lat=lat,
                 lon=lon,
                 hsys=HOUSE_SYSTEMS[config["HOUSE SYSTEM"]["selected"]]
-            ).patterns()
+            ).patterns(
+                planets_in_signs,
+                planets_in_elements,
+                planets_in_modes,
+                houses_in_signs,
+                houses_in_elements,
+                houses_in_modes,
+                planets_in_houses,
+                planets_in_houses_in_signs,
+                basic_traditional_rulership,
+                basic_modern_rulership,
+                detailed_traditional_rulership,
+                detailed_modern_rulership,
+                aspects,
+                temporary,
+            )
         except BaseException as err:
             log.write(
                 f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| "
@@ -616,87 +646,32 @@ def start_calculation(
                 pstring=pstring
             )
             continue
-        temporary = create_enumerate_dict(
-            lists=[list(config["ORB FACTORS"]), PLANETS, PLANETS],
-            keys=["", "", ""],
-        )
-        for index, (p, h) in enumerate(zip(patterns[0], patterns[1]), 1):
-            if "Ascendant" != p[0] and "Midheaven" != p[0]:
-                if planets_in_signs:
-                    planets_in_signs[p[0]][p[1]] += 1
-                if planets_in_elements:
-                    planets_in_elements[p[0]][get_element(p[1])] += 1
-                if planets_in_modes:
-                    planets_in_modes[p[0]][get_mode(p[1])] += 1
-                if planets_in_houses:
-                    planets_in_houses[p[0]][p[3]] += 1
-                if planets_in_houses_in_signs:
-                    planets_in_houses_in_signs[p[0]][p[3]][p[1]] += 1
-                if houses_in_signs:
-                    houses_in_signs[f"House-{h[0]}"][h[1]] += 1
-                if houses_in_elements:
-                    houses_in_elements[f"House-{h[0]}"][get_element(h[1])] += 1
-                if houses_in_modes:
-                    houses_in_modes[f"House-{h[0]}"][get_mode(h[1])] += 1
-                rulers = []
-                if basic_traditional_rulership:
-                    rulers.append(
-                        [
-                            TRADITIONAL_RULERSHIP[h[1]],
-                            detailed_traditional_rulership
-                        ]
-                    )
-                if basic_modern_rulership:
-                    rulers.append(
-                            [MODERN_RULERSHIP[h[1]],
-                             detailed_modern_rulership]
-                    )
-                if rulers:
-                    for _p in patterns[0]:
-                        for lord, rulership in rulers:
-                            if rulership:
-                                select_rulership(
-                                    lord=lord,
-                                    rulership=rulership,
-                                    p=_p,
-                                    index=index
-                                )
-            if aspects:
-                for _p in patterns[0][index:]:
-                    find_aspect(
-                        aspects=aspects,
-                        temporary=temporary,
-                        orb=config["ORB FACTORS"],
-                        planet1=p[0],
-                        planet2=_p[0],
-                        aspect=abs(p[2] - _p[2])
-                    )
-        if aspects and yod:
+        if yod:
             special_aspect_3d_pattern(temporary, yod, get_yod)
-        if aspects and t_square:
+        if t_square:
             special_aspect_3d_pattern(temporary, t_square, get_t_square)
-        if aspects and grand_trine:
+        if grand_trine:
             special_aspect_3d_pattern(
                 temporary,
                 grand_trine,
                 get_grand_trine,
                 apex=False
             )
-        if aspects and mystic_rectangle:
+        if mystic_rectangle:
             special_aspect_4d_pattern(
                 temporary,
                 mystic_rectangle,
                 get_mystic_rectangle,
                 apex=False
             )
-        if aspects and grand_cross:
+        if grand_cross:
             special_aspect_4d_pattern(
                 temporary,
                 grand_cross,
                 get_grand_cross,
                 apex=False
             )
-        if aspects and kite:
+        if kite:
             special_aspect_4d_pattern(
                 temporary,
                 kite,
@@ -719,18 +694,6 @@ def start_calculation(
                 for _planet in list(PLANETS)[index:]:
                     sum_of_aspects[planet][_planet] += \
                         aspects[aspect][planet][_planet]
-    if basic_traditional_rulership:
-        get_total_of_rulership(
-            constant=TRADITIONAL_RULERSHIP,
-            rulership=detailed_traditional_rulership,
-            total=basic_traditional_rulership
-        )
-    if basic_modern_rulership:
-        get_total_of_rulership(
-            constant=MODERN_RULERSHIP,
-            rulership=detailed_modern_rulership,
-            total=basic_modern_rulership
-        )
     log.write(
         f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| Process finished."
     )
@@ -789,27 +752,6 @@ def start_calculation(
     )
 
 
-def elements_and_modes(element, mode, lookup):
-    for var, signs in lookup.items():
-        for sign, value in signs.items():
-            if element:
-                if sign in ["Aries", "Leo", "Sagittarius"]:
-                    element[var]["Fire"] += value
-                elif sign in ["Taurus", "Virgo", "Capricorn"]:
-                    element[var]["Earth"] += value
-                elif sign in ["Gemini", "Libra", "Aquarius"]:
-                    element[var]["Air"] += value
-                elif sign in ["Cancer", "Scorpio", "Pisces"]:
-                    element[var]["Water"] += value
-            if mode:
-                if sign in ["Aries", "Cancer", "Libra", "Capricorn"]:
-                    mode[var]["Cardinal"] += value
-                elif sign in ["Taurus", "Leo", "Scorpio", "Aquarius"]:
-                    mode[var]["Fixed"] += value
-                elif sign in ["Gemini", "Virgo", "Sagittarius", "Pisces"]:
-                    mode[var]["Mutable"] += value
-
-
 def special_aspect_3d_pattern(temporary, pattern, func, apex=True):
     for i in func(temporary):
         if not apex:
@@ -834,119 +776,6 @@ def special_aspect_4d_pattern(temporary, pattern, func, apex=True):
         else:
             ordered = sorted(i[2:], key=list(PLANETS).index)
             pattern[i[0]][i[1]][ordered[0]][ordered[1]] += 1
-
-
-def select_rulership(lord, rulership, index, p):
-    if lord[:-4] == p[0]:
-        rulership[
-            f"Lord-{index}"
-        ][lord][p[3]] += 1
-
-
-def get_total_of_rulership(constant, rulership, total):
-    for i in range(1, 13):
-        for key, value in constant.items():
-            for j in range(1, 13):
-                total[
-                    f"Lord-{i}"
-                ][f"House-{j}"] += \
-                    rulership[f"Lord-{i}"][value][f"House-{j}"]
-
-
-def find_aspect(aspects, temporary, orb, aspect, planet1, planet2):
-    if (
-        0 < aspect < float(orb["conjunction"])
-        or
-        360 - float(orb["conjunction"]) < aspect < 360
-    ):
-        aspects["conjunction"][planet1][planet2] += 1
-        temporary["conjunction"][planet1][planet2] += 1
-    elif (
-        30 - float(orb["semi-sextile"]) <
-        aspect < 30 + float(orb["semi-sextile"])
-        or
-        330 - float(orb["semi-sextile"]) <
-        aspect < 330 + float(orb["semi-sextile"])
-    ):
-        aspects["semi-sextile"][planet1][planet2] += 1
-        temporary["semi-sextile"][planet1][planet2] += 1
-    elif (
-        45 - float(orb["semi-square"]) <
-        aspect < 45 + float(orb["semi-square"])
-        or
-        315 - float(orb["semi-square"]) <
-        aspect < 315 + float(orb["semi-square"])
-    ):
-        aspects["semi-square"][planet1][planet2] += 1
-        temporary["semi-square"][planet1][planet2] += 1
-    elif (
-        60 - float(orb["sextile"]) <
-        aspect < 60 + float(orb["sextile"])
-        or
-        300 - float(orb["sextile"]) <
-        aspect < 300 + float(orb["sextile"])
-    ):
-        aspects["sextile"][planet1][planet2] += 1
-        temporary["sextile"][planet1][planet2] += 1
-    elif (
-        72 - float(orb["quintile"]) <
-        aspect < 72 + float(orb["quintile"])
-        or
-        288 - float(orb["quintile"]) <
-        aspect < 288 + float(orb["quintile"])
-    ):
-        aspects["quintile"][planet1][planet2] += 1
-        temporary["quintile"][planet1][planet2] += 1
-    elif (
-        90 - float(orb["square"]) <
-        aspect < 90 + float(orb["square"]) or
-        270 - float(orb["square"]) <
-        aspect < 270 + float(orb["square"])
-    ):
-        aspects["square"][planet1][planet2] += 1
-        temporary["square"][planet1][planet2] += 1
-    elif (
-        120 - float(orb["trine"]) <
-        aspect < 120 + float(orb["trine"])
-        or
-        240 - float(orb["trine"]) <
-        aspect < 240 + float(orb["trine"])
-    ):
-        aspects["trine"][planet1][planet2] += 1
-        temporary["trine"][planet1][planet2] += 1
-    elif (
-        135 - float(orb["sesquiquadrate"]) <
-        aspect < 135 + float(orb["sesquiquadrate"])
-        or
-        225 - float(orb["sesquiquadrate"]) <
-        aspect < 225 + float(orb["sesquiquadrate"])
-    ):
-        aspects["sesquiquadrate"][planet1][planet2] += 1
-        temporary["sesquiquadrate"][planet1][planet2] += 1
-    elif (
-        144 - float(orb["biquintile"]) <
-        aspect < 144 + float(orb["biquintile"])
-        or
-        216 - float(orb["biquintile"]) <
-        aspect < 216 + float(orb["biquintile"])
-    ):
-        aspects["biquintile"][planet1][planet2] += 1
-        temporary["biquintile"][planet1][planet2] += 1
-    elif (
-        150 - float(orb["quincunx"]) <
-        aspect < 150 + float(orb["quincunx"])
-        or
-        210 - float(orb["quincunx"]) <
-        aspect < 210 + float(orb["quincunx"])
-    ):
-        aspects["quincunx"][planet1][planet2] += 1
-        temporary["quincunx"][planet1][planet2] += 1
-    elif (
-        180 - float(orb["opposite"]) <
-        aspect < 180 + float(orb["opposite"])
-    ):
-        aspects["opposite"][planet1][planet2] += 1
-        temporary["opposite"][planet1][planet2] += 1
 
 
 def get_values(filename):

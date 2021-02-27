@@ -269,6 +269,8 @@ class DatabaseFrame(tk.Frame):
         longitude_from = self.ranges["Longitude"].widgets["From"].get()
         longitude_to = self.ranges["Longitude"].widgets["To"].get()
         for record in self.database:
+            if not (1958470.5 < float(record[6]) < 3419437.5):
+                continue
             if record[3] not in self.selected_ratings:
                 continue
             if event.get() == "1" and record[2] == "N/A":

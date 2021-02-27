@@ -124,33 +124,13 @@ def load_defaults():
 
 def convert_coordinates(coord):
     if "n" in coord:
-        d, _m = coord.split("n")
-        if len(_m) == 4:
-            m = _m[:2]
-            s = _m[2:]
-            return dms_to_dd(f"{d}\u00b0{m}'{s}\"")
-        return dms_to_dd(coord.replace("n", "\u00b0") + "'0\"")
+        return dms_to_dd(coord.replace("n", " "))
     elif "s" in coord:
-        d, _m = coord.split("s")
-        if len(_m) == 4:
-            m = _m[:2]
-            s = _m[2:]
-            return -1 * dms_to_dd(f"{d}\u00b0{m}'{s}\"")
-        return -1 * dms_to_dd(coord.replace("s", "\u00b0") + "'0\"")
+        return -1 * dms_to_dd(coord.replace("s", " "))
     elif "e" in coord:
-        d, _m = coord.split("e")
-        if len(_m) == 4:
-            m = _m[:2]
-            s = _m[2:]
-            return dms_to_dd(f"{d}\u00b0{m}'{s}\"")
-        return dms_to_dd(coord.replace("e", "\u00b0") + "'0\"")
+        return dms_to_dd(coord.replace("e", " "))
     elif "w" in coord:
-        d, _m = coord.split("w")
-        if len(_m) == 4:
-            m = _m[:2]
-            s = _m[2:]
-            return -1 * dms_to_dd(f"{d}\u00b0{m}'{s}\"")
-        return -1 * dms_to_dd(coord.replace("w", "\u00b0") + "'0\"")
+        return -1 * dms_to_dd(coord.replace("w", " "))
 
 
 def tbutton_command(cvar_list, tlevel, select):
@@ -163,7 +143,7 @@ def tbutton_command(cvar_list, tlevel, select):
 def convert_degree(degree):
     for i in range(12):
         if i * 30 <= degree < (i + 1) * 30:
-            return degree - (30 * i), [*SIGNS][i]
+            return [[*SIGNS][i], degree - (30 * i)]
 
 
 def reverse_convert_degree(degree, sign):
@@ -178,10 +158,13 @@ def dd_to_dms(dd):
 
 
 def dms_to_dd(dms):
-    dms = dms.replace("\u00b0", " ").replace("\'", " ").replace("\"", " ")
-    degree = int(dms.split(" ")[0])
-    minute = float(dms.split(" ")[1]) / 60
-    second = float(dms.split(" ")[2]) / 3600
+    dms = dms.split(" ")
+    degree = int(dms[0])
+    minute = float(dms[1]) / 60
+    if len(dms) == 3:
+        second = float(dms[2]) / 3600
+    else:
+        second = 0
     return degree + minute + second
 
 
@@ -444,3 +427,110 @@ def get_mode(sign: str):
         return "Fixed"
     elif sign in ["Gemini", "Virgo", "Sagittarius", "Pisces"]:
         return "Mutable"
+        
+        
+def find_aspect(aspects, temporary, orb, aspect, planet1, planet2):
+    if (
+        0 < aspect < float(orb["conjunction"])
+        or
+        360 - float(orb["conjunction"]) < aspect < 360
+    ):
+        aspects["conjunction"][planet1][planet2] += 1
+        if temporary:
+            temporary["conjunction"][planet1][planet2] += 1
+    elif (
+        30 - float(orb["semi-sextile"]) <
+        aspect < 30 + float(orb["semi-sextile"])
+        or
+        330 - float(orb["semi-sextile"]) <
+        aspect < 330 + float(orb["semi-sextile"])
+    ):
+        aspects["semi-sextile"][planet1][planet2] += 1
+        if temporary:
+            temporary["semi-sextile"][planet1][planet2] += 1
+    elif (
+        45 - float(orb["semi-square"]) <
+        aspect < 45 + float(orb["semi-square"])
+        or
+        315 - float(orb["semi-square"]) <
+        aspect < 315 + float(orb["semi-square"])
+    ):
+        aspects["semi-square"][planet1][planet2] += 1
+        if temporary:
+            temporary["semi-square"][planet1][planet2] += 1
+    elif (
+        60 - float(orb["sextile"]) <
+        aspect < 60 + float(orb["sextile"])
+        or
+        300 - float(orb["sextile"]) <
+        aspect < 300 + float(orb["sextile"])
+    ):
+        aspects["sextile"][planet1][planet2] += 1
+        if temporary:
+            temporary["sextile"][planet1][planet2] += 1
+    elif (
+        72 - float(orb["quintile"]) <
+        aspect < 72 + float(orb["quintile"])
+        or
+        288 - float(orb["quintile"]) <
+        aspect < 288 + float(orb["quintile"])
+    ):
+        aspects["quintile"][planet1][planet2] += 1
+        if temporary:
+            temporary["quintile"][planet1][planet2] += 1
+    elif (
+        90 - float(orb["square"]) <
+        aspect < 90 + float(orb["square"]) or
+        270 - float(orb["square"]) <
+        aspect < 270 + float(orb["square"])
+    ):
+        aspects["square"][planet1][planet2] += 1
+        if temporary:
+            temporary["square"][planet1][planet2] += 1
+    elif (
+        120 - float(orb["trine"]) <
+        aspect < 120 + float(orb["trine"])
+        or
+        240 - float(orb["trine"]) <
+        aspect < 240 + float(orb["trine"])
+    ):
+        aspects["trine"][planet1][planet2] += 1
+        if temporary:
+            temporary["trine"][planet1][planet2] += 1
+    elif (
+        135 - float(orb["sesquiquadrate"]) <
+        aspect < 135 + float(orb["sesquiquadrate"])
+        or
+        225 - float(orb["sesquiquadrate"]) <
+        aspect < 225 + float(orb["sesquiquadrate"])
+    ):
+        aspects["sesquiquadrate"][planet1][planet2] += 1
+        if temporary:
+            temporary["sesquiquadrate"][planet1][planet2] += 1
+    elif (
+        144 - float(orb["biquintile"]) <
+        aspect < 144 + float(orb["biquintile"])
+        or
+        216 - float(orb["biquintile"]) <
+        aspect < 216 + float(orb["biquintile"])
+    ):
+        aspects["biquintile"][planet1][planet2] += 1
+        if temporary:
+            temporary["biquintile"][planet1][planet2] += 1
+    elif (
+        150 - float(orb["quincunx"]) <
+        aspect < 150 + float(orb["quincunx"])
+        or
+        210 - float(orb["quincunx"]) <
+        aspect < 210 + float(orb["quincunx"])
+    ):
+        aspects["quincunx"][planet1][planet2] += 1
+        if temporary:
+            temporary["quincunx"][planet1][planet2] += 1
+    elif (
+        180 - float(orb["opposite"]) <
+        aspect < 180 + float(orb["opposite"])
+    ):
+        aspects["opposite"][planet1][planet2] += 1
+        if temporary:
+            temporary["opposite"][planet1][planet2] += 1

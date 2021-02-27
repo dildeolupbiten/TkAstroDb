@@ -412,8 +412,9 @@ class Spreadsheet(Workbook):
             totals[12].append(t)
             row += 1
         if total:
+            row += 1
             sheet.write(
-                f"{pos}{row}", "Total", self.format(align="center", bold=True)
+                f"A{row}", "Total", self.format(align="center", bold=True)
             )
             for index, i in enumerate(totals):
                 sheet.write(
