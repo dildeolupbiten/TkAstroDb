@@ -189,3 +189,17 @@ class Zodiac:
                             detailed_modern_rulership[k][v][
                                 f"House-{house}"
                             ] += 1
+        if aspects:
+            asc = ["Ascendant"] + hp[0][1:]
+            mc = ["Midheaven"] + hp[9][1:]
+            for key in [asc, mc]:
+                for i in pp:
+                    find_aspect(
+                        aspects=aspects,
+                        temporary=temporary,
+                        orb=orb_factors,
+                        planet1=i[0],
+                        planet2=key[0],
+                        aspect=abs(key[2] - i[2])
+                    )
+                pp.append(key)
