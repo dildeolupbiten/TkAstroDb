@@ -197,7 +197,7 @@ class Zodiac:
                     find_aspect(
                         aspects=aspects,
                         temporary=temporary,
-                        orb=orb_factors,
+                        orb=config["ORB FACTORS"],
                         planet1=i[0],
                         planet2=key[0],
                         aspect=abs(key[2] - i[2])
