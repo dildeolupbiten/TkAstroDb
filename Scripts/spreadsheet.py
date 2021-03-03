@@ -35,6 +35,7 @@ class Spreadsheet(Workbook):
             mystic_rectangle,
             grand_cross,
             kite,
+            orb_factors=None,
             *args,
             **kwargs
     ):
@@ -51,9 +52,12 @@ class Spreadsheet(Workbook):
             "M", "N", "O",
             "P", "Q", "R"
         ]
-        self.config = ConfigParser()
-        self.config.read("defaults.ini")
-        self.orb_factor = self.config["ORB FACTORS"]
+        if orb_factors is None:
+            self.config = ConfigParser()
+            self.config.read("defaults.ini")
+            self.orb_factor = self.config["ORB FACTORS"]
+        else:
+            self.orb_factor = orb_factors
         if info:
             self.write_info(
                 sheet=self.sheets["Info"],
@@ -257,7 +261,7 @@ class Spreadsheet(Workbook):
                 if not aspects:
                     if df is not None and len(df.values) != 0:
                         c = 0
-                        for key in self.config["ORB FACTORS"]:
+                        for key in self.orb_factor:
                             aspects[key] = get_aspect_dict(
                                 values=df.values,
                                 indexes=[c, c + 14],
@@ -272,7 +276,7 @@ class Spreadsheet(Workbook):
                             data=aspects[aspect],
                             row=row,
                             aspect=aspect.title(),
-                            orb_factor=self.config["ORB FACTORS"][aspect]
+                            orb_factor=self.orb_factor[aspect]
                         )
                         row += 16
                     aspects.clear()

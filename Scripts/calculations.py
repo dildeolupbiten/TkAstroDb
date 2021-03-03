@@ -6,7 +6,8 @@ from .messagebox import MsgBox, ChoiceBox
 from .utilities import (
     convert_coordinates, progressbar, get_basic_dict,
     get_planet_dict, get_aspect_dict, only_planets,
-    get_3d_pattern_dict, get_4d_pattern_dict
+    get_3d_pattern_dict, get_4d_pattern_dict,
+    get_orb_factor
 )
 from .modules import (
     os, dt, pd, tk, ttk, time, binom, shutil,
@@ -859,6 +860,11 @@ def get_values(filename):
     else:
         detailed_modern_rulership = {}
     values = dfs[13].values
+    orb_factors = {}
+    orb_factors.update(get_orb_factor(dfs[13].columns[0]))
+    for i in values:
+        if isinstance(i[0], str) and "Orb Factor" in i[0]:
+            orb_factors.update(get_orb_factor(i[0]))
     if len(values) != 0:
         c = 0
         aspects = {}
@@ -910,7 +916,8 @@ def get_values(filename):
         basic_modern_rulership,
         detailed_traditional_rulership,
         detailed_modern_rulership,
-        info
+        info,
+        orb_factors
     )
 
 
@@ -997,18 +1004,23 @@ def select_calculation(
         return
     x = get_values(filename=input1)
     y = get_values(filename=input2)
-    x_info = x[-1]
-    y_info = y[-1]
+    x_info = x[-2]
+    y_info = y[-2]
+    x_orb_factors = x[-1]
+    y_orb_factors = y[-1]
+    orb_factors = {}
+    for k, v in x_orb_factors.items():
+        orb_factors[k] = f"{v} & {y_orb_factors[k]}"
     if calculation_type in ["expected", "binomial limit"]:
         for k in x_info:
-            x_info[k] = str(x_info[k]) + " & " + str(y_info[k])
+            x_info[k] = f"{x_info[k]} + & {y_info[k]}"
     else:
         x_info = y_info
     config = ConfigParser()
     config.read("defaults.ini")
     method = config["METHOD"]["selected"]
     for i in range(len(y)):
-        if i in [0, 21]:
+        if i in [0, 21, 22]:
             continue
         if i in [1, 2, 3, 4, 5, 6, 7, 9, 17, 18]:
             if i == 9 and calculation_type == "cohen's d":
@@ -1083,6 +1095,7 @@ def select_calculation(
         basic_modern_rulership=results[17],
         detailed_traditional_rulership=results[18],
         detailed_modern_rulership=results[19],
+        orb_factors=orb_factors,
     )
     widget.after(
         0, 
