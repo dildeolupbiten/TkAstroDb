@@ -555,4 +555,4 @@ def find_aspect(aspects, temporary, orb, aspect, planet1, planet2):
 
 def get_orb_factor(text: str):
     key, value = text.split(": Orb Factor: +- ")
-    return {key.lower(): int(value)}
+    return {key.lower(): value}
