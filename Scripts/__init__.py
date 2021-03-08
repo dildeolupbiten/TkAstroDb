@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__version__ = "2.3.3"
+__version__ = "2.3.4"
 
 from .menu import Menu
 from .modules import tk, logging
