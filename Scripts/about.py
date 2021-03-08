@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from .modules import tk, open_new
+from .modules import dt, tk, open_new
 
 
 class About(tk.Toplevel):
-    def __init__(self):
+    def __init__(self, version):
         super().__init__()
         self.resizable(width=False, height=False)
-        self.version = "2.3.2"
+        self.version = version
         self.name = "TkAstroDb"
         self.date_built = "21.12.2018"
-        self.date_updated = "03.03.2021"
+        self.date_updated = dt.now().strftime("%d.%m.%Y")
         self.thanks = "Alois Trendl, Flavia Alonzo, Sjoerd Visser"
         self.developed_by = "Tanberk Celalettin Kutlu"
         self.contact = "tckutlu@gmail.com"

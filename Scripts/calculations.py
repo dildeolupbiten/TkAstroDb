@@ -212,7 +212,7 @@ def get_kite(aspects):
     return four_point(aspects, "kite")
 
 
-def find_observed_values(widget, icons, menu):
+def find_observed_values(widget, icons, menu, version):
     displayed_results = []
     selected_categories = []
     ignored_categories = []
@@ -286,8 +286,9 @@ def find_observed_values(widget, icons, menu):
         longitude_range = "None"
     info.update(
         {
-            "Database": config["DATABASE"]["selected"]
+            "ADb Version": config["DATABASE"]["selected"]
             .replace(".json", "").replace(".xml", ""),
+            "TkAstroDb Version": version,
             "House System": config["HOUSE SYSTEM"]["selected"],
             "Rodden Rating": selected_ratings,
             "Category": selected_categories,
@@ -372,7 +373,8 @@ def find_observed_values(widget, icons, menu):
                     selected_categories=selected_categories,
                     ignored_categories=ignored_categories,
                     menu=menu,
-                    save_categories=save_categories
+                    save_categories=save_categories,
+                    version=version
                 ),
                 daemon=True
             ).start()
@@ -390,7 +392,8 @@ def find_observed_values(widget, icons, menu):
                 selected_categories=selected_categories,
                 ignored_categories=ignored_categories,
                 menu=menu,
-                save_categories=save_categories
+                save_categories=save_categories,
+                version=version
             ),
             daemon=True
         ).start()
@@ -406,7 +409,8 @@ def start_calculation(
         selected_categories,
         ignored_categories,
         menu,
-        save_categories
+        save_categories,
+        version,
 ):
     if config["TABLE SELECTION"]["planets_in_signs"] == "true":
         planets_in_signs = create_normal_dict(
@@ -552,7 +556,8 @@ def start_calculation(
     log = open("output.log", "w", encoding="utf-8")
     if selected_categories != "Control_Group":
         log.write(
-            f"Database: {info['Database']}\n"
+            f"Adb Version: {info['Database']}\n"
+            f"TkAstroDb Version: {version}\n"
             f"House System: {info['House System']}\n"
             f"Rodden Rating: {info['Rodden Rating']}\n"
             f"Orb Factor: {'_'.join(config['ORB FACTORS'].values())}\n"
@@ -563,7 +568,8 @@ def start_calculation(
         )
     else:
         log.write(
-            f"Database: {info['Database']}\n"
+            f"Adb Version: {info['Database']}\n"
+            f"TkAstroDb Version: {version}\n"
             f"House System: {info['House System']}\n"
             f"Rodden Rating: {info['Rodden Rating']}\n"
             f"Orb Factor: {'_'.join(config['ORB FACTORS'].values())}\n"
@@ -746,7 +752,8 @@ def start_calculation(
             target=lambda: find_observed_values(
                 widget=widget,
                 icons=icons,
-                menu=menu
+                menu=menu,
+                version=version
             ),
             daemon=True
         ).start()
@@ -1013,7 +1020,7 @@ def select_calculation(
         orb_factors[k] = f"{v} & {y_orb_factors[k]}"
     if calculation_type in ["expected", "binomial limit"]:
         for k in x_info:
-            x_info[k] = f"{x_info[k]} + & {y_info[k]}"
+            x_info[k] = f"{x_info[k]} & {y_info[k]}"
     else:
         x_info = y_info
     config = ConfigParser()

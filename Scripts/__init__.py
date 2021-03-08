@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+__version__ = "2.3.3"
+
 from .menu import Menu
 from .modules import tk, logging
 from .utilities import create_image_files, load_defaults
@@ -19,6 +21,6 @@ def main():
     root.geometry("800x650")
     root.resizable(width=False, height=False)
     icons = create_image_files(path="Icons")
-    Menu(master=root, icons=icons)
+    Menu(master=root, icons=icons, version=__version__)
     load_defaults()
     root.mainloop()

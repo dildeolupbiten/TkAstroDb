@@ -12,7 +12,7 @@ from .export import export_link, export_lat_frequency, export_year_frequency
 
 
 class Menu(tk.Menu):
-    def __init__(self, icons, *args, **kwargs):
+    def __init__(self, icons, version, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.master["menu"] = self
         self.database_menu = tk.Menu(master=self, tearoff=False)
@@ -53,7 +53,8 @@ class Menu(tk.Menu):
             command=lambda: find_observed_values(
                 widget=self.master,
                 icons=icons,
-                menu=self.calculations_menu
+                menu=self.calculations_menu,
+                version=version
             )
         )
         self.calculations_menu.add_command(
@@ -174,7 +175,7 @@ class Menu(tk.Menu):
         )
         self.help_menu.add_command(
             label="About",
-            command=About
+            command=lambda: About(version=version)
         )
         self.help_menu.add_command(
             label="Check for updates",
