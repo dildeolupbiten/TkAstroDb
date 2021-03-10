@@ -286,7 +286,7 @@ def find_observed_values(widget, icons, menu, version):
         longitude_range = "None"
     info.update(
         {
-            "ADb Version": config["DATABASE"]["selected"]
+            "Adb Version": config["DATABASE"]["selected"]
             .replace(".json", "").replace(".xml", ""),
             "TkAstroDb Version": version,
             "House System": config["HOUSE SYSTEM"]["selected"],
@@ -556,7 +556,7 @@ def start_calculation(
     log = open("output.log", "w", encoding="utf-8")
     if selected_categories != "Control_Group":
         log.write(
-            f"Adb Version: {info['Database']}\n"
+            f"Adb Version: {info['Adb Version']}\n"
             f"TkAstroDb Version: {version}\n"
             f"House System: {info['House System']}\n"
             f"Rodden Rating: {info['Rodden Rating']}\n"
@@ -568,7 +568,7 @@ def start_calculation(
         )
     else:
         log.write(
-            f"Adb Version: {info['Database']}\n"
+            f"Adb Version: {info['Adb Version']}\n"
             f"TkAstroDb Version: {version}\n"
             f"House System: {info['House System']}\n"
             f"Rodden Rating: {info['Rodden Rating']}\n"
@@ -868,7 +868,8 @@ def get_values(filename):
         detailed_modern_rulership = {}
     values = dfs[13].values
     orb_factors = {}
-    orb_factors.update(get_orb_factor(dfs[13].columns[0]))
+    if [i for i in dfs[13].columns]:
+        orb_factors.update(get_orb_factor(dfs[13].columns[0]))
     for i in values:
         if isinstance(i[0], str) and "Orb Factor" in i[0]:
             orb_factors.update(get_orb_factor(i[0]))
