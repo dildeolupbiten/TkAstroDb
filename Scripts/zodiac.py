@@ -227,6 +227,6 @@ class Zodiac:
                         orb=config["ORB FACTORS"],
                         planet1=i[0],
                         planet2=key[0],
-                        aspect=abs(key[2] - i[2])
+                        aspect=abs(float(key[2]) - float(i[2]))
                     )
                 pp.append(key)

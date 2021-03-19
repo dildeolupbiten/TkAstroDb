@@ -92,7 +92,6 @@ class SingleSelection(Selection):
                 self.frame.destroy()
                 self.frame = None
 
-            
     def create_frame(self, catalogue):
         self.frame = tk.Frame(master=self.topframe)
         self.frame.grid(row=len(self.catalogue), column=0)
