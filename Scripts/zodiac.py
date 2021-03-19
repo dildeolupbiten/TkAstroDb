@@ -8,28 +8,55 @@ swe.set_ephe_path(os.path.join(os.getcwd(), "Eph"))
 
 
 class Zodiac:
-    def __init__(self, jd, lat, lon, hsys):
+    def __init__(
+        self, 
+        jd, 
+        lat, 
+        lon, 
+        hsys,
+        zodiac,
+        ayanamsha
+    ):
         self.jd = jd
         self.lat = lat
         self.lon = lon
         self.hsys = hsys
+        self.zodiac = zodiac
+        if self.zodiac == "Sidereal":
+            swe.set_sid_mode(ayanamsha)
 
     def planet_pos(self, planet):
         degree = swe.calc(self.jd, planet)[0]
+        if isinstance(degree, tuple):
+            degree = degree[0]
+        if self.zodiac == "Sidereal":
+            diff = swe.get_ayanamsa(self.jd)
+        else:
+            diff = 0
+        degree -= diff
+        if degree < 0:
+            degree += 360
         return [convert_degree(degree)[0], degree]
 
     def house_pos(self):
-        return [
-            [i + 1, convert_degree(j)[0], j]
-            for i, j in enumerate(
-                swe.houses(
-                    self.jd,
-                    self.lat,
-                    self.lon,
-                    bytes(self.hsys.encode("utf-8"))
-                )[0]
-            )
-        ]        
+        if self.zodiac == "Sidereal":
+            diff = swe.get_ayanamsa(self.jd)
+        else:
+            diff = 0
+        hp = []
+        for i, j in enumerate(
+            swe.houses(
+                self.jd,
+                self.lat,
+                self.lon,
+                bytes(self.hsys.encode("utf-8"))
+            )[0]
+        ):
+            degree = j - diff 
+            if degree < 0:
+                degree += 360
+            hp.append([i + 1, convert_degree(degree)[0], degree])
+        return hp       
 
     def patterns(
         self,

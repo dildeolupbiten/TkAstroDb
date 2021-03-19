@@ -98,6 +98,8 @@ def load_defaults():
         return
     config = ConfigParser()
     with open("defaults.ini", "w") as f:
+        config["ZODIAC"] = {"selected": "Tropical"}
+        config["AYANAMSHA"] = {"selected": "Hindu/Lahiri"}
         config["HOUSE SYSTEM"] = {"selected": "Placidus"}
         config["ORB FACTORS"] = {
             "Conjunction": 6,

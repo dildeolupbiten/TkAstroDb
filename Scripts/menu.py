@@ -156,6 +156,13 @@ class Menu(tk.Menu):
             )
         )
         self.options_menu.add_command(
+            label="Zodiac",
+            command=lambda: SingleSelection(
+                title="Zodiac",
+                catalogue=["Tropical", "Sidereal"]
+            )
+        )
+        self.options_menu.add_command(
             label="House System",
             command=lambda: SingleSelection(
                 title="House System",

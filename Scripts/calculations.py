@@ -15,7 +15,7 @@ from .modules import (
 )
 from .constants import (
     HOUSE_SYSTEMS, PLANETS, SIGNS, HOUSES, SHEETS,
-    TRADITIONAL_RULERSHIP, MODERN_RULERSHIP
+    TRADITIONAL_RULERSHIP, MODERN_RULERSHIP, AYANAMSHA
 )
 
 
@@ -284,11 +284,17 @@ def find_observed_values(widget, icons, menu, version):
         longitude_range = f"{longitude_from} - {longitude_to}"
     else:
         longitude_range = "None"
+    if config["ZODIAC"]["selected"] == "Sidereal":
+        zodiac = f"{config['ZODIAC']['selected']} " \
+                 f"(Ayanamsha: {config['AYANAMSHA']['selected']})"
+    else:
+        zodiac = config["ZODIAC"]["selected"]
     info.update(
         {
             "Adb Version": config["DATABASE"]["selected"]
             .replace(".json", "").replace(".xml", ""),
             "TkAstroDb Version": version,
+            "Zodiac": zodiac,
             "House System": config["HOUSE SYSTEM"]["selected"],
             "Rodden Rating": selected_ratings,
             "Category": selected_categories,
@@ -301,6 +307,7 @@ def find_observed_values(widget, icons, menu, version):
         *selected_categories.split("/"),
         f"RR_{selected_ratings}",
         f"ORB_{'_'.join(config['ORB FACTORS'].values())}",
+        zodiac,
         config["HOUSE SYSTEM"]["selected"]
     )
     if info["Event"] == "False" and info["Human"] == "True":
@@ -558,6 +565,7 @@ def start_calculation(
         log.write(
             f"Adb Version: {info['Adb Version']}\n"
             f"TkAstroDb Version: {version}\n"
+            f"Zodiac: {info['Zodiac']}\n"
             f"House System: {info['House System']}\n"
             f"Rodden Rating: {info['Rodden Rating']}\n"
             f"Orb Factor: {'_'.join(config['ORB FACTORS'].values())}\n"
@@ -570,6 +578,7 @@ def start_calculation(
         log.write(
             f"Adb Version: {info['Adb Version']}\n"
             f"TkAstroDb Version: {version}\n"
+            f"Zodiac: {info['Zodiac']}\n"
             f"House System: {info['House System']}\n"
             f"Rodden Rating: {info['Rodden Rating']}\n"
             f"Orb Factor: {'_'.join(config['ORB FACTORS'].values())}\n"
@@ -616,7 +625,9 @@ def start_calculation(
                 jd=jd,
                 lat=lat,
                 lon=lon,
-                hsys=HOUSE_SYSTEMS[config["HOUSE SYSTEM"]["selected"]]
+                hsys=HOUSE_SYSTEMS[config["HOUSE SYSTEM"]["selected"]],
+                zodiac=config["ZODIAC"]["selected"],
+                ayanamsha=AYANAMSHA[config["AYANAMSHA"]["selected"]]
             ).patterns(
                 planets_in_signs,
                 planets_in_elements,

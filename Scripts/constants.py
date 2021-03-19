@@ -112,6 +112,36 @@ PLANETS = {
     }
 }
 
+AYANAMSHA = {
+    "Aldebaran 15 Taurus": swe.SIDM_ALDEBARAN_15TAU,
+    "Aryabhata": swe.SIDM_ARYABHATA,
+    "Aryabhata (Mean Sun)": swe.SIDM_ARYABHATA_MSUN,
+    "B1950": swe.SIDM_B1950,
+    "Babylonian (Huber)": swe.SIDM_BABYL_HUBER,
+    "Babylonian (Kugler 1)": swe.SIDM_BABYL_KUGLER1,
+    "Babylonian (Kugler 2)": swe.SIDM_BABYL_KUGLER2,
+    "Babylonian (Kugler 3)": swe.SIDM_BABYL_KUGLER3,
+    "De Luce": swe.SIDM_DELUCE,
+    "Fagan-Bradley": swe.SIDM_FAGAN_BRADLEY,
+    "Galactic Center 0 Sagittarius": swe.SIDM_GALCENT_0SAG,
+    "Hindu-Lahiri": swe.SIDM_LAHIRI,
+    "Hipparchus": swe.SIDM_HIPPARCHOS,  
+    "J1900": swe.SIDM_J1900,
+    "J2000": swe.SIDM_J2000,
+    "JN Bhasin": swe.SIDM_JN_BHASIN,
+    "Krishnamurti": swe.SIDM_KRISHNAMURTI,
+    "Raman": swe.SIDM_RAMAN,
+    "Sassanian": swe.SIDM_SASSANIAN,
+    "Suryasiddhanta": swe.SIDM_SURYASIDDHANTA,
+    "Suryasiddhanta Citra": swe.SIDM_SS_CITRA,
+    "Suryasiddhanta Revati": swe.SIDM_SS_REVATI,
+    "Suryasiddhanta (Mean Sun)": swe.SIDM_SURYASIDDHANTA_MSUN,
+    "True Citra": swe.SIDM_TRUE_CITRA,
+    "True Revati": swe.SIDM_TRUE_REVATI,   
+    "Usha & Sashi": swe.SIDM_USHASHASHI,
+    "Yukteshwar": swe.SIDM_YUKTESHWAR   
+}
+
 HOUSES = [f"House-{i}" for i in range(1, 13)]
 
 HOUSE_SYSTEMS = {

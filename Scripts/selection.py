@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from .modules import tk, ConfigParser
+from .modules import tk, ttk, ConfigParser
+from .constants import AYANAMSHA
 
 
 class Selection(tk.Toplevel):
@@ -48,6 +49,15 @@ class SingleSelection(Selection):
             checkbutton.grid(row=i, column=0, sticky="w")
             self.checkbuttons[j] = [checkbutton, var]
             self.configure_checkbuttons(option=j)
+        self.ayanamsha = self.config["AYANAMSHA"]["selected"]
+        if (
+            "Sidereal" in self.checkbuttons 
+            and 
+            self.checkbuttons["Sidereal"][1].get()
+        ):         
+            self.create_frame(catalogue=AYANAMSHA)
+        else:
+            self.frame = None
         self.wait_window()
 
     def apply(self, title):
@@ -56,6 +66,8 @@ class SingleSelection(Selection):
         for i in self.catalogue:
             if self.checkbuttons[i][1].get():
                 config[title] = {"selected": i}
+                if i == "Sidereal":
+                    config["AYANAMSHA"] = {"selected": self.ayanamsha}
                 with open("defaults.ini", "w") as f:
                     config.write(f)
         self.done = True
@@ -73,6 +85,44 @@ class SingleSelection(Selection):
                 self.checkbuttons[i][0].configure(
                     variable=self.checkbuttons[i][1]
                 )
+        if "Sidereal" in self.checkbuttons:
+            if self.checkbuttons["Sidereal"][1].get():
+                self.create_frame(catalogue=AYANAMSHA)
+            else:
+                self.frame.destroy()
+                self.frame = None
+
+            
+    def create_frame(self, catalogue):
+        self.frame = tk.Frame(master=self.topframe)
+        self.frame.grid(row=len(self.catalogue), column=0)
+        label = tk.Label(
+            master=self.frame, 
+            text="Ayanamsha", 
+            font="Default 10 bold"
+        )
+        label.pack()
+        style = ttk.Style()
+        style.map(
+            "TCombobox",
+            fieldbackground=[("readonly", "white")]
+        )
+        combobox = ttk.Combobox(
+            master=self.frame, 
+            values=list(catalogue),
+            style="TCombobox"
+        )
+        combobox.pack()
+        combobox.insert("0", self.ayanamsha)
+        combobox["state"] = "readonly"
+        combobox.bind(
+            sequence="<<ComboboxSelected>>", 
+            func=self.change_ayanamsha
+        )
+    
+    def change_ayanamsha(self, event):
+        self.ayanamsha = event.widget.get()
+        event.widget.selection_clear()
 
 
 class MultipleSelection(Selection):
