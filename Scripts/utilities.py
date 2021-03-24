@@ -3,7 +3,7 @@
 from .messagebox import MsgBox
 from .constants import SIGNS, PLANETS, SHEETS
 from .modules import (
-    os, ET, json, time, Popen, urlopen,
+    os, np, ET, json, time, Popen, urlopen,
     Thread, URLError, PhotoImage, ConfigParser
 )
 
@@ -121,6 +121,7 @@ def load_defaults():
             i.replace(" ", "_"): "true"
             for i in SHEETS if i != "Info"
         }
+        config["MIDPOINT ORB FACTOR"] = {"selected": "1"}
         config.write(f)
 
 
@@ -558,3 +559,57 @@ def find_aspect(aspects, temporary, orb, aspect, planet1, planet2):
 def get_orb_factor(text: str):
     key, value = text.split(": Orb Factor: +- ")
     return {key.lower(): value}
+
+
+def get_midpoints(midpoints, aspect, planet1, planet2, patterns, orb_factor):
+    if planet1 in midpoints and planet2 in midpoints[planet1]:
+        for i in [j for j in patterns if j[0] not in [planet1, planet2]]:
+            if aspect - orb_factor <= i[2] <= aspect + orb_factor:
+                midpoints[planet1][planet2][i[0]] += 1
+
+
+def find_midpoint(aspect1, aspect2):
+    if aspect1 > aspect2:
+        if aspect1 - aspect2 >= 180:
+            return ((aspect1 + (360 + aspect2)) / 2) % 360
+        else:
+            return ((aspect1 + aspect2) / 2) % 360
+    elif aspect2 > aspect1:
+        if aspect2 - aspect1 >= 180:
+            return ((aspect2 + (360 + aspect1)) / 2) % 360
+        else:
+            return ((aspect2 + aspect1) / 2) % 360
+
+
+def create_midpoint_dict(planets):
+    result = {}
+    for i in planets:
+        result[i] = {}
+        for j in [m for m in planets if m != i]:
+            if j not in result:
+                result[i][j] = {}
+                for k in [m for m in planets if m not in [i, j]]:
+                    result[i][j][k] = 0
+    return result
+
+
+def get_midpoint_dict(values):
+    midpoints = create_midpoint_dict(PLANETS)
+    orb_factor = ""
+    for i in values:
+        if (
+            (isinstance(i[-1], float) or isinstance(i[-1], int))
+            and
+            i[0] is not np.nan
+        ):
+            arr = list(i)
+            arr.pop(1)
+            arr.pop(1)
+            planets, orb_factor = arr[0].split(" (")
+            orb_factor = orb_factor\
+                .replace("Orb Factor: +- ", "")\
+                .replace(")", "")
+            p1, p2 = planets.split(" / ")
+            for k, v in zip(midpoints[p1][p2], arr[1:]):
+                midpoints[p1][p2][k] = v
+    return midpoints, orb_factor

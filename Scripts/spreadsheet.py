@@ -7,7 +7,8 @@ from .constants import (
 )
 from .utilities import (
     only_planets, get_basic_dict, get_planet_dict,
-    get_aspect_dict, get_3d_pattern_dict, get_4d_pattern_dict
+    get_aspect_dict, get_3d_pattern_dict, get_4d_pattern_dict,
+    get_midpoint_dict
 )
 
 
@@ -35,7 +36,9 @@ class Spreadsheet(Workbook):
             mystic_rectangle,
             grand_cross,
             kite,
+            midpoints,
             orb_factors=None,
+            orb_factor=None,
             *args,
             **kwargs
     ):
@@ -52,12 +55,16 @@ class Spreadsheet(Workbook):
             "M", "N", "O",
             "P", "Q", "R"
         ]
+        self.config = ConfigParser()
+        self.config.read("defaults.ini")
         if orb_factors is None:
-            self.config = ConfigParser()
-            self.config.read("defaults.ini")
-            self.orb_factor = self.config["ORB FACTORS"]
+            self.orb_factors = self.config["ORB FACTORS"]
         else:
-            self.orb_factor = orb_factors
+            self.orb_factors = orb_factors
+        if orb_factor is None:
+            self.orb_factor = self.config["MIDPOINT ORB FACTOR"]["orb-factor"]
+        else:
+            self.orb_factor = orb_factor
         if info:
             self.write_info(
                 sheet=self.sheets["Info"],
@@ -261,7 +268,7 @@ class Spreadsheet(Workbook):
                 if not aspects:
                     if df is not None and len(df.values) != 0:
                         c = 0
-                        for key in self.orb_factor:
+                        for key in self.orb_factors:
                             aspects[key] = get_aspect_dict(
                                 values=df.values,
                                 indexes=[c, c + 14],
@@ -276,7 +283,7 @@ class Spreadsheet(Workbook):
                             data=aspects[aspect],
                             row=row,
                             aspect=aspect.title(),
-                            orb_factor=self.orb_factor[aspect]
+                            orb_factor=self.orb_factors[aspect]
                         )
                         row += 16
                     aspects.clear()
@@ -357,6 +364,18 @@ class Spreadsheet(Workbook):
                             )
                             row += 14
                     d.clear()
+            elif name == "Midpoints":
+                if not midpoints:
+                    if df is not None and len(df.values) != 0:
+                        midpoints = get_midpoint_dict(
+                            values=df.values,
+                        )
+                if midpoints:
+                    self.write_midpoints(
+                        sheet=self.sheets[name],
+                        midpoints=midpoints
+                    )
+                    midpoints.clear()
         self.close()
 
     def format(
@@ -544,3 +563,25 @@ class Spreadsheet(Workbook):
                 value,
                 self.format(bold=False, align="left")
             )
+
+    def write_midpoints(self, sheet, midpoints):
+        row = 1
+        for key, value in midpoints.items():
+            for k, v in value.items():
+                sheet.merge_range(
+                    f"A{row + 1}:C{row + 1}",
+                    f"{key} / {k} (Orb Factor: +- {self.orb_factor})",
+                    self.format(bold=True)
+                )
+                for index, (_k, _v) in enumerate(v.items(), 3):
+                    sheet.write(
+                        f"{self.cols[index]}{row}",
+                        _k,
+                        self.format(bold=True)
+                    )
+                    sheet.write(
+                        f"{self.cols[index]}{row + 1}",
+                        _v,
+                        self.format(bold=False)
+                    )
+                row += 3

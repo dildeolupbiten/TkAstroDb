@@ -4,7 +4,7 @@ from .about import About
 from .database import Database
 from .modules import tk, Thread
 from .orb_factor import OrbFactor
-from .constants import HOUSE_SYSTEMS
+from .constants import HOUSE_SYSTEMS, ASPECTS
 from .selection import SingleSelection, MultipleSelection
 from .calculations import find_observed_values, select_calculation
 from .utilities import check_update, table_selection, merge_databases
@@ -178,7 +178,19 @@ class Menu(tk.Menu):
         )
         self.options_menu.add_command(
             label="Orb Factor",
-            command=OrbFactor
+            command=lambda: OrbFactor(
+                title="Orb Factor",
+                catalogue=ASPECTS,
+                config_key="ORB FACTORS"
+            )
+        )
+        self.options_menu.add_command(
+            label="Midpoint Orb Factor",
+            command=lambda: OrbFactor(
+                title="Midpoint Orb Factor",
+                catalogue=["orb-factor"],
+                config_key="MIDPOINT ORB FACTOR"
+            )
         )
         self.help_menu.add_command(
             label="About",

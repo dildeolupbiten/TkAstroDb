@@ -7,7 +7,7 @@ from .utilities import (
     convert_coordinates, progressbar, get_basic_dict,
     get_planet_dict, get_aspect_dict, only_planets,
     get_3d_pattern_dict, get_4d_pattern_dict,
-    get_orb_factor
+    get_orb_factor, create_midpoint_dict, get_midpoint_dict
 )
 from .modules import (
     os, dt, pd, tk, ttk, time, binom, shutil,
@@ -545,6 +545,10 @@ def start_calculation(
         kite = create_4d_dict(list(PLANETS))
     else:
         kite = {}
+    if config["TABLE SELECTION"]["midpoints"] == "true":
+        midpoints = create_midpoint_dict(PLANETS)
+    else:
+        midpoints = {}
     size = len(displayed_results)
     received = 0
     now = time.time()
@@ -643,6 +647,7 @@ def start_calculation(
                 detailed_modern_rulership,
                 aspects,
                 temporary,
+                midpoints,
             )
         except BaseException as err:
             log.write(
@@ -742,7 +747,8 @@ def start_calculation(
         grand_trine=grand_trine,
         mystic_rectangle=mystic_rectangle,
         grand_cross=grand_cross,
-        kite=kite
+        kite=kite,
+        midpoints=midpoints,
     )
     shutil.move(
         src=os.path.join(os.getcwd(), "output.log"),
@@ -923,6 +929,8 @@ def get_values(filename):
             )
         else:
             pattern_4d.append({})
+    values = dfs[21].values
+    midpoints, orb_factor = get_midpoint_dict(values)
     return (
         total,
         *pattern_2d,
@@ -936,7 +944,9 @@ def get_values(filename):
         detailed_traditional_rulership,
         detailed_modern_rulership,
         info,
-        orb_factors
+        orb_factors,
+        orb_factor,
+        midpoints
     )
 
 
@@ -1023,11 +1033,12 @@ def select_calculation(
         return
     x = get_values(filename=input1)
     y = get_values(filename=input2)
-    x_info = x[-2]
-    y_info = y[-2]
-    x_orb_factors = x[-1]
-    y_orb_factors = y[-1]
+    x_info = x[-4]
+    y_info = y[-4]
+    x_orb_factors = x[-3]
+    y_orb_factors = y[-3]
     orb_factors = {}
+    orb_factor = f"{x[-2]} & {y[-2]}"
     for k, v in x_orb_factors.items():
         orb_factors[k] = f"{v} & {y_orb_factors[k]}"
     if calculation_type in ["expected", "binomial limit"]:
@@ -1039,7 +1050,7 @@ def select_calculation(
     config.read("defaults.ini")
     method = config["METHOD"]["selected"]
     for i in range(len(y)):
-        if i in [0, 21, 22]:
+        if i in [0, 21, 22, 23]:
             continue
         if i in [1, 2, 3, 4, 5, 6, 7, 9, 17, 18]:
             if i == 9 and calculation_type == "cohen's d":
@@ -1057,7 +1068,7 @@ def select_calculation(
             )
         else:
             if (
-                i in [8, 10, 11, 12, 13, 14, 15]
+                i in [8, 10, 11, 12, 13, 14, 15, 24]
                 and
                 calculation_type == "cohen's d"
             ):
@@ -1089,7 +1100,7 @@ def select_calculation(
                     )
     results = [
         x[i] if len(x[i]) == len(y[i]) else {}
-        for i in range(1, 21)
+        for i in range(1, 25)
     ]
     Spreadsheet(
         filename=output,
@@ -1115,6 +1126,8 @@ def select_calculation(
         detailed_traditional_rulership=results[18],
         detailed_modern_rulership=results[19],
         orb_factors=orb_factors,
+        midpoints=results[23],
+        orb_factor=orb_factor
     )
     widget.after(
         0, 

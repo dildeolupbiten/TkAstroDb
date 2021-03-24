@@ -205,5 +205,20 @@ SHEETS = [
     "Grand Trine",
     "Mystic Rectangle",
     "Grand Cross",
-    "Kite"
+    "Kite",
+    "Midpoints"
+]
+
+ASPECTS = [
+    "Conjunction",
+    "Semi-Sextile",
+    "Semi-Square",
+    "Sextile",
+    "Quintile",
+    "Square",
+    "Trine",
+    "Sesquiquadrate",
+    "BiQuintile",
+    "Quincunx",
+    "Opposite"
 ]

@@ -2,7 +2,14 @@
 
 from .modules import os, swe, ConfigParser
 from .constants import PLANETS, TRADITIONAL_RULERSHIP, MODERN_RULERSHIP
-from .utilities import convert_degree, get_element, get_mode, find_aspect
+from .utilities import (
+    convert_degree,
+    get_element,
+    get_mode,
+    find_aspect,
+    find_midpoint,
+    get_midpoints
+)
 
 swe.set_ephe_path(os.path.join(os.getcwd(), "Eph"))
 
@@ -73,7 +80,8 @@ class Zodiac:
         detailed_traditional_rulership,
         detailed_modern_rulership,
         aspects,
-        temporary
+        temporary,
+        midpoints
     ):
         pp = []
         hp = self.house_pos()
@@ -121,16 +129,17 @@ class Zodiac:
             if value["number"] is None:
                 continue
             pos = self.planet_pos(planet=value["number"])
-            if aspects:
-                for i in pp:
-                    find_aspect(
-                        aspects=aspects,
-                        temporary=temporary,
-                        orb=config["ORB FACTORS"],
-                        planet1=i[0],
-                        planet2=key,
-                        aspect=abs(pos[1] - i[2])
-                    )
+            if aspects or midpoints:
+                if aspects:
+                    for i in pp:
+                        find_aspect(
+                            aspects=aspects,
+                            temporary=temporary,
+                            orb=config["ORB FACTORS"],
+                            planet1=i[0],
+                            planet2=key,
+                            aspect=abs(pos[1] - i[2])
+                        )
                 pp.append([key, *pos])
             if planets_in_signs:
                 planets_in_signs[key][pos[0]] += 1
@@ -216,17 +225,31 @@ class Zodiac:
                             detailed_modern_rulership[k][v][
                                 f"House-{house}"
                             ] += 1
-        if aspects:
+        if aspects or midpoints:
             asc = ["Ascendant"] + hp[0][1:]
             mc = ["Midheaven"] + hp[9][1:]
             for key in [asc, mc]:
-                for i in pp:
-                    find_aspect(
-                        aspects=aspects,
-                        temporary=temporary,
-                        orb=config["ORB FACTORS"],
-                        planet1=i[0],
-                        planet2=key[0],
-                        aspect=abs(float(key[2]) - float(i[2]))
-                    )
+                if aspects:
+                    for i in pp:
+                        find_aspect(
+                            aspects=aspects,
+                            temporary=temporary,
+                            orb=config["ORB FACTORS"],
+                            planet1=i[0],
+                            planet2=key[0],
+                            aspect=abs(float(key[2]) - float(i[2]))
+                        )
                 pp.append(key)
+        if midpoints:
+            for i in pp:
+                for j in [m for m in pp if m[0] != i[0]]:
+                    get_midpoints(
+                        midpoints=midpoints,
+                        aspect=find_midpoint(i[2], j[2]),
+                        planet1=i[0],
+                        planet2=j[0],
+                        patterns=pp,
+                        orb_factor=float(
+                            config["MIDPOINT ORB FACTOR"]["orb-factor"]
+                        )
+                    )
