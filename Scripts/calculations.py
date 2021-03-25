@@ -629,33 +629,33 @@ def start_calculation(
             )
         else:
             temporary = {}
-        # try:
-        Zodiac(
-            jd=jd,
-            lat=lat,
-            lon=lon,
-            hsys=HOUSE_SYSTEMS[config["HOUSE SYSTEM"]["selected"]],
-            zodiac=config["ZODIAC"]["selected"],
-            ayanamsha=AYANAMSHA[config["AYANAMSHA"]["selected"]]
-        ).patterns(
-            planets_in_signs,
-            planets_in_elements,
-            planets_in_modes,
-            houses_in_signs,
-            houses_in_elements,
-            houses_in_modes,
-            planets_in_houses,
-            planets_in_houses_in_signs,
-            basic_traditional_rulership,
-            basic_modern_rulership,
-            detailed_traditional_rulership,
-            detailed_modern_rulership,
-            aspects,
-            temporary,
-            midpoints,
-            midpoint_orbs,
-        )
-        """except BaseException as err:
+        try:
+            Zodiac(
+                jd=jd,
+                lat=lat,
+                lon=lon,
+                hsys=HOUSE_SYSTEMS[config["HOUSE SYSTEM"]["selected"]],
+                zodiac=config["ZODIAC"]["selected"],
+                ayanamsha=AYANAMSHA[config["AYANAMSHA"]["selected"]]
+            ).patterns(
+                planets_in_signs,
+                planets_in_elements,
+                planets_in_modes,
+                houses_in_signs,
+                houses_in_elements,
+                houses_in_modes,
+                planets_in_houses,
+                planets_in_houses_in_signs,
+                basic_traditional_rulership,
+                basic_modern_rulership,
+                detailed_traditional_rulership,
+                detailed_modern_rulership,
+                aspects,
+                temporary,
+                midpoints,
+                midpoint_orbs,
+            )
+        except BaseException as err:
             log.write(
                 f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| "
                 f"Error Type: '{err}'\n"
@@ -674,7 +674,7 @@ def start_calculation(
                 plabel=plabel,
                 pstring=pstring
             )
-            continue"""
+            continue
         if yod:
             special_aspect_3d_pattern(temporary, yod, get_yod)
         if t_square:

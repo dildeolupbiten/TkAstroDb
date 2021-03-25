@@ -102,17 +102,17 @@ def load_defaults():
         config["AYANAMSHA"] = {"selected": "Hindu-Lahiri"}
         config["HOUSE SYSTEM"] = {"selected": "Placidus"}
         config["ORB FACTORS"] = {
-            "Conjunction": 6,
-            "Semi-Sextile": 2,
-            "Semi-Square": 2,
-            "Sextile": 4,
+            "Conjunction": 10,
+            "Semi-Sextile": 3,
+            "Semi-Square": 3,
+            "Sextile": 6,
             "Quintile": 2,
-            "Square": 6,
-            "Trine": 6,
-            "Sesquiquadrate": 2,
+            "Square": 10,
+            "Trine": 10,
+            "Sesquiquadrate": 3,
             "BiQuintile": 2,
-            "Quincunx": 2,
-            "Opposite": 6
+            "Quincunx": 3,
+            "Opposite": 10
         }
         config["DATABASE"] = {"selected": "None"}
         config["METHOD"] = {"selected": "Subcategory"}
@@ -124,12 +124,12 @@ def load_defaults():
         config["MIDPOINT ORB FACTORS"] = {
             "Conjunction": 2,
             "Semi-Sextile": 1,
-            "Semi-Square": 1,
+            "Semi-Square": 1.5,
             "Sextile": 1,
             "Quintile": 1,
             "Square": 2,
-            "Trine": 2,
-            "Sesquiquadrate": 1,
+            "Trine": 1,
+            "Sesquiquadrate": 1.5,
             "BiQuintile": 1,
             "Quincunx": 1,
             "Opposite": 2
