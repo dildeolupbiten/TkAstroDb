@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .messagebox import MsgBox
-from .constants import SIGNS, PLANETS, SHEETS
+from .constants import SIGNS, PLANETS, SHEETS, ASPECTS
 from .modules import (
     os, np, ET, json, time, Popen, urlopen,
     Thread, URLError, PhotoImage, ConfigParser
@@ -118,10 +118,22 @@ def load_defaults():
         config["METHOD"] = {"selected": "Subcategory"}
         config["CATEGORY SELECTION"] = {"selected": "Basic"}
         config["TABLE SELECTION"] = {
-            i.replace(" ", "_"): "true"
+            i.replace(" ", "_"): "false"
             for i in SHEETS if i != "Info"
         }
-        config["MIDPOINT ORB FACTOR"] = {"orb-factor": "1"}
+        config["MIDPOINT ORB FACTORS"] = {
+            "Conjunction": 2,
+            "Semi-Sextile": 1,
+            "Semi-Square": 1,
+            "Sextile": 1,
+            "Quintile": 1,
+            "Square": 2,
+            "Trine": 2,
+            "Sesquiquadrate": 1,
+            "BiQuintile": 1,
+            "Quincunx": 1,
+            "Opposite": 2
+        }
         config.write(f)
 
 
@@ -554,18 +566,78 @@ def find_aspect(aspects, temporary, orb, aspect, planet1, planet2):
         aspects["opposite"][planet1][planet2] += 1
         if temporary:
             temporary["opposite"][planet1][planet2] += 1
+            
+            
+def find_midpoints(midpoints, orb, aspect, planet1, planet2, planet3):
+    if (
+        0 < aspect < orb["conjunction"] 
+        or 
+        360 - orb["conjunction"] < aspect < 360
+    ):
+        midpoints["conjunction"][planet1][planet2][planet3] += 1
+    elif (
+        30 - orb["semi-sextile"] < aspect < 30 + orb["semi-sextile"]
+        or
+        330 - orb["semi-sextile"] < aspect < 330 + orb["semi-sextile"]
+    ):
+        midpoints["semi-sextile"][planet1][planet2][planet3] += 1
+    elif (
+        45 - orb["semi-square"] < aspect < 45 + orb["semi-square"]
+        or
+        315 - orb["semi-square"] < aspect < 315 + orb["semi-square"]
+    ):
+        midpoints["semi-square"][planet1][planet2][planet3] += 1
+    elif (
+        60 - orb["sextile"] < aspect < 60 + orb["sextile"]
+        or
+        300 - orb["sextile"] < aspect < 300 + orb["sextile"]
+    ):
+        midpoints["sextile"][planet1][planet2][planet3] += 1
+    elif (
+        72 - orb["quintile"] < aspect < 72 + orb["quintile"]
+        or
+        288 - orb["quintile"] < aspect < 288 + orb["quintile"]
+    ):
+        midpoints["quintile"][planet1][planet2][planet3] += 1
+    elif (
+        90 - orb["square"] < aspect < 90 + orb["square"]
+        or
+        270 - orb["square"] < aspect < 270 + orb["square"]
+    ):
+        midpoints["square"][planet1][planet2][planet3] += 1
+    elif (
+        120 - orb["trine"] < aspect < 120 + orb["trine"]
+        or
+        240 - orb["trine"] < aspect < 240 + orb["trine"]
+    ):
+        midpoints["trine"][planet1][planet2][planet3] += 1
+    elif (
+        135 - orb["sesquiquadrate"] < aspect < 135 + orb["sesquiquadrate"]
+        or
+        225 - orb["sesquiquadrate"] < aspect < 225 + orb["sesquiquadrate"]
+    ):
+        midpoints["sesquiquadrate"][planet1][planet2][planet3] += 1
+    elif (
+        144 - orb["biquintile"] < aspect < 144 + orb["biquintile"]
+        or
+        216 - orb["biquintile"] < aspect < 216 + orb["biquintile"]
+    ):
+        midpoints["biquintile"][planet1][planet2][planet3] += 1
+    elif (
+        150 - orb["quincunx"] < aspect < 150 + orb["quincunx"]
+        or
+        210 - orb["quincunx"] < aspect < 210 + orb["quincunx"]
+    ):
+        midpoints["quincunx"][planet1][planet2][planet3] += 1
+    elif (
+        180 - orb["opposite"] < aspect < 180 + orb["opposite"]
+    ):
+        midpoints["opposite"][planet1][planet2][planet3] += 1
 
 
 def get_orb_factor(text: str):
     key, value = text.split(": Orb Factor: +- ")
     return {key.lower(): value}
-
-
-def get_midpoints(midpoints, aspect, planet1, planet2, patterns, orb_factor):
-    if planet1 in midpoints and planet2 in midpoints[planet1]:
-        for i in [j for j in patterns if j[0] not in [planet1, planet2]]:
-            if aspect - orb_factor <= i[2] <= aspect + orb_factor:
-                midpoints[planet1][planet2][i[0]] += 1
 
 
 def find_midpoint(aspect1, aspect2):
@@ -583,33 +655,54 @@ def find_midpoint(aspect1, aspect2):
 
 def create_midpoint_dict(planets):
     result = {}
-    for i in planets:
-        result[i] = {}
-        for j in [m for m in planets if m != i]:
-            if j not in result:
-                result[i][j] = {}
-                for k in [m for m in planets if m not in [i, j]]:
-                    result[i][j][k] = 0
+    for aspect in ASPECTS:
+        key = aspect.lower()
+        result[key] = {}
+        for i in planets:
+            result[key][i] = {}
+            for j in [m for m in planets if m != i]:
+                if j not in result[key]:
+                    result[key][i][j] = {}
+                    for k in [m for m in planets if m not in [i, j]]:
+                        result[key][i][j][k] = 0
     return result
 
 
 def get_midpoint_dict(values):
     midpoints = create_midpoint_dict(PLANETS)
-    orb_factor = ""
+    mp_orb_factor = {} 
+    check = []
     for i in values:
         if (
             (isinstance(i[-1], float) or isinstance(i[-1], int))
             and
             i[0] is not np.nan
         ):
-            arr = list(i)
-            arr.pop(1)
-            arr.pop(1)
-            planets, orb_factor = arr[0].split(" (")
-            orb_factor = orb_factor\
-                .replace("Orb Factor: +- ", "")\
-                .replace(")", "")
-            p1, p2 = planets.split(" / ")
-            for k, v in zip(midpoints[p1][p2], arr[1:]):
-                midpoints[p1][p2][k] = v
-    return midpoints, orb_factor
+            if "Orb Factor" in i[0]:
+                aspect, orb = i[0].replace(": Orb Factor: +- ", "|").split("|")
+                mp_orb_factor[aspect] = orb
+            else:
+                planet1, planet2 = i[0].split(" / ")
+                check += [i[0]]
+                aspect = ASPECTS[check.count(i[0]) - 1].lower()
+                midpoints[aspect][planet1][planet2] = {
+                    k: m
+                    for k, m in zip(
+                        [n for n in PLANETS if n not in [planet1, planet2]], 
+                        i[2:]
+                    ) 
+                }
+    return midpoints, mp_orb_factor
+    
+    
+def edit_coordinate(coordinate: int, dist: str):
+    if dist == "latitude":
+        if coordinate > 0:
+            return str(abs(coordinate)) + "n"
+        else:
+            return str(abs(coordinate)) + "s"
+    elif dist == "longitude":
+        if coordinate > 0:
+            return str(abs(coordinate)) + "e"
+        else:
+            return str(abs(coordinate)) + "w"

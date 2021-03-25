@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from .modules import tk, ttk, ConfigParser
 from .constants import AYANAMSHA
+from .modules import tk, ttk, ConfigParser
 
 
 class Selection(tk.Toplevel):
@@ -177,11 +177,11 @@ class MultipleSelection(Selection):
 
     def check_all_command(self):
         if self.check_all.get():
-            for values in self.checkbuttons.values():
-                values[-1].set(True)
+            for key, value in self.checkbuttons.items():
+                value[-1].set(True)                  
         else:
-            for values in self.checkbuttons.values():
-                values[-1].set(False)
+            for key, value in self.checkbuttons.items():
+                value[-1].set(False)
 
     def check_command(self):
         for key, value in self.checkbuttons.items():

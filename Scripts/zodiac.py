@@ -7,8 +7,8 @@ from .utilities import (
     get_element,
     get_mode,
     find_aspect,
-    find_midpoint,
-    get_midpoints
+    find_midpoints,
+    find_midpoint
 )
 
 swe.set_ephe_path(os.path.join(os.getcwd(), "Eph"))
@@ -81,7 +81,8 @@ class Zodiac:
         detailed_modern_rulership,
         aspects,
         temporary,
-        midpoints
+        midpoints,
+        midpoint_orbs,
     ):
         pp = []
         hp = self.house_pos()
@@ -124,7 +125,7 @@ class Zodiac:
                 ):
                     modern[
                         f"Lord-{i[0]}"
-                    ] = MODERN_RULERSHIP[i[1]]             
+                    ] = MODERN_RULERSHIP[i[1]]
         for key, value in PLANETS.items():
             if value["number"] is None:
                 continue
@@ -243,13 +244,17 @@ class Zodiac:
         if midpoints:
             for i in pp:
                 for j in [m for m in pp if m[0] != i[0]]:
-                    get_midpoints(
-                        midpoints=midpoints,
-                        aspect=find_midpoint(i[2], j[2]),
-                        planet1=i[0],
-                        planet2=j[0],
-                        patterns=pp,
-                        orb_factor=float(
-                            config["MIDPOINT ORB FACTOR"]["orb-factor"]
-                        )
-                    )
+                    for k in (n for n in pp if n[0] not in [i[0], j[0]]):
+                        try:
+                            find_midpoints(
+                                midpoints=midpoints,
+                                orb=midpoint_orbs,                          
+                                planet1=i[0],
+                                planet2=j[0],
+                                planet3=k[0],
+                                aspect=abs(
+                                    float(k[2]) - find_midpoint(i[2], j[2])
+                                ),
+                            )
+                        except KeyError:
+                            pass

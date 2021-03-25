@@ -3,7 +3,7 @@
 from .modules import Workbook, ConfigParser, pd
 from .constants import (
     SIGNS, HOUSES, SHEETS, PLANETS,
-    MODERN_RULERSHIP, TRADITIONAL_RULERSHIP
+    MODERN_RULERSHIP, TRADITIONAL_RULERSHIP, ASPECTS
 )
 from .utilities import (
     only_planets, get_basic_dict, get_planet_dict,
@@ -38,7 +38,7 @@ class Spreadsheet(Workbook):
             kite,
             midpoints,
             orb_factors=None,
-            orb_factor=None,
+            mp_orb_factors=None,
             *args,
             **kwargs
     ):
@@ -61,10 +61,10 @@ class Spreadsheet(Workbook):
             self.orb_factors = self.config["ORB FACTORS"]
         else:
             self.orb_factors = orb_factors
-        if orb_factor is None:
-            self.orb_factor = self.config["MIDPOINT ORB FACTOR"]["orb-factor"]
+        if mp_orb_factors is None:
+            self.mp_orb_factors = self.config["MIDPOINT ORB FACTORS"]
         else:
-            self.orb_factor = orb_factor
+            self.mp_orb_factors = mp_orb_factors
         if info:
             self.write_info(
                 sheet=self.sheets["Info"],
@@ -369,7 +369,7 @@ class Spreadsheet(Workbook):
                     if df is not None and len(df.values) != 0:
                         midpoints = get_midpoint_dict(
                             values=df.values,
-                        )
+                        )[0]
                 if midpoints:
                     self.write_midpoints(
                         sheet=self.sheets[name],
@@ -566,22 +566,29 @@ class Spreadsheet(Workbook):
 
     def write_midpoints(self, sheet, midpoints):
         row = 1
-        for key, value in midpoints.items():
-            for k, v in value.items():
-                sheet.merge_range(
-                    f"A{row + 1}:C{row + 1}",
-                    f"{key} / {k} (Orb Factor: +- {self.orb_factor})",
-                    self.format(bold=True)
-                )
-                for index, (_k, _v) in enumerate(v.items(), 3):
-                    sheet.write(
-                        f"{self.cols[index]}{row}",
-                        _k,
-                        self.format(bold=True)
+        for aspect in ASPECTS:
+            sheet.merge_range(
+                f"A{row}:N{row}",
+                f"{aspect}: Orb Factor: +- {self.mp_orb_factors[aspect]}",
+                self.format(bold=True)
+            )
+            for key, value in midpoints[aspect.lower()].items():
+                for k, v in value.items():
+                    sheet.merge_range(
+                        f"A{row + 2}:B{row + 2}",
+                        f"{key} / {k}",
+                        self.format(bold=True, align="left")
                     )
-                    sheet.write(
-                        f"{self.cols[index]}{row + 1}",
-                        _v,
-                        self.format(bold=False)
-                    )
-                row += 3
+                    for index, (_k, _v) in enumerate(v.items(), 2):
+                        sheet.write(
+                            f"{self.cols[index]}{row + 1}",
+                            _k,
+                            self.format(bold=True)
+                        )
+                        sheet.write(
+                            f"{self.cols[index]}{row + 2}",
+                            _v,
+                            self.format(bold=False)
+                        )
+                    row += 3
+            row += 1

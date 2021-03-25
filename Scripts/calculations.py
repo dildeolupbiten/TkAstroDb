@@ -547,8 +547,13 @@ def start_calculation(
         kite = {}
     if config["TABLE SELECTION"]["midpoints"] == "true":
         midpoints = create_midpoint_dict(PLANETS)
+        midpoint_orbs = {
+            i: float(config["MIDPOINT ORB FACTORS"][i])
+            for i in config["MIDPOINT ORB FACTORS"]
+        }
     else:
         midpoints = {}
+        midpoint_orbs = {}
     size = len(displayed_results)
     received = 0
     now = time.time()
@@ -624,32 +629,33 @@ def start_calculation(
             )
         else:
             temporary = {}
-        try:
-            Zodiac(
-                jd=jd,
-                lat=lat,
-                lon=lon,
-                hsys=HOUSE_SYSTEMS[config["HOUSE SYSTEM"]["selected"]],
-                zodiac=config["ZODIAC"]["selected"],
-                ayanamsha=AYANAMSHA[config["AYANAMSHA"]["selected"]]
-            ).patterns(
-                planets_in_signs,
-                planets_in_elements,
-                planets_in_modes,
-                houses_in_signs,
-                houses_in_elements,
-                houses_in_modes,
-                planets_in_houses,
-                planets_in_houses_in_signs,
-                basic_traditional_rulership,
-                basic_modern_rulership,
-                detailed_traditional_rulership,
-                detailed_modern_rulership,
-                aspects,
-                temporary,
-                midpoints,
-            )
-        except BaseException as err:
+        # try:
+        Zodiac(
+            jd=jd,
+            lat=lat,
+            lon=lon,
+            hsys=HOUSE_SYSTEMS[config["HOUSE SYSTEM"]["selected"]],
+            zodiac=config["ZODIAC"]["selected"],
+            ayanamsha=AYANAMSHA[config["AYANAMSHA"]["selected"]]
+        ).patterns(
+            planets_in_signs,
+            planets_in_elements,
+            planets_in_modes,
+            houses_in_signs,
+            houses_in_elements,
+            houses_in_modes,
+            planets_in_houses,
+            planets_in_houses_in_signs,
+            basic_traditional_rulership,
+            basic_modern_rulership,
+            detailed_traditional_rulership,
+            detailed_modern_rulership,
+            aspects,
+            temporary,
+            midpoints,
+            midpoint_orbs,
+        )
+        """except BaseException as err:
             log.write(
                 f"|{dt.now().strftime('%Y-%m-%d %H:%M:%S')}| "
                 f"Error Type: '{err}'\n"
@@ -668,7 +674,7 @@ def start_calculation(
                 plabel=plabel,
                 pstring=pstring
             )
-            continue
+            continue"""
         if yod:
             special_aspect_3d_pattern(temporary, yod, get_yod)
         if t_square:
@@ -930,7 +936,12 @@ def get_values(filename):
         else:
             pattern_4d.append({})
     values = dfs[21].values
-    midpoints, orb_factor = get_midpoint_dict(values)
+    aspect, orb = dfs[21].columns[0].replace(
+        ": Orb Factor: +- ", "|"
+    ).split("|")
+    orb_factor = {aspect: orb}
+    midpoints, _orb_factor = get_midpoint_dict(values)
+    orb_factor.update(_orb_factor)
     return (
         total,
         *pattern_2d,
@@ -1035,12 +1046,12 @@ def select_calculation(
     y = get_values(filename=input2)
     x_info = x[-4]
     y_info = y[-4]
-    x_orb_factors = x[-3]
-    y_orb_factors = y[-3]
     orb_factors = {}
-    orb_factor = f"{x[-2]} & {y[-2]}"
-    for k, v in x_orb_factors.items():
-        orb_factors[k] = f"{v} & {y_orb_factors[k]}"
+    mp_orb_factors = {}
+    for k, v in x[-3].items():
+        orb_factors[k] = f"{v} & {y[-3][k]}"
+    for k, v in x[-2].items():
+        mp_orb_factors[k] = f"{v} & {y[-2][k]}"
     if calculation_type in ["expected", "binomial limit"]:
         for k in x_info:
             x_info[k] = f"{x_info[k]} & {y_info[k]}"
@@ -1075,7 +1086,7 @@ def select_calculation(
                 cancel = True
             else:
                 cancel = False
-            if i in [13, 14, 15]:
+            if i in [13, 14, 15, 24]:
                 for key in x[i]:
                     for k in x[i][key]:
                         select_dict(
@@ -1127,7 +1138,7 @@ def select_calculation(
         detailed_modern_rulership=results[19],
         orb_factors=orb_factors,
         midpoints=results[23],
-        orb_factor=orb_factor
+        mp_orb_factors=mp_orb_factors
     )
     widget.after(
         0, 

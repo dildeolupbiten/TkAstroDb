@@ -4,11 +4,11 @@ from .about import About
 from .database import Database
 from .modules import tk, Thread
 from .orb_factor import OrbFactor
+from .export import export_link, export_dist
 from .constants import HOUSE_SYSTEMS, ASPECTS
 from .selection import SingleSelection, MultipleSelection
 from .calculations import find_observed_values, select_calculation
 from .utilities import check_update, table_selection, merge_databases
-from .export import export_link, export_lat_frequency, export_year_frequency
 
 
 class Menu(tk.Menu):
@@ -135,17 +135,27 @@ class Menu(tk.Menu):
             )
         )
         self.export_menu.add_command(
-            label="Latitude Frequency",
-            command=lambda: export_lat_frequency(
+            label="Latitude Distribution",
+            command=lambda: export_dist(
                 widget=self.master,
-                icons=icons
+                icons=icons,
+                dist="latitude"
             )
         )
         self.export_menu.add_command(
-            label="Year Frequency",
-            command=lambda: export_year_frequency(
+            label="Longitude Distribution",
+            command=lambda: export_dist(
                 widget=self.master,
-                icons=icons
+                icons=icons,
+                dist="longitude"
+            )
+        )
+        self.export_menu.add_command(
+            label="Year Distribution",
+            command=lambda: export_dist(
+                widget=self.master,
+                icons=icons,
+                dist="year"
             )
         )
         self.options_menu.add_command(
@@ -188,8 +198,8 @@ class Menu(tk.Menu):
             label="Midpoint Orb Factor",
             command=lambda: OrbFactor(
                 title="Midpoint Orb Factor",
-                catalogue=["orb-factor"],
-                config_key="MIDPOINT ORB FACTOR"
+                catalogue=ASPECTS,
+                config_key="MIDPOINT ORB FACTORS"
             )
         )
         self.help_menu.add_command(
