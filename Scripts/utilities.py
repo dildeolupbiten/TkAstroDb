@@ -121,7 +121,7 @@ def load_defaults():
             i.replace(" ", "_"): "true"
             for i in SHEETS if i != "Info"
         }
-        config["MIDPOINT ORB FACTOR"] = {"selected": "1"}
+        config["MIDPOINT ORB FACTOR"] = {"orb-factor": "1"}
         config.write(f)
 
 
