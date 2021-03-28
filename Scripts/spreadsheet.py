@@ -37,8 +37,6 @@ class Spreadsheet(Workbook):
             grand_cross,
             kite,
             midpoints,
-            orb_factors=None,
-            mp_orb_factors=None,
             *args,
             **kwargs
     ):
@@ -55,16 +53,6 @@ class Spreadsheet(Workbook):
             "M", "N", "O",
             "P", "Q", "R"
         ]
-        self.config = ConfigParser()
-        self.config.read("defaults.ini")
-        if orb_factors is None:
-            self.orb_factors = self.config["ORB FACTORS"]
-        else:
-            self.orb_factors = orb_factors
-        if mp_orb_factors is None:
-            self.mp_orb_factors = self.config["MIDPOINT ORB FACTORS"]
-        else:
-            self.mp_orb_factors = mp_orb_factors
         if info:
             self.write_info(
                 sheet=self.sheets["Info"],
@@ -268,7 +256,7 @@ class Spreadsheet(Workbook):
                 if not aspects:
                     if df is not None and len(df.values) != 0:
                         c = 0
-                        for key in self.orb_factors:
+                        for key in info["Orb Factor"]:
                             aspects[key] = get_aspect_dict(
                                 values=df.values,
                                 indexes=[c, c + 14],
@@ -283,7 +271,7 @@ class Spreadsheet(Workbook):
                             data=aspects[aspect],
                             row=row,
                             aspect=aspect.title(),
-                            orb_factor=self.orb_factors[aspect]
+                            orb_factor=""
                         )
                         row += 16
                     aspects.clear()
@@ -367,9 +355,7 @@ class Spreadsheet(Workbook):
             elif name == "Midpoints":
                 if not midpoints:
                     if df is not None and len(df.values) != 0:
-                        midpoints = get_midpoint_dict(
-                            values=df.values,
-                        )[0]
+                        midpoints = get_midpoint_dict(df)
                 if midpoints:
                     self.write_midpoints(
                         sheet=self.sheets[name],
@@ -447,22 +433,9 @@ class Spreadsheet(Workbook):
                 )
 
     def write_aspects(self, sheet, data, row, aspect, orb_factor):
-        if orb_factor:
-            if (
-                "Apex" in orb_factor
-                or
-                "Planet" in orb_factor
-                or
-                "Opposite" in orb_factor
-            ):
-                orb = orb_factor
-            else:
-                orb = ": Orb Factor: +- " + orb_factor
-        else:
-            orb = ""
         sheet.merge_range(
             f"A{row}:C{row}",
-            aspect.title() + orb,
+            aspect.title() + orb_factor,
             self.format(align="left", bold=True)
         )
         for index, (key, value) in enumerate(data.items()):
@@ -552,43 +525,105 @@ class Spreadsheet(Workbook):
             row += 15
 
     def write_info(self, sheet, info):
-        for index, (key, value) in enumerate(info.items()):
-            sheet.merge_range(
-                f"A{index + 1}:B{index + 1}",
-                key,
-                self.format(bold=True, align="left")
-            )
-            sheet.merge_range(
-                f"C{index + 1}:N{index + 1}",
-                value,
-                self.format(bold=False, align="left")
-            )
-
-    def write_midpoints(self, sheet, midpoints):
         row = 1
-        for aspect in ASPECTS:
-            sheet.merge_range(
-                f"A{row}:N{row}",
-                f"{aspect}: Orb Factor: +- {self.mp_orb_factors[aspect]}",
-                self.format(bold=True)
-            )
-            for key, value in midpoints[aspect.lower()].items():
-                for k, v in value.items():
+        factors = {
+            "Orb Factor": "Planet To Planet",
+            "Midpoint Orb Factor": "Midpoint To Planet"
+        }
+        key1_row, key2_row = 0, 0
+        for key, value in info.items():
+            if key in ["Orb Factor", "Midpoint Orb Factor"]:
+                new = {"Aspect": factors[key]}
+                new.update(value)
+                if key1_row == 0:
                     sheet.merge_range(
-                        f"A{row + 2}:B{row + 2}",
-                        f"{key} / {k}",
-                        self.format(bold=True, align="left")
+                        f"A{row}:F{row}",
+                        "Orb Factors",
+                        self.format(bold=True, align="center")
                     )
-                    for index, (_k, _v) in enumerate(v.items(), 2):
-                        sheet.write(
-                            f"{self.cols[index]}{row + 1}",
-                            _k,
-                            self.format(bold=True)
+                    row += 1
+                    key1_row, key2_row = row, row
+                for index, (k, v) in enumerate(new.items()):
+                    if key == "Orb Factor":
+                        bold = True if index == 0 else False
+                        align = "center" if index == 0 else "left"                  
+                        sheet.merge_range(
+                            f"A{key1_row}:B{key1_row}",
+                            k,
+                            self.format(bold=bold, align=align)
                         )
-                        sheet.write(
-                            f"{self.cols[index]}{row + 2}",
-                            _v,
-                            self.format(bold=False)
+                        sheet.merge_range(
+                            f"C{key1_row}:D{key1_row}",
+                            v,
+                            self.format(bold=bold, align=align)
                         )
-                    row += 3
-            row += 1
+                        key1_row += 1
+                    if key == "Midpoint Orb Factor":
+                        bold = True if index == 0 else False
+                        align = "center" if index == 0 else "left" 
+                        sheet.merge_range(
+                            f"E{key2_row}:F{key2_row}",
+                            v,
+                            self.format(bold=bold, align=align)
+                        )
+                        key2_row += 1
+            else:
+                sheet.merge_range(
+                    f"A{row}:B{row}",
+                    key,
+                    self.format(bold=True, align="left")
+                )
+                sheet.merge_range(
+                    f"C{row}:N{row}",
+                    value,
+                    self.format(bold=False, align="left")
+                )
+                row += 1
+            
+    def write_midpoints(self, sheet, midpoints):
+        p1_row = 1
+        for planet1 in midpoints:            
+            p2_row = 0        
+            for planet2 in midpoints[planet1]:
+                aspect_row = 0
+                totals = [0 for i in range(len(midpoints) - 2)]
+                for aspect in midpoints[planet1][planet2]:
+                    row1 = p1_row + p2_row + aspect_row
+                    sheet.merge_range(
+                        f"A{row1 + 1}:C{row1 + 1}",
+                        f"{planet1} / {planet2} ({aspect})",
+                        self.format(bold=True, align="left")
+                    )                
+                    c = 3
+                    for index, (planet3, value) in enumerate(
+                        midpoints[planet1][planet2][aspect].items()
+                    ):
+                        if aspect_row == 0:
+                            sheet.write(
+                                f"{self.cols[c]}{p1_row + p2_row}",
+                                planet3,
+                                self.format(bold=True, align="center")
+                            )
+                        sheet.write(
+                            f"{self.cols[c]}{row1 + 1}",
+                            value,
+                            self.format(bold=False, align="center")
+                        )
+                        if value:
+                            totals[index] += value
+                        c += 1
+                    aspect_row += 1          
+                sheet.merge_range(
+                    f"A{row1 + 2}:C{row1 + 2} (Total)",
+                    f"{planet1} / {planet2} (Total)",
+                    self.format(bold=True, align="left")
+                )
+                if totals[0]:
+                    for index, total in enumerate(totals, 3):
+                        sheet.write(
+                            f"{self.cols[index]}{row1 + 2}",
+                            total,
+                            self.format(bold=False, align="center")
+                        )
+                p2_row += aspect_row + 2
+            p1_row += p2_row

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .modules import os, swe, ConfigParser
+from .modules import os, swe
 from .constants import PLANETS, TRADITIONAL_RULERSHIP, MODERN_RULERSHIP
 from .utilities import (
     convert_degree,
@@ -82,14 +82,13 @@ class Zodiac:
         aspects,
         temporary,
         midpoints,
-        midpoint_orbs,
+        orb_factors,
+        midpoint_orb_factors,
     ):
         pp = []
         hp = self.house_pos()
         traditional = {}
         modern = {}
-        config = ConfigParser()
-        config.read("defaults.ini")
         if any(
             [
                 houses_in_signs,
@@ -136,7 +135,7 @@ class Zodiac:
                         find_aspect(
                             aspects=aspects,
                             temporary=temporary,
-                            orb=config["ORB FACTORS"],
+                            orb=orb_factors,
                             planet1=i[0],
                             planet2=key,
                             aspect=abs(pos[1] - i[2])
@@ -235,7 +234,7 @@ class Zodiac:
                         find_aspect(
                             aspects=aspects,
                             temporary=temporary,
-                            orb=config["ORB FACTORS"],
+                            orb=orb_factors,
                             planet1=i[0],
                             planet2=key[0],
                             aspect=abs(float(key[2]) - float(i[2]))
@@ -248,7 +247,7 @@ class Zodiac:
                         try:
                             find_midpoints(
                                 midpoints=midpoints,
-                                orb=midpoint_orbs,                          
+                                orb=midpoint_orb_factors,
                                 planet1=i[0],
                                 planet2=j[0],
                                 planet3=k[0],

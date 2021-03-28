@@ -218,7 +218,7 @@ ASPECTS = [
     "Square",
     "Trine",
     "Sesquiquadrate",
-    "BiQuintile",
+    "Biquintile",
     "Quincunx",
     "Opposite"
 ]

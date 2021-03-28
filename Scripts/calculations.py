@@ -7,7 +7,7 @@ from .utilities import (
     convert_coordinates, progressbar, get_basic_dict,
     get_planet_dict, get_aspect_dict, only_planets,
     get_3d_pattern_dict, get_4d_pattern_dict,
-    get_orb_factor, create_midpoint_dict, get_midpoint_dict
+    create_midpoint_dict, get_midpoint_dict, get_info
 )
 from .modules import (
     os, dt, pd, tk, ttk, time, binom, shutil,
@@ -213,6 +213,16 @@ def get_kite(aspects):
 
 
 def find_observed_values(widget, icons, menu, version):
+    config = ConfigParser()
+    config.read("defaults.ini")
+    if all(v == "false" for k, v in config["TABLE SELECTION"].items()):
+        MsgBox(
+            title="Warning",
+            level="warning",
+            message="Select a table from Spreadsheet\nmenu cascade.",
+            icons=icons
+        )
+        return
     displayed_results = []
     selected_categories = []
     ignored_categories = []
@@ -239,6 +249,12 @@ def find_observed_values(widget, icons, menu, version):
             checkbuttons.update(i.checkbuttons)
             break
     if not displayed_results:
+        MsgBox(
+            title="Warning",
+            level="warning",
+            message="No records are selected.",
+            icons=icons
+        )
         return
     save_categories = [i for i in selected_categories]
     if selected_categories:
@@ -257,21 +273,6 @@ def find_observed_values(widget, icons, menu, version):
         selected_ratings = "+".join(selected_ratings)
     else:
         selected_ratings = "None"
-    config = ConfigParser()
-    config.read("defaults.ini")
-    if "event" in checkbuttons:
-        info = {
-            key.title(): "True" if value[0].get() == "0" else "False"
-            for key, value in checkbuttons.items()
-        }
-    else:
-        info = {"Event": "False", "Human": "True"}
-        info.update(
-            {
-                key.title(): "True" if value[0].get() == "0" else "False"
-                for key, value in checkbuttons.items()
-            }
-        )
     if year_from and year_to:
         year_range = f"{year_from} - {year_to}"
     else:
@@ -289,20 +290,33 @@ def find_observed_values(widget, icons, menu, version):
                  f"(Ayanamsha: {config['AYANAMSHA']['selected']})"
     else:
         zodiac = config["ZODIAC"]["selected"]
-    info.update(
-        {
-            "Adb Version": config["DATABASE"]["selected"]
-            .replace(".json", "").replace(".xml", ""),
-            "TkAstroDb Version": version,
-            "Zodiac": zodiac,
-            "House System": config["HOUSE SYSTEM"]["selected"],
-            "Rodden Rating": selected_ratings,
-            "Category": selected_categories,
-            "Year Range": year_range,
-            "Latitude Range": latitude_range,
-            "Longitude Range": longitude_range
-        }
-    )
+    info = {
+        "Adb Version": config["DATABASE"]["selected"]
+        .replace(".json", "").replace(".xml", ""),
+        "TkAstroDb Version": version,
+        "Zodiac": zodiac,
+        "House System": config["HOUSE SYSTEM"]["selected"],
+        "Rodden Rating": selected_ratings,
+        "Category": selected_categories,
+        "Year Range": year_range,
+        "Latitude Range": latitude_range,
+        "Longitude Range": longitude_range
+    }
+    if "event" in checkbuttons:
+        info.update(
+            {
+                key.title(): "True" if value[0].get() == "0" else "False"
+                for key, value in checkbuttons.items()
+            }
+        )
+    else:
+        info = {"Event": "False", "Human": "True"}
+        info.update(
+            {
+                key.title(): "True" if value[0].get() == "0" else "False"
+                for key, value in checkbuttons.items()
+            }
+        )
     path = os.path.join(
         *selected_categories.split("/"),
         f"RR_{selected_ratings}",
@@ -547,14 +561,15 @@ def start_calculation(
         kite = {}
     if config["TABLE SELECTION"]["midpoints"] == "true":
         midpoints = create_midpoint_dict(PLANETS)
-        midpoint_orbs = {
-            i: float(config["MIDPOINT ORB FACTORS"][i])
+        midpoint_orb_factors = {
+            i.title(): float(config["MIDPOINT ORB FACTORS"][i])
             for i in config["MIDPOINT ORB FACTORS"]
         }
     else:
         midpoints = {}
-        midpoint_orbs = {}
-    size = len(displayed_results)
+        midpoint_orb_factors = {}
+    orb_factors = config["ORB FACTORS"]
+    size = len(displayed_results) + 1
     received = 0
     now = time.time()
     pframe = tk.Frame(master=widget)
@@ -653,7 +668,8 @@ def start_calculation(
                 aspects,
                 temporary,
                 midpoints,
-                midpoint_orbs,
+                orb_factors,
+                midpoint_orb_factors,
             )
         except BaseException as err:
             log.write(
@@ -731,6 +747,12 @@ def start_calculation(
         os.makedirs(path)
     filename = os.path.join(path, "observed_values.xlsx")
     info["Number Of Records"] = total
+    info["Orb Factor"] = {
+        k.title(): v for k, v in config["ORB FACTORS"].items()
+    }
+    info["Midpoint Orb Factor"] = {
+        k.title(): v for k, v in config["MIDPOINT ORB FACTORS"].items()
+    }
     Spreadsheet(
         filename=filename,
         info=info,
@@ -755,6 +777,16 @@ def start_calculation(
         grand_cross=grand_cross,
         kite=kite,
         midpoints=midpoints,
+    )
+    received += 1
+    progressbar(
+        s=size,
+        r=received,
+        n=now,
+        pframe=pframe,
+        pbar=pbar,
+        plabel=plabel,
+        pstring=pstring
     )
     shutil.move(
         src=os.path.join(os.getcwd(), "output.log"),
@@ -814,8 +846,7 @@ def get_values(filename):
         pd.read_excel(filename, sheet_name=name)
         for name in SHEETS
     ]
-    values = dfs[0].values
-    info = {v[0].replace(":", ""): v[2] for v in values}
+    info = get_info(dfs[0])
     total = info["Number Of Records"]
     config = ConfigParser()
     config.read("defaults.ini")
@@ -890,12 +921,6 @@ def get_values(filename):
     else:
         detailed_modern_rulership = {}
     values = dfs[13].values
-    orb_factors = {}
-    if [i for i in dfs[13].columns]:
-        orb_factors.update(get_orb_factor(dfs[13].columns[0]))
-    for i in values:
-        if isinstance(i[0], str) and "Orb Factor" in i[0]:
-            orb_factors.update(get_orb_factor(i[0]))
     if len(values) != 0:
         c = 0
         aspects = {}
@@ -935,13 +960,10 @@ def get_values(filename):
             )
         else:
             pattern_4d.append({})
-    values = dfs[21].values
-    aspect, orb = dfs[21].columns[0].replace(
-        ": Orb Factor: +- ", "|"
-    ).split("|")
-    orb_factor = {aspect: orb}
-    midpoints, _orb_factor = get_midpoint_dict(values)
-    orb_factor.update(_orb_factor)
+    if len(dfs[21].values) != 0:
+        midpoints = get_midpoint_dict(dfs[21])
+    else:
+        midpoints = {}
     return (
         total,
         *pattern_2d,
@@ -955,8 +977,6 @@ def get_values(filename):
         detailed_traditional_rulership,
         detailed_modern_rulership,
         info,
-        orb_factors,
-        orb_factor,
         midpoints
     )
 
@@ -1042,26 +1062,70 @@ def select_calculation(
             message=f"{input2} is not found."
         )
         return
+    size = 26
+    received = 0
+    now = time.time()
+    pframe = tk.Frame(master=widget)
+    pbar = ttk.Progressbar(
+        master=pframe,
+        orient="horizontal",
+        length=200,
+        mode="determinate"
+    )
+    pstring = tk.StringVar()
+    plabel = tk.Label(master=pframe, textvariable=pstring)
+    pframe.pack()
+    pbar.pack(side="left")
+    plabel.pack(side="left")
     x = get_values(filename=input1)
+    received += 1
+    progressbar(
+        s=size,
+        r=received,
+        n=now,
+        pframe=pframe,
+        pbar=pbar,
+        plabel=plabel,
+        pstring=pstring
+    )
     y = get_values(filename=input2)
-    x_info = x[-4]
-    y_info = y[-4]
-    orb_factors = {}
-    mp_orb_factors = {}
-    for k, v in x[-3].items():
-        orb_factors[k] = f"{v} & {y[-3][k]}"
-    for k, v in x[-2].items():
-        mp_orb_factors[k] = f"{v} & {y[-2][k]}"
+    received += 1 
+    progressbar(
+        s=size,
+        r=received,
+        n=now,
+        pframe=pframe,
+        pbar=pbar,
+        plabel=plabel,
+        pstring=pstring
+    )
+    
+    x_info = x[-2]
+    y_info = y[-2]
     if calculation_type in ["expected", "binomial limit"]:
         for k in x_info:
-            x_info[k] = f"{x_info[k]} & {y_info[k]}"
+            if k not in ["Orb Factor", "Midpoint Orb Factor"]:
+                x_info[k] = f"{x_info[k]} & {y_info[k]}"
+            else:
+                for key, value in x_info[k].items():
+                    x_info[k][key] = f"{x_info[k][key]} & {y_info[k][key]}"
     else:
         x_info = y_info
     config = ConfigParser()
     config.read("defaults.ini")
     method = config["METHOD"]["selected"]
     for i in range(len(y)):
-        if i in [0, 21, 22, 23]:
+        if i in [0, 21]:
+            received += 1
+            progressbar(
+                s=size,
+                r=received,
+                n=now,
+                pframe=pframe,
+                pbar=pbar,
+                plabel=plabel,
+                pstring=pstring
+            )
             continue
         if i in [1, 2, 3, 4, 5, 6, 7, 9, 17, 18]:
             if i == 9 and calculation_type == "cohen's d":
@@ -1077,16 +1141,26 @@ def select_calculation(
                 x_total=x[0],
                 y_total=y[0]
             )
+            received += 1
+            progressbar(
+                s=size,
+                r=received,
+                n=now,
+                pframe=pframe,
+                pbar=pbar,
+                plabel=plabel,
+                pstring=pstring
+            )
         else:
             if (
-                i in [8, 10, 11, 12, 13, 14, 15, 24]
+                i in [8, 10, 11, 12, 13, 14, 15, 22]
                 and
                 calculation_type == "cohen's d"
             ):
                 cancel = True
             else:
                 cancel = False
-            if i in [13, 14, 15, 24]:
+            if i in [13, 14, 15, 22]:
                 for key in x[i]:
                     for k in x[i][key]:
                         select_dict(
@@ -1109,9 +1183,19 @@ def select_calculation(
                         x_total=x[0],
                         y_total=y[0]
                     )
+            received += 1
+            progressbar(
+                s=size,
+                r=received,
+                n=now,
+                pframe=pframe,
+                pbar=pbar,
+                plabel=plabel,
+                pstring=pstring
+            )
     results = [
         x[i] if len(x[i]) == len(y[i]) else {}
-        for i in range(1, 25)
+        for i in range(1, 23)
     ]
     Spreadsheet(
         filename=output,
@@ -1136,9 +1220,17 @@ def select_calculation(
         basic_modern_rulership=results[17],
         detailed_traditional_rulership=results[18],
         detailed_modern_rulership=results[19],
-        orb_factors=orb_factors,
-        midpoints=results[23],
-        mp_orb_factors=mp_orb_factors
+        midpoints=results[21]
+    )
+    received += 1
+    progressbar(
+        s=size,
+        r=received,
+        n=now,
+        pframe=pframe,
+        pbar=pbar,
+        plabel=plabel,
+        pstring=pstring
     )
     widget.after(
         0, 

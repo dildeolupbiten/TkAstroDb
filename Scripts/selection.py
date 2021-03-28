@@ -196,6 +196,9 @@ class MultipleSelection(Selection):
             ]:
                 if value[-1].get():
                     self.checkbuttons["Aspects"][-1].set(True)
+            if key == "Sum Of Midpoints":
+                if value[-1].get():
+                    self.checkbuttons["Midpoints"][-1].set(True)
 
     def apply(self, title):
         if not self.get:
