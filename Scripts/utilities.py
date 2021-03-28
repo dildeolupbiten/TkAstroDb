@@ -586,7 +586,7 @@ def find_midpoints(midpoints, orb, aspect, planet1, planet2, planet3):
         or
         315 - orb["Semi-Square"] < aspect < 315 + orb["Semi-Square"]
     ):
-        midpoints[planet1][planet2]["Semi-square"][planet3] += 1
+        midpoints[planet1][planet2]["Semi-Square"][planet3] += 1
     elif (
         60 - orb["Sextile"] < aspect < 60 + orb["Sextile"]
         or
