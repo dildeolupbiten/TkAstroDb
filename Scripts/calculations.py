@@ -865,7 +865,7 @@ def get_values(filename):
             pattern_2d.append(
                 get_basic_dict(
                     values=values,
-                    indexes=[0, 12],
+                    indexes=[0, 13 if j == planets else 12],
                     constants=[j, k],
                     sub_index=m
                 )
@@ -927,7 +927,7 @@ def get_values(filename):
         for key in config["ORB FACTORS"]:
             aspects[key] = get_aspect_dict(
                 values=values,
-                indexes=[c, c + 14],
+                indexes=[c, c + 15],
                 constants=[PLANETS]
             )
             c += 16
@@ -937,7 +937,7 @@ def get_values(filename):
     if len(values) != 0:
         sum_of_aspects = get_aspect_dict(
             values=values,
-            indexes=[0, 14],
+            indexes=[0, 15],
             constants=[PLANETS]
         )
     else:

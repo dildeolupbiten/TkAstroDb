@@ -94,8 +94,12 @@ PLANETS = {
         "number": swe.PLUTO,
         "symbol": "\u2647"
     },
-    "North Node": {
+    "True Node": {
         "number": swe.TRUE_NODE,
+        "symbol": "\u260A"
+    },
+    "Mean Node": {
+        "number": swe.MEAN_NODE,
         "symbol": "\u260A"
     },
     "Chiron": {

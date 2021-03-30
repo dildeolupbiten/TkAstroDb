@@ -69,7 +69,7 @@ class Spreadsheet(Workbook):
                     if df is not None and len(df.values) != 0:
                         planets_in_signs = get_basic_dict(
                             values=df.values,
-                            indexes=[0, 12],
+                            indexes=[0, 13],
                             constants=[planets, SIGNS]
                         )
                 if planets_in_signs:
@@ -84,7 +84,7 @@ class Spreadsheet(Workbook):
                     if df is not None and len(df.values) != 0:
                         planets_in_elements = get_basic_dict(
                             values=df.values,
-                            indexes=[0, 12],
+                            indexes=[0, 13],
                             constants=[
                                 planets,
                                 ["Fire", "Earth", "Air", "Water"]
@@ -103,7 +103,7 @@ class Spreadsheet(Workbook):
                     if df is not None and len(df.values) != 0:
                         planets_in_modes = get_basic_dict(
                             values=df.values,
-                            indexes=[0, 12],
+                            indexes=[0, 13],
                             constants=[
                                 planets,
                                 ["Cardinal", "Fixed", "Mutable"]
@@ -175,7 +175,7 @@ class Spreadsheet(Workbook):
                     if df is not None and len(df.values) != 0:
                         planets_in_houses = get_basic_dict(
                             values=df.values,
-                            indexes=[0, 12],
+                            indexes=[0, 13],
                             constants=[planets, HOUSES]
                         )
                 if planets_in_houses:
@@ -259,7 +259,7 @@ class Spreadsheet(Workbook):
                         for key in info["Orb Factor"]:
                             aspects[key] = get_aspect_dict(
                                 values=df.values,
-                                indexes=[c, c + 14],
+                                indexes=[c, c + 15],
                                 constants=[PLANETS]
                             )
                             c += 16
@@ -280,7 +280,7 @@ class Spreadsheet(Workbook):
                     if df is not None and len(df.values) != 0:
                         sum_of_aspects = get_aspect_dict(
                             values=df.values,
-                            indexes=[0, 14],
+                            indexes=[0, 15],
                             constants=[PLANETS]
                         )
                 if sum_of_aspects:
