@@ -4,8 +4,19 @@ from .messagebox import MsgBox
 from .constants import SIGNS, PLANETS, SHEETS, ASPECTS
 from .modules import (
     os, np, ET, json, time, Popen, urlopen,
-    Thread, URLError, PhotoImage, ConfigParser
+    Thread, URLError, PhotoImage, ConfigParser, askopenfilename
 )
+
+
+def read_excel(file):
+    try:
+        return askopenfilename(
+            initialdir="./",
+            title=f"Select {file}",
+            filetypes=[("XLSX Files", "*.xlsx")]
+        )
+    except FileNotFoundError:
+        return ""
 
 
 def get_xml_file_list(path):
@@ -710,3 +721,7 @@ def get_info(df):
                 continue
             info[i[0]] = i[2]
     return info
+
+
+def variance(n, k):
+    return k * (1 - k / n)

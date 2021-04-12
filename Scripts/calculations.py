@@ -7,11 +7,12 @@ from .utilities import (
     convert_coordinates, progressbar, get_basic_dict,
     get_planet_dict, get_aspect_dict, only_planets,
     get_3d_pattern_dict, get_4d_pattern_dict,
-    create_midpoint_dict, get_midpoint_dict, get_info
+    create_midpoint_dict, get_midpoint_dict, get_info, read_excel,
+    variance
 )
 from .modules import (
     os, dt, pd, tk, ttk, time, binom, shutil,
-    Thread, variance, ConfigParser
+    Thread, ConfigParser
 )
 from .constants import (
     HOUSE_SYSTEMS, PLANETS, SIGNS, HOUSES, SHEETS,
@@ -993,13 +994,12 @@ def select_dict(
         d2,
         method,
         calculation_type,
-        cancel,
         x_total,
         y_total
 ):
     for (key, value), (_key, _value) in zip(d1.items(), d2.items()):
-        save1 = {m: n for m, n in value.items()}
-        save2 = {m: n for m, n in _value.items()}
+        # save1 = {m: n for m, n in value.items()}
+        # save2 = {m: n for m, n in _value.items()}
         for (k, v), (_k, _v) in zip(value.items(), _value.items()):
             try:
                 if calculation_type == "expected":
@@ -1013,16 +1013,9 @@ def select_dict(
                 elif calculation_type == "chi-square":
                     d1[key][k] = (v - _v) ** 2 / _v
                 elif calculation_type == "cohen's d":
-                    if cancel:
-                        d1[key][k] = ""
-                    else:
-                        d1[key][k] = (v - _v) / \
-                            (
-                                (
-                                    variance(save1.values()) +
-                                    variance(save2.values())
-                                ) / 2
-                            ) ** 0.5
+                    v1 = variance(n=x_total, k=v)
+                    v2 = variance(n=x_total, k=_v)
+                    d1[key][k] = (v - _v) / ((v1 + v2) / 2) ** 0.5
                 elif calculation_type == "binomial limit":
                     p1 = probability_mass_function(
                         n=x_total, k=v, p=_v / y_total
@@ -1041,25 +1034,32 @@ def select_dict(
 def select_calculation(
         icons,
         calculation_type,
-        input1, 
-        input2, 
+        files,
         output, 
         widget
 ):
-    if not os.path.exists(input1):
-        MsgBox(
-            icons=icons,
-            title="Warning",
-            level="warning",
-            message=f"{input1} is not found."
+    file1 = read_excel(files[0])
+    file2 = read_excel(files[1])
+    if not file1:
+        widget.after(
+            0, 
+            lambda: MsgBox(
+                icons=icons,
+                title="Warning",
+                level="warning",
+                message=f"{files[0]} is not found."
+            )
         )
         return
-    if not os.path.exists(input2):
-        MsgBox(
-            icons=icons,
-            title="Warning",
-            level="warning",
-            message=f"{input2} is not found."
+    if not file2:
+        widget.after(
+            0,
+            lambda: MsgBox(
+                icons=icons,
+                title="Warning",
+                level="warning",
+                message=f"{files[1]} is not found."
+            )
         )
         return
     size = 26
@@ -1077,7 +1077,7 @@ def select_calculation(
     pframe.pack()
     pbar.pack(side="left")
     plabel.pack(side="left")
-    x = get_values(filename=input1)
+    x = get_values(filename=file1)
     received += 1
     progressbar(
         s=size,
@@ -1088,7 +1088,7 @@ def select_calculation(
         plabel=plabel,
         pstring=pstring
     )
-    y = get_values(filename=input2)
+    y = get_values(filename=file2)
     received += 1 
     progressbar(
         s=size,
@@ -1128,16 +1128,11 @@ def select_calculation(
             )
             continue
         if i in [1, 2, 3, 4, 5, 6, 7, 9, 17, 18]:
-            if i == 9 and calculation_type == "cohen's d":
-                cancel = True
-            else:
-                cancel = False
             select_dict(
                 d1=x[i],
                 d2=y[i],
                 method=method,
                 calculation_type=calculation_type,
-                cancel=cancel,
                 x_total=x[0],
                 y_total=y[0]
             )
@@ -1152,14 +1147,6 @@ def select_calculation(
                 pstring=pstring
             )
         else:
-            if (
-                i in [8, 10, 11, 12, 13, 14, 15, 22]
-                and
-                calculation_type == "cohen's d"
-            ):
-                cancel = True
-            else:
-                cancel = False
             if i in [13, 14, 15, 22]:
                 for key in x[i]:
                     for k in x[i][key]:
@@ -1168,7 +1155,6 @@ def select_calculation(
                             d2=y[i][key][k],
                             method=method,
                             calculation_type=calculation_type,
-                            cancel=cancel,
                             x_total=x[0],
                             y_total=y[0]
                         )
@@ -1179,7 +1165,6 @@ def select_calculation(
                         d2=y[i][key],
                         method=method,
                         calculation_type=calculation_type,
-                        cancel=cancel,
                         x_total=x[0],
                         y_total=y[0]
                     )

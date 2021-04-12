@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .modules import Workbook, ConfigParser, pd
+from .modules import Workbook, pd
 from .constants import (
     SIGNS, HOUSES, SHEETS, PLANETS,
-    MODERN_RULERSHIP, TRADITIONAL_RULERSHIP, ASPECTS
+    MODERN_RULERSHIP, TRADITIONAL_RULERSHIP
 )
 from .utilities import (
     only_planets, get_basic_dict, get_planet_dict,
@@ -582,11 +582,12 @@ class Spreadsheet(Workbook):
             
     def write_midpoints(self, sheet, midpoints):
         p1_row = 1
+        row1 = 0
         for planet1 in midpoints:            
             p2_row = 0        
             for planet2 in midpoints[planet1]:
                 aspect_row = 0
-                totals = [0 for i in range(len(midpoints) - 2)]
+                totals = [0 for _ in range(len(midpoints) - 2)]
                 for aspect in midpoints[planet1][planet2]:
                     row1 = p1_row + p2_row + aspect_row
                     sheet.merge_range(

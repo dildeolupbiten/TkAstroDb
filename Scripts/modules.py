@@ -16,10 +16,10 @@ from threading import Thread
 from scipy.stats import binom
 from xlsxwriter import Workbook
 from webbrowser import open_new
-from statistics import variance
 from urllib.error import URLError
 from urllib.request import urlopen
 from tkinter import ttk, PhotoImage
 from datetime import datetime as dt
 from configparser import ConfigParser
 from tkinter.ttk import Progressbar, Treeview
+from tkinter.filedialog import askopenfilename

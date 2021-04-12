@@ -63,8 +63,7 @@ class Menu(tk.Menu):
                 target=lambda: select_calculation(
                     icons=icons,
                     calculation_type="expected",
-                    input1="observed_values.xlsx",
-                    input2="control_group.xlsx",
+                    files=["Case Group", "Control Group"],
                     output="expected_values.xlsx",
                     widget=self.master
                 ),
@@ -77,8 +76,7 @@ class Menu(tk.Menu):
                 target=lambda: select_calculation(
                     icons=icons,
                     calculation_type="chi-square",
-                    input1="observed_values.xlsx",
-                    input2="expected_values.xlsx",
+                    files=["Case Group", "Expected Values"],
                     output="chi-square.xlsx",
                     widget=self.master
                 ),
@@ -91,8 +89,7 @@ class Menu(tk.Menu):
                 target=lambda: select_calculation(
                     icons=icons,
                     calculation_type="effect-size",
-                    input1="observed_values.xlsx",
-                    input2="expected_values.xlsx",
+                    files=["Case Group", "Expected Values"],
                     output="effect-size.xlsx",
                     widget=self.master
                 ),
@@ -105,8 +102,7 @@ class Menu(tk.Menu):
                 target=lambda: select_calculation(
                     icons=icons,
                     calculation_type="cohen's d",
-                    input1="observed_values.xlsx",
-                    input2="expected_values.xlsx",
+                    files=["Case Group", "Expected Values"],
                     output="cohens_d_effect.xlsx",
                     widget=self.master
                 ),
@@ -119,8 +115,7 @@ class Menu(tk.Menu):
                 target=lambda: select_calculation(
                     icons=icons,
                     calculation_type="binomial limit",
-                    input1="observed_values.xlsx",
-                    input2="control_group.xlsx",
+                    files=["Case Group", "Control Group"],
                     output="binomial_limit.xlsx",
                     widget=self.master
                 ),
