@@ -20,6 +20,10 @@ from urllib.error import URLError
 from urllib.request import urlopen
 from tkinter import ttk, PhotoImage
 from datetime import datetime as dt
+from matplotlib import pyplot as plt
 from configparser import ConfigParser
 from tkinter.ttk import Progressbar, Treeview
 from tkinter.filedialog import askopenfilename
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg, NavigationToolbar2Tk
+)

@@ -725,3 +725,15 @@ def get_info(df):
 
 def variance(n, k):
     return k * (1 - k / n)
+
+
+def delete_nonnumeric_chars(event, _type=float):
+    try:
+        if event.widget.get() != "-":
+            if _type == float:
+                float(event.widget.get())
+            elif _type == int:
+                int(event.widget.get())
+    except ValueError:
+        index = event.widget.index("insert")
+        event.widget.delete(index - 1, "end")

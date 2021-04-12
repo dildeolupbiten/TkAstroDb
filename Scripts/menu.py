@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from .plot import Plot
 from .about import About
 from .database import Database
 from .modules import tk, Thread
@@ -22,6 +23,10 @@ class Menu(tk.Menu):
         self.options_menu = tk.Menu(master=self, tearoff=False)
         self.help_menu = tk.Menu(master=self, tearoff=False)
         self.add_cascade(label="Database", menu=self.database_menu)
+        self.add_command(
+            label="Plot",
+            command=lambda: Plot(icons=icons)
+        )
         self.add_cascade(label="Spreadsheet", menu=self.spreadsheet_menu)
         self.add_cascade(label="Calculations", menu=self.calculations_menu)
         self.add_cascade(label="Export", menu=self.export_menu)

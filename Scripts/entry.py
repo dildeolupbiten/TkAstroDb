@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .modules import tk, ttk
+from .utilities import delete_nonnumeric_chars
 
 
 class EntryFrame(tk.Frame):
@@ -21,16 +22,7 @@ class EntryFrame(tk.Frame):
             entry.grid(row=index, column=1, sticky="w")
             entry.bind(
                 sequence="<KeyRelease>",
-                func=self.delete_nonnumeric_chars
+                func=delete_nonnumeric_chars
             )
             widgets[text] = entry
         return widgets
-
-    @staticmethod
-    def delete_nonnumeric_chars(event):
-        try:
-            if event.widget.get() != "-":
-                float(event.widget.get())
-        except ValueError:
-            index = event.widget.index("insert")
-            event.widget.delete(index - 1, "end")

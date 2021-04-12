@@ -15,6 +15,7 @@ installed_packages = [
 
 packages = [
     "numpy==1.19.2",
+    "matplotlib",
     "scipy==1.4.1",
     "pandas==1.1.2",
     "XlsxWriter",
