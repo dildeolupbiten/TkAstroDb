@@ -14,6 +14,7 @@ import xml.etree.ElementTree as ET
 from subprocess import Popen
 from threading import Thread
 from scipy.stats import binom
+from statistics import variance
 from xlsxwriter import Workbook
 from webbrowser import open_new
 from urllib.error import URLError

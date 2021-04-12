@@ -7,12 +7,11 @@ from .utilities import (
     convert_coordinates, progressbar, get_basic_dict,
     get_planet_dict, get_aspect_dict, only_planets,
     get_3d_pattern_dict, get_4d_pattern_dict,
-    create_midpoint_dict, get_midpoint_dict, get_info, read_excel,
-    variance
+    create_midpoint_dict, get_midpoint_dict, get_info, read_excel
 )
 from .modules import (
     os, dt, pd, tk, ttk, time, binom, shutil,
-    Thread, ConfigParser
+    Thread, ConfigParser, variance
 )
 from .constants import (
     HOUSE_SYSTEMS, PLANETS, SIGNS, HOUSES, SHEETS,
@@ -994,12 +993,13 @@ def select_dict(
         d2,
         method,
         calculation_type,
+        cancel,
         x_total,
         y_total
 ):
     for (key, value), (_key, _value) in zip(d1.items(), d2.items()):
-        # save1 = {m: n for m, n in value.items()}
-        # save2 = {m: n for m, n in _value.items()}
+        save1 = {m: n for m, n in value.items()}
+        save2 = {m: n for m, n in _value.items()}
         for (k, v), (_k, _v) in zip(value.items(), _value.items()):
             try:
                 if calculation_type == "expected":
@@ -1013,9 +1013,16 @@ def select_dict(
                 elif calculation_type == "chi-square":
                     d1[key][k] = (v - _v) ** 2 / _v
                 elif calculation_type == "cohen's d":
-                    v1 = variance(n=x_total, k=v)
-                    v2 = variance(n=x_total, k=_v)
-                    d1[key][k] = (v - _v) / ((v1 + v2) / 2) ** 0.5
+                    if cancel:
+                        d1[key][k] = ""
+                    else:
+                        d1[key][k] = (v - _v) / \
+                            (
+                                (
+                                    variance(save1.values()) +
+                                    variance(save2.values())
+                                ) / 2
+                            ) ** 0.5
                 elif calculation_type == "binomial limit":
                     p1 = probability_mass_function(
                         n=x_total, k=v, p=_v / y_total
@@ -1128,11 +1135,16 @@ def select_calculation(
             )
             continue
         if i in [1, 2, 3, 4, 5, 6, 7, 9, 17, 18]:
+            if i == 9 and calculation_type == "cohen's d":
+                cancel = True
+            else:
+                cancel = False
             select_dict(
                 d1=x[i],
                 d2=y[i],
                 method=method,
                 calculation_type=calculation_type,
+                cancel=cancel,
                 x_total=x[0],
                 y_total=y[0]
             )
@@ -1147,6 +1159,14 @@ def select_calculation(
                 pstring=pstring
             )
         else:
+            if (
+                i in [8, 10, 11, 12, 13, 14, 15, 22]
+                and
+                calculation_type == "cohen's d"
+            ):
+                cancel = True
+            else:
+                cancel = False
             if i in [13, 14, 15, 22]:
                 for key in x[i]:
                     for k in x[i][key]:
@@ -1155,6 +1175,7 @@ def select_calculation(
                             d2=y[i][key][k],
                             method=method,
                             calculation_type=calculation_type,
+                            cancel=cancel,
                             x_total=x[0],
                             y_total=y[0]
                         )
@@ -1165,6 +1186,7 @@ def select_calculation(
                         d2=y[i][key],
                         method=method,
                         calculation_type=calculation_type,
+                        cancel=cancel,
                         x_total=x[0],
                         y_total=y[0]
                     )

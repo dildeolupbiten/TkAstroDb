@@ -723,10 +723,6 @@ def get_info(df):
     return info
 
 
-def variance(n, k):
-    return k * (1 - k / n)
-
-
 def delete_nonnumeric_chars(event, _type=float):
     try:
         if event.widget.get() != "-":
