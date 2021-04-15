@@ -23,9 +23,9 @@ packages = [
 ]
 
 
-def call(p, n):
+def call(p, n, f):
     os.system(
-        f"{sys.executable} -m pip install {os.path.join(p, files[n])}"
+        f"{sys.executable} -m pip install {os.path.join(p, f[n])}"
     )
     
 
@@ -37,24 +37,24 @@ elif os.name == "nt":
         files = [i for i in os.listdir(path) if "pyswisseph" in i]
         if sys.version_info.minor == 6:
             if platform.architecture()[0] == "32bit":
-                call(p=path, n=0)
+                call(p=path, n=0, f=files)
             elif platform.architecture()[0] == "64bit":
-                call(p=path, n=1)
+                call(p=path, n=1, f=files)
         elif sys.version_info.minor == 7:
             if platform.architecture()[0] == "32bit":
-                call(p=path, n=2)
+                call(p=path, n=2, f=files)
             elif platform.architecture()[0] == "64bit":
-                call(p=path, n=3)
+                call(p=path, n=3, f=files)
         elif sys.version_info.minor == 8:
             if platform.architecture()[0] == "32bit":
-                call(p=path, n=4)
+                call(p=path, n=4, f=files)
             elif platform.architecture()[0] == "64bit":
-                call(p=path, n=5)
+                call(p=path, n=5, f=files)
         elif sys.version_info.minor == 9:
             if platform.architecture()[0] == "32bit":
-                call(p=path, n=6)
+                call(p=path, n=6, f=files)
             elif platform.architecture()[0] == "64bit":
-                call(p=path, n=7)
+                call(p=path, n=7, f=files)
 
 for package in packages:
     if package.startswith("pyswisseph"):
