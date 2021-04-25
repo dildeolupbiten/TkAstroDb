@@ -200,7 +200,7 @@ class Plot(tk.Toplevel):
             n_case=n_case
         )
         ax.set_xlabel("Number Of People")
-        ax.set_ylabel("Probability")
+        ax.set_ylabel("Probability Mass Function")
         ax.set_title(title)
         self.figure.legend(*ax.get_legend_handles_labels())
         self.canvas.draw()
