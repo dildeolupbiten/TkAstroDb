@@ -3,7 +3,7 @@
 from .messagebox import MsgBox
 from .utilities import delete_nonnumeric_chars
 from .modules import (
-    np, tk, ttk, plt, binom, FigureCanvasTkAgg, NavigationToolbar2Tk
+    np, tk, ttk, plt, norm, binom, FigureCanvasTkAgg, NavigationToolbar2Tk
 )
 
 
@@ -78,24 +78,46 @@ class Plot(tk.Toplevel):
         k,
         title,
         color,
-        confidence_interval=False
+        confidence_interval=False,
+        n_case=0,
+        which="observed"
     ):
-        values = {m: binom.pmf(n=n, p=k / n, k=m) for m in range(n + 1)}
-        x = np.array(list(values.keys()))
-        y = np.array(list(values.values()))
         p = k / n
-        ax.plot(x, y, label=title, color=color)
-        sd = (k * (1 - p)) ** 0.5
-        mean = [(k, k), (0, values[int(k)])]
+        k_control = k
+        if n_case and k >= 20:
+            status = "expected"
+            sd = ((k * (1 - p)) ** 0.5) * n_case / n
+            k = k * n_case / n
+            values = np.linspace(k - 3 * sd, k + 3 * sd, 100)
+            x = values
+            y = norm.pdf(values, k, sd)
+            values = {i: j for i, j in zip(x, y)}
+            diffs = [abs(k - i) for i in x]
+            min_diff = diffs.index(min(diffs))
+            mean = [(k, k), (0, values[x[min_diff]])]
+        else:
+            status = "observed"
+            n_case = n
+            sd = (k * (1 - p)) ** 0.5   
+            values = {m: binom.pmf(n=n, p=k/n, k=m) for m in range(n + 1)}
+            x = np.array(list(values.keys()))
+            y = np.array(list(values.values()))
+            mean = [(k, k), (0, values[int(k)])]
+        if which == "observed":
+            label = f"n = {n_case}\nX = {k}"
+        else:
+            label = f"n(expected) = {n_case}\nX(expected) = {k}\n" \
+                    f"n(control) = {n}\nX(control) = {k_control}"
         if int(k) == k:
             k = int(k)
         else:
             k = round(k, 2)
+        ax.plot(x, y, label=title, color=color)
         ax.plot(
-            mean[0],
-            mean[1],
-            color=color,
-            label=f"n = {n}\nX = {k}",
+            mean[0], 
+            mean[1], 
+            color=color, 
+            label=label, 
             linestyle="--"
         )
         if confidence_interval:
@@ -169,18 +191,21 @@ class Plot(tk.Toplevel):
             k=x_case,
             title="Observed",
             color="red",
-            confidence_interval=True
+            confidence_interval=True,
+            which="observed"
         )
         self.draw_binomial_distribution(
             ax=ax,
-            n=n_case,
-            k=n_case/n_control*x_control,
+            n=n_control,
+            k=x_control,
             title="Expected",
             color="blue",
-            confidence_interval=True
+            confidence_interval=True,
+            n_case=n_case,
+            which="expected"
         )
         ax.set_xlabel("Number Of People")
-        ax.set_ylabel("Probability Mass Function")
+        ax.set_ylabel("Probability")
         ax.set_title(title)
         self.figure.legend(*ax.get_legend_handles_labels())
         self.canvas.draw()
