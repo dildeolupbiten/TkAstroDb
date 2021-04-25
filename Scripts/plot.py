@@ -79,13 +79,11 @@ class Plot(tk.Toplevel):
         title,
         color,
         confidence_interval=False,
-        n_case=0,
-        which="observed"
+        n_case=0
     ):
         p = k / n
         k_control = k
         if n_case and k >= 20:
-            status = "expected"
             sd = ((k * (1 - p)) ** 0.5) * n_case / n
             k = k * n_case / n
             values = np.linspace(k - 3 * sd, k + 3 * sd, 100)
@@ -96,14 +94,13 @@ class Plot(tk.Toplevel):
             min_diff = diffs.index(min(diffs))
             mean = [(k, k), (0, values[x[min_diff]])]
         else:
-            status = "observed"
             n_case = n
             sd = (k * (1 - p)) ** 0.5   
             values = {m: binom.pmf(n=n, p=k/n, k=m) for m in range(n + 1)}
             x = np.array(list(values.keys()))
             y = np.array(list(values.values()))
             mean = [(k, k), (0, values[int(k)])]
-        if which == "observed":
+        if title == "Observed":
             label = f"n = {n_case}\nX = {k}"
         else:
             label = f"n(expected) = {n_case}\nX(expected) = {k}\n" \
@@ -191,8 +188,7 @@ class Plot(tk.Toplevel):
             k=x_case,
             title="Observed",
             color="red",
-            confidence_interval=True,
-            which="observed"
+            confidence_interval=True
         )
         self.draw_binomial_distribution(
             ax=ax,
@@ -201,8 +197,7 @@ class Plot(tk.Toplevel):
             title="Expected",
             color="blue",
             confidence_interval=True,
-            n_case=n_case,
-            which="expected"
+            n_case=n_case
         )
         ax.set_xlabel("Number Of People")
         ax.set_ylabel("Probability")
