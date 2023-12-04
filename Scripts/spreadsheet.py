@@ -510,12 +510,6 @@ class Spreadsheet(Workbook):
                     self.format(bold=True, align="center")
                 )
                 r += 1
-            for i in range(12):
-                sheet.merge_range(
-                    f"A{row + 13}:B{row + 13}",
-                    "Total",
-                    self.format(bold=True, align="center")
-                )
             for index, i in enumerate(totals):
                 sheet.write(
                     f"{self.cols[2 + index]}{row + 13}",
