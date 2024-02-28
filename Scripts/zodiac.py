@@ -11,8 +11,6 @@ from .utilities import (
     find_midpoint
 )
 
-swe.set_ephe_path(os.path.join(os.getcwd(), "Eph"))
-
 
 class Zodiac:
     def __init__(
@@ -29,6 +27,7 @@ class Zodiac:
         self.lon = lon
         self.hsys = hsys
         self.zodiac = zodiac
+        swe.set_ephe_path(os.path.join(os.getcwd(), "Eph"))
         if self.zodiac == "Sidereal":
             swe.set_sid_mode(ayanamsha)
 
