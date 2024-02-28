@@ -10,7 +10,7 @@ from .utilities import (
     create_midpoint_dict, get_midpoint_dict, get_info, read_excel
 )
 from .modules import (
-    os, dt, pd, tk, ttk, time, binom, shutil,
+    os, swe, dt, pd, tk, ttk, time, binom, shutil,
     Thread, ConfigParser, variance
 )
 from .constants import (
@@ -624,6 +624,7 @@ def start_calculation(
     log.flush()
     menu.entryconfigure(0, command=lambda: send_warning_message(icons=icons))
     total = 0
+    swe.set_ephe_path(os.path.join(os.getcwd(), "Eph"))
     for i in displayed_results:
         jd = float(i[6])
         lat = convert_coordinates(i[7])

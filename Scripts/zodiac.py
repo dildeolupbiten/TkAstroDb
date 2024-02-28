@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .modules import os, swe
+from .modules import swe
 from .constants import PLANETS, TRADITIONAL_RULERSHIP, MODERN_RULERSHIP
 from .utilities import (
     convert_degree,
@@ -27,7 +27,6 @@ class Zodiac:
         self.lon = lon
         self.hsys = hsys
         self.zodiac = zodiac
-        swe.set_ephe_path(os.path.join(os.getcwd(), "Eph"))
         if self.zodiac == "Sidereal":
             swe.set_sid_mode(ayanamsha)
 
