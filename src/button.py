@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .utils import get_selections, filter_database, get_chart_patterns
-from .libs import Qt, QVBoxLayout, QPushButton, QProgressBar, Thread, QFrame, QLabel, QObject, pyqtSignal, QThread
+from .libs import Qt, QVBoxLayout, QPushButton, QProgressBar, QFrame, QLabel, QObject, pyqtSignal, QThread
 
 
 class Worker(QObject):

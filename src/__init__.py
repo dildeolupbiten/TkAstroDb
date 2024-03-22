@@ -16,7 +16,7 @@ from .comparison import Comparison
 from .table import Table
 from .libs import (
     os, sys, path, getcwd, Qt, QApplication, QMainWindow, QLabel, QPushButton, QFrame, QHBoxLayout, QVBoxLayout,
-    QMessageBox, QAction, QFileDialog, ElementTree, Thread, Queue, QObject, pyqtSignal, QThread, QTableWidget
+    QMessageBox, QAction, QFileDialog, ElementTree, QObject, pyqtSignal, QThread, QTableWidget
 )
 
 
