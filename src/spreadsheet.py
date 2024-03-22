@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from .libs import np, pd, BytesIO, Workbook
+from .libs import np, pd, Workbook
 from .consts import SHEETS, PLANETS, ORB_FACTORS
 
 
 class XLFile:
-    def __init__(self, output: BytesIO, other: 'XLFile' = None, func=None):
+    def __init__(self, output, other: 'XLFile' = None, func=None):
         super().__init__()
         self.__xl = pd.ExcelFile(output, engine="openpyxl")
         self.other = other

@@ -4,8 +4,8 @@ from .consts import *
 from .zodiac import Zodiac
 from .spreadsheet import Spreadsheet, XLFile
 from .libs import (
-    e, os, dt, pi, path, load, getcwd, urlopen, Popen, URLError,
-    binom, quad, ElementTree, perf_counter, time as now, QFrame, QVBoxLayout, QPushButton, QMessageBox
+    e, os, dt, pi, path, getcwd, binom, quad, ElementTree, perf_counter, 
+    time as now, QFrame, QVBoxLayout, QPushButton, QMessageBox
 )
 
 

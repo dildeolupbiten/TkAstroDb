@@ -6,18 +6,13 @@ import numpy as np
 import pandas as pd
 import swisseph as swe
 
-from json import load
-from io import BytesIO
 from queue import Queue
 from numpy import e, pi
 from os import path, getcwd
-from subprocess import Popen
 from threading import Thread
 from webbrowser import open_new
 from scipy.integrate import quad
-from urllib.error import URLError
 from xml.etree import ElementTree
-from urllib.request import urlopen
 from time import time, perf_counter
 from scipy.stats import binom, norm
 from datetime import datetime as dt

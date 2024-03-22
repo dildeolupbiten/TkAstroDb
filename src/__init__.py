@@ -6,7 +6,7 @@ from .about import About
 from .consts import *
 from .select import Select
 from .button import Button
-from .utils import from_xml, check_update
+from .utils import from_xml
 from .spinbox import Spinbox
 from .carousel import Carousel
 from .combobox import Combobox
@@ -58,11 +58,6 @@ class App(QMainWindow):
             menu=self.help_menu,
             label="About",
             func=lambda: About(version=__version__).exec_()
-        )
-        self.add_action(
-            menu=self.help_menu,
-            label="Update",
-            func=lambda: check_update(self.msgbox)
         )
         self.main_collapse = MainCollapse(
             labels=["Analysis", "Calculations", "Comparison"],
