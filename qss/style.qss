@@ -1,0 +1,150 @@
+QPushButton {
+    background-color: #343a40;
+    border: none;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font: 15px Monospace;
+}
+
+QPushButton:hover {
+    background-color: #212529;
+    border: 1px solid #343a40;
+}
+
+QMainWindow {
+    background-color: #212529;
+}
+
+QListWidget {
+    background-color: #343a40;
+    font: 15px Monospace;
+}
+
+QListWidget::item {
+    background-color: #343a40;
+    color: white;
+    font: 15px Monospace;
+}
+
+QListWidget::item:selected {
+    background-color: #212529;
+    color: white;
+}
+
+#top {
+    background-color: #212529;
+}
+
+#bottom {
+    background-color: #212529;
+}
+
+#Analysis {
+    background-color: #212529;
+}
+
+#Calculations {
+    background-color: #212529;
+}
+
+#Comparison {
+    background-color: #212529;
+}
+
+QLabel {
+    color: white;
+    font: 15px Monospace;
+}
+
+QComboBox {
+    color: white;
+    selection-color: white;
+}
+
+QComboBox QAbstractItemView {
+    color: white;
+    selection-color: white;
+}
+
+QScrollArea {
+    border: none;
+}
+
+QProgressBar {
+    background: #343a40;
+    color: white;
+}
+
+QMenuBar {
+    background: #212529;
+    color: white;
+    font: 15px Monospace;
+    padding-left: 0px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #343a40;
+}
+
+QMenuBar::item {
+    background-color: #212529;
+    width: 120px;
+    text-align: center;
+    width: 100px;
+}
+
+QMenu {
+    background: #212529;
+    color: white;
+    font: 15px Monospace;
+    border: 1 solid #212529;
+    width: 100px;
+    border-radius: 5px;
+}
+
+QMenu::item:selected {
+    background-color: #343a40;
+    border: none;
+}
+
+QMessageBox {
+    background-color: #212529;
+    color: white;
+}
+
+QDialog {
+    background-color: #212529;
+    color: white;
+}
+
+QCheckBox::indicator {
+    background-color: #212529;
+    color: white;
+}
+
+QCheckBox {
+    background-color: #212529;
+    color: white;
+    padding-left: 20px;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #343a40;
+    color: white;
+}
+
+QCheckBox::indicator:unchecked {
+    border: 1px solid #343a40;
+}
+
+QTableWidget::item:selected {
+    background-color: #212529;
+}
+
+QTableWidget::item:!selected {
+    background-color: #343a40;
+}
+
+QTableWidget QTableCornerButton::section {
+    background-color: #212529;
+}
