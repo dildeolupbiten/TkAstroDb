@@ -39,13 +39,13 @@ pip3 install -r requirements.txt
 Run the program by writing the below to **cmd** for Windows or to **bash** for Unix.
 
 ```commandline
-python3 run.py
+python3 app.py
 ```
 
 or
 
 ```commandline
-python run.py
+python app.py
 ```
 
 ## News
