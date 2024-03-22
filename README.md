@@ -33,10 +33,7 @@ or
 ```commandline
 pip3 install -r requirements.txt
 ```
-
 ## Usage
-
-Run the program by writing the below to **cmd** for Windows or to **bash** for Unix.
 
 ```commandline
 python3 app.py
