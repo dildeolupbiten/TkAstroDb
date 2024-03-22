@@ -36,7 +36,7 @@ python3 app.py
 - Changed the graphical user interface from [TkInter](https://docs.python.org/3/library/tk.html) to [PyQt5](https://doc.qt.io/qtforpython-5/).
 - Added collapsible frames that can be activated/deactivated by buttons for the main features of the program which are `Analysis`, `Calculations` and `Comparison`.
 - Removed selections and calculations for `Grand Cross`, `Kite`, `Mystic Rectangle` aspect patterns.
-- Added selections to calculate `z-index` and `significance values` based on significance level.
+- Added selections to calculate `z-score` and `significance values` based on significance level.
 - Added a responsive user input for graphical comparison.
 - Added an intuitive carousel to make selections more easily and analyze the astrological charts quickly.
 - Added a table view to discover and filter the database using different columns.
