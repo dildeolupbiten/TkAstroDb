@@ -185,6 +185,7 @@ class App(QMainWindow):
         self.select_categories.button.clicked.connect(lambda e: self.open_table())
         self.select_categories.box.addWidget(self.select_categories.selected_records, alignment=Qt.AlignCenter)
         self.select_categories.box.addWidget(self.select_categories.button, alignment=Qt.AlignCenter)
+        self.setFixedSize(920, 940)
         if os.name == "nt":
             self.setStyleSheet(
                 """
