@@ -2,6 +2,10 @@
 
 **TkAstroDb** is a Python program that uses [Astro-Databank](https://www.astro.com/astro-databank/Main_Page) to conduct statistical studies in astrology. Because of the license conditions, [Astro-Databank](https://www.astro.com/astro-databank/Main_Page) can not be shared with third party users. Therefore those who are interested in using this program with [Astro-Databank](https://www.astro.com/astro-databank/Main_Page), should contact with the webmaster of [Astrodienst](http://www.astro.com) to get a license.
 
+## News
+
+[AstroDb](https://github.com/dildeolupbiten/AstroDb) is a C/C++ program whose graphical interface is based on static Qt libraries. It is designed to perform similar tasks of what TkAstroDb does, with higher performance.
+
 ## Availability
 
 - Windows, Linux and macOS
