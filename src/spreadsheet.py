@@ -89,7 +89,7 @@ class XLFile:
 
     @property
     def sum_of_aspects(self):
-        return self.__aspects
+        return self.__sum_of_aspects
 
     @property
     def yod(self):
